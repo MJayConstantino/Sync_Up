@@ -2,29 +2,37 @@ import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-const Project = ({ projectName, groupImage, deadline, collaborators }) => {
+const Project = ({ projectName, deadline, collaborators, progress }) => {
+  // Calculate progress status color based on completion percentage
+  let progressColor;
+  if (progress >= 100) {
+    progressColor = "#00FF00"; // Green for completed
+  } else if (progress >= 50) {
+    progressColor = "#FFA500"; // Orange for 50% or above done
+  } else {
+    progressColor = "#FF0000"; // Red for less than 50% or overdue
+  }
+
   return (
     <View style={styles.item}>
       <View style={styles.topContainer}>
-        <View style={styles.timeContainer}>
-          <MaterialCommunityIcons name="clock-outline" size={15} color="#000" />
-          <Text style={styles.deadlineText}>Deadline: {deadline}</Text>
+        <View style={styles.deadlineContainer}>
+          <MaterialCommunityIcons name="clock-outline" size={15} color="#FFFFFF" />
+          <View style={styles.deadlineTextContainer}>
+            <Text style={styles.deadlineText}>{deadline}</Text>
+          </View>
+        </View>
+        <View style={[styles.statusIndicator, { backgroundColor: progressColor }]}>
+          <Text style={styles.statusText}>{progress >= 100 ? "Completed" : progress + "%"}</Text>
         </View>
       </View>
       <View style={styles.contentContainer}>
-        {/* <View style={styles.groupImageContainer}>
-          <Image source={{ uri: groupImage }} style={styles.groupImage} />
-        </View> */}
         <View style={styles.itemLeft}>
           <Text style={styles.textContainer}>{projectName}</Text>
         </View>
       </View>
       <View style={styles.collaboratorContainer}>
-        {/* {collaborators.map((collaborator, index) => (
-          <View key={index} style={styles.avatarContainer}>
-            <Image source={{ uri: collaborator }} style={styles.avatar} />
-          </View>
-        ))} */}
+        {/* Display collaborators if needed */}
       </View>
     </View>
   );
@@ -45,49 +53,46 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 10,
   },
-  timeContainer: {
+  deadlineContainer: {
     flexDirection: "row",
     alignItems: "center",
+    backgroundColor: "#00adf5", // Blue oval
+    borderRadius: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    marginRight: 10,
+  },
+  deadlineTextContainer: {
+    marginLeft: 5,
   },
   deadlineText: {
-    fontSize: 12,
-    color: "#666",
-    marginLeft: 5,
+    fontSize: 16, // Increased font size
+    color: "#FFFFFF",
   },
   contentContainer: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 10,
   },
-  groupImageContainer: {
-    marginRight: 10,
-  },
-  groupImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-  },
   itemLeft: {
     flex: 1,
   },
   textContainer: {
-    fontSize: 16,
+    fontSize: 25,
   },
   collaboratorContainer: {
     flexDirection: "row",
     alignItems: "center",
   },
-  avatarContainer: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    overflow: "hidden",
-    marginRight: 5,
+  statusIndicator: {
+    backgroundColor: "#00FF00", // Default color is green
+    borderRadius: 20,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
   },
-  avatar: {
-    flex: 1,
-    width: null,
-    height: null,
+  statusText: {
+    color: "#FFFFFF",
+    fontSize: 12,
   },
 });
 

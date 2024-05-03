@@ -10,9 +10,9 @@ const AddScheduleModal = ({
   onSave,
 }) => {
   const [scheduleName, setScheduleName] = useState('');
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [selectedStartTime, setSelectedStartTime] = useState(new Date());
-  const [selectedEndTime, setSelectedEndTime] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedStartTime, setSelectedStartTime] = useState("");
+  const [selectedEndTime, setSelectedEndTime] = useState("");
   const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
   const [isStartTimePickerVisible, setIsStartTimePickerVisible] = useState(false);
   const [isEndTimePickerVisible, setIsEndTimePickerVisible] = useState(false);

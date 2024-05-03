@@ -12,7 +12,7 @@ const EditClassScheduleScreen = ({ navigation, route }) => {
   const [stubCode, setStubCode] = useState('');
   const [instructor, setInstructor] = useState('');
   const [room, setRoom] = useState('');
-  const [subjectName, setSubjectName] = useState('');
+  const [subject, setSubject] = useState('');
   const [timeStart, setTimeStart] = useState('');
   const [timeEnd, setTimeEnd] = useState('');
   const [day, setDay] = useState('');
@@ -29,8 +29,8 @@ const EditClassScheduleScreen = ({ navigation, route }) => {
         console.log("Class Schedule data:", classScheduleData); // Log the schedule data
         if (classScheduleData) {
           setStubCode(classScheduleData.stubCode);
-          setSubjectName(classScheduleData.scheduleName);
-          setDay(classScheduleData.date);
+          setSubject(classScheduleData.subject);
+          setDay(classScheduleData.day);
           setTimeStart(classScheduleData.time.timeStart);
           setTimeEnd(classScheduleData.time.timeEnd);
           setInstructor(classScheduleData.instructor);
@@ -84,16 +84,18 @@ const EditClassScheduleScreen = ({ navigation, route }) => {
   
 
   const handleSaveClassSchedule = async () => {
-    if (!subjectName) {
+    if (!subject) {
       alert("Please enter a subject name.");
       return;
     }
 
     const editedClassSchedule = {
       stubCode,
-      subjectName,
-      timeStart,
-      timeEnd,
+      subject, // Use subjectName instead of subject
+      time: { // Create a nested object for time with timeStart and timeEnd
+        timeStart,
+        timeEnd,
+      },
       day,
       instructor,
       room,
@@ -129,56 +131,81 @@ const EditClassScheduleScreen = ({ navigation, route }) => {
         </TouchableOpacity>
       </View>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Enter subject name"
-        value={subjectName}
-        onChangeText={setSubjectName}
-      />
+      {/* Subject Section */}
+      <View style={styles.sectionContainer}>
+        <Text style={styles.sectionLabel}>Subject</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter subject name"
+          value={subject}
+          onChangeText={setSubject}
+        />
+      </View>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Enter stub code"
-        value={stubCode}
-        onChangeText={setStubCode}
-      />
+      {/* Stub Code Section */}
+      <View style={styles.sectionContainer}>
+        <Text style={styles.sectionLabel}>Stub Code</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter stub code"
+          value={stubCode}
+          onChangeText={setStubCode}
+        />
+      </View>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Enter instructor"
-        value={instructor}
-        onChangeText={setInstructor}
-      />
+      {/* Instructor Section */}
+      <View style={styles.sectionContainer}>
+        <Text style={styles.sectionLabel}>Instructor</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter instructor"
+          value={instructor}
+          onChangeText={setInstructor}
+        />
+      </View>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Enter room"
-        value={room}
-        onChangeText={setRoom}
-      />
+      {/* Room Section */}
+      <View style={styles.sectionContainer}>
+        <Text style={styles.sectionLabel}>Room</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter room"
+          value={room}
+          onChangeText={setRoom}
+        />
+      </View>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Enter day"
-        value={day}
-        onChangeText={setDay}
-      />
+      {/* Day Section */}
+      <View style={styles.sectionContainer}>
+        <Text style={styles.sectionLabel}>Day</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter day"
+          value={day}
+          onChangeText={setDay}
+        />
+      </View>
 
-      <TouchableOpacity style={styles.timeButton} onPress={openTimePicker}>
-        <Icon name="clock" size={20} color="#ccc" />
-        <Text style={styles.timeButtonText}>
-          {timeStart ? timeStart : 'Set Start Time'}
-        </Text>
-      </TouchableOpacity>
+      {/* Section title for Class Duration */}
+      <Text style={styles.sectionTitle}>Class Duration</Text>
+      {/* Start Time and End Time in the same row */}
+      <View style={styles.timeContainer}>
+        <TouchableOpacity style={styles.timeButton} onPress={openTimePicker}>
+          <Icon name="clock" size={20} color="#ccc" />
+          <Text style={styles.timeButtonText}>
+            {timeStart ? timeStart : 'Set Start Time'}
+          </Text>
+        </TouchableOpacity>
+        <Text style={styles.dashText}>-</Text>
+        <TouchableOpacity style={styles.timeButton} onPress={openEndTimePicker}>
+          <Icon name="clock" size={20} color="#ccc" />
+          <Text style={styles.timeButtonText}>
+            {timeEnd ? timeEnd : 'Set End Time'}
+          </Text>
+        </TouchableOpacity>
+      </View>
 
-      {/* New button for selecting end time */}
-      <TouchableOpacity style={styles.timeButton} onPress={openEndTimePicker}>
-        <Icon name="clock" size={20} color="#ccc" />
-        <Text style={styles.timeButtonText}>
-          {timeEnd ? timeEnd : 'Set End Time'}
-        </Text>
-      </TouchableOpacity>
-
+      {/* DateTimePicker component */}
       {isTimePickerVisible && (
         <DateTimePicker
           value={selectedTime ? new Date(selectedTime) : new Date()}
@@ -210,21 +237,30 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
   },
+  sectionContainer: {
+    marginBottom: 20,
+  },
+  sectionLabel: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 5,
+  },
   input: {
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 5,
     padding: 10,
+  },
+  timeContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: 10,
   },
-  inputDescription: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 10,
-    flex: 1, // Fill remaining space
-    textAlignVertical: "top", // Align text to the top
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 5,
   },
   timeButton: {
     flexDirection: "row",
@@ -233,11 +269,16 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     borderRadius: 5,
     padding: 10,
-    marginBottom: 10,
+    marginRight: 5,
   },
   timeButtonText: {
     fontSize: 16,
     marginLeft: 5,
+  },
+  dashText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginHorizontal: 5,
   },
   datePicker: {
     width: "100%",

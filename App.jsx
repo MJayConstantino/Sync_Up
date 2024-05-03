@@ -21,6 +21,7 @@ import EditScheduleScreen from "./src/screens/EditScheduleScreen";
 import RFScannerScreen from "./src/screens/RFScannerScreen";
 import AppRoot from './src/screens/SplashScreen';
 import EditTaskScreen from "./src/screens/EditTasksScreen";
+import EditProjectTaskScreen from "./src/screens/EditProjectTaskScreen";
 import EditClassScheduleScreen from "./src/screens/EditClassScheduleScreen";
 import ChatScreen from "./src/screens/ChatScreen";
 
@@ -177,6 +178,7 @@ export default function App() {
       >
         <Stack.Screen name="ProjectsScreen" component={ProjectsScreen} />
         <Stack.Screen name="ProjectTasksScreen" component={ProjectTasksScreen} />
+        <Stack.Screen name="EditProjectTaskScreen" component={EditProjectTaskScreen} />
       </Stack.Navigator>
     )
   }

@@ -1,29 +1,44 @@
 import React from "react";
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import DeleteBtn from "../Tasks/DeleteBtn"; // Assuming DeleteBtn component is defined elsewhere
 import CheckBox from "../Tasks/CheckBox";
 
 const ProjectTask = ({ assignedTo, taskName, description, time, date, deleteTask, toggleTaskStatus, taskId, status }) => {
+  // Function to determine the color of the deadline date based on completion status
+  const getDeadlineColor = () => {
+    if (status === "completed") {
+      return "#00FF00"; // Green if completed before deadline
+    } else if (new Date(date) >= new Date()) {
+      return "#00adf5"; // Blue if not completed but not yet the deadline
+    } else if (status === "pending") {
+      return "#FF0000"; // Red if not completed and past the deadline
+    }
+  };
+
   return (
     <View style={styles.item}>
-      <View style={styles.topContainer}>
-        <View style={styles.avatarContainer}>
-          <Image source={{ uri: assignedTo.avatar }} style={styles.avatar} />
+      {/* Display the time and deadline */}
+      <View style={styles.deadlineContainer}>
+        <View style={[styles.oval, { backgroundColor: getDeadlineColor() }]}>
+          <MaterialCommunityIcons name="calendar" size={15} color="#FFFFFF" />
         </View>
-        <Text style={styles.deadlineText}>
-          <MaterialCommunityIcons name="clock-outline" size={15} color="#000" />
-          {time} {date}
-        </Text>
+        <Text style={styles.deadlineText}>{date}</Text>
+        <View style={styles.timeOval}>
+          <Text style={styles.time}>{time}</Text>
+        </View>
       </View>
+
       <View style={styles.contentContainer}>
         <View style={styles.itemLeft}>
           <CheckBox taskId={taskId} status={status} toggleTaskStatus={toggleTaskStatus} style={styles.checkBoxMargin} />
-          <Text style={styles.textContainer}>{taskName}</Text>
+          {/* Display the task name */}
+          <Text style={styles.taskName}>{taskName}</Text>
         </View>
         <DeleteBtn deleteTask={deleteTask} />
       </View>
       <View style={styles.bottomRow}>
+        {/* Display the description */}
         <Text style={styles.descriptionText}>{description}</Text>
       </View>
     </View>
@@ -42,25 +57,34 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 0.5,
   },
-  topContainer: {
+  deadlineContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#00adf5", // Light blue background
-    paddingHorizontal: 10, // Add padding for better spacing
-    paddingVertical: 5, // Add padding for better spacing
-    borderTopLeftRadius: 10, // Match corner radius of the main item
-    borderTopRightRadius: 10, // Match corner radius of the main item
+    marginBottom: 5, // Add margin bottom for spacing
   },
-  avatarContainer: {
+  oval: {
     width: 30,
-    height: 30,
-    borderRadius: 15,
-    overflow: "hidden",
-    marginRight: 10,
+    height: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 10,
+    marginRight: 5, // Add margin right for spacing
   },
-  avatar: {
-    width: "100%",
-    height: "100%",
+  timeOval: {
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#D6D6D6",
+    marginLeft: "auto", // Align to the right
+    paddingLeft: 5, // Add padding left for better spacing
+    paddingRight: 5, // Add padding right for better spacing
+  },
+  deadlineText: {
+    fontSize: 14,
+  },
+  time: {
+    fontSize: 12,
   },
   contentContainer: {
     flexDirection: "row",
@@ -73,15 +97,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexWrap: "wrap",
   },
-  textContainer: {
-    marginLeft: 5,
+  taskName: {
+    fontSize: 16, // Increase font size slightly
+    marginLeft: 5, // Add margin left for spacing
   },
   checkBoxMargin: {
     marginLeft: 5,
-  },
-  deadlineText: {
-    fontSize: 12,
-    color: "#FFFFFF",
   },
   bottomRow: {
     paddingHorizontal: 10,
