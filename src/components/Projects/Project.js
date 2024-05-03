@@ -2,44 +2,29 @@ import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-const Project = ({ text, groupImage, time, day, progress, collaborators }) => {
-  // Calculate the percentage of tasks done
-  const percentageDone = Math.round((progress / 100) * 100);
-
-  // Determine progress color based on percentage
-  let progressColor = "#FF0000"; // Default color: red
-  if (percentageDone >= 50 && percentageDone < 100) {
-    progressColor = "#FFFF00"; // Yellow
-  } else if (percentageDone === 100) {
-    progressColor = "#00FF00"; // Green
-  }
-
+const Project = ({ projectName, groupImage, deadline, collaborators }) => {
   return (
     <View style={styles.item}>
       <View style={styles.topContainer}>
         <View style={styles.timeContainer}>
           <MaterialCommunityIcons name="clock-outline" size={15} color="#000" />
-          <Text style={styles.deadlineText}>{time} {day}</Text>
+          <Text style={styles.deadlineText}>Deadline: {deadline}</Text>
         </View>
       </View>
       <View style={styles.contentContainer}>
-        <View style={styles.groupImageContainer}>
+        {/* <View style={styles.groupImageContainer}>
           <Image source={{ uri: groupImage }} style={styles.groupImage} />
-        </View>
+        </View> */}
         <View style={styles.itemLeft}>
-          <Text style={styles.textContainer}>{text}</Text>
+          <Text style={styles.textContainer}>{projectName}</Text>
         </View>
-      </View>
-      <View style={[styles.progressBar, { backgroundColor: progressColor }]} />
-      <View style={styles.progressTextContainer}>
-        <Text style={styles.progressText}>{percentageDone}% Complete</Text>
       </View>
       <View style={styles.collaboratorContainer}>
-        {collaborators.map((collaborator, index) => (
+        {/* {collaborators.map((collaborator, index) => (
           <View key={index} style={styles.avatarContainer}>
-            <Image source={{ uri: collaborator.avatar }} style={styles.avatar} />
+            <Image source={{ uri: collaborator }} style={styles.avatar} />
           </View>
-        ))}
+        ))} */}
       </View>
     </View>
   );
@@ -87,19 +72,6 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     fontSize: 16,
-  },
-  progressBar: {
-    height: 10,
-    borderRadius: 5,
-    marginBottom: 5,
-  },
-  progressTextContainer: {
-    alignItems: "flex-end",
-    marginBottom: 10,
-  },
-  progressText: {
-    fontSize: 12,
-    color: "#666",
   },
   collaboratorContainer: {
     flexDirection: "row",

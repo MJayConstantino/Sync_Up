@@ -1,140 +1,220 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
 import { Button, StyleSheet, Text, Image, SafeAreaView, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import { firebase } from '../../firebase-config';
+import { MaterialCommunityIcons } from '@expo/vector-icons'; // Importing icon library
 
-export default function App() {
-    const [image, setImage] = useState(null);
-    const [schedule, setSchedule] = useState([]);
+const firestore = firebase.firestore();
 
-    // Function to parse the course data
-    function parseCourseData(data) {
-        const schedules = [];
-        const lines = data.split('\n');
+export default function RFScannerScreen() {
+  const [image, setImage] = useState(null);
+  const [classSchedule, setClassSchedule] = useState([]);
+  const currentUser = firebase.auth().currentUser;
 
-        for (let i = 0; i < lines.length; i += 5) {
-            const stubCodeSubjectLine = lines[i].trim().split(' ');
-            const timeDayLine = lines[i + 1].trim().split(' ');
-            const roomLine = lines[i + 2].trim();
-            const instructorLine = lines[i + 3].trim();
+  function parseCourseData(data) {
+    const schedules = [];
+    const lines = data.split('\n');
 
-            const schedule = {
-                stubCode: stubCodeSubjectLine[0],
-                subject: stubCodeSubjectLine.slice(1).join(' '),
-                time: timeDayLine[1],
-                day: timeDayLine[2],
-                room: roomLine,
-                instructor: instructorLine
-            };
+    for (let i = 0; i < lines.length; i += 4) {
+      const stubCodeSubjectLine = lines[i].trim().split(' ');
+      const timeDayLine = lines[i + 1].trim().split(' ');
+      const roomLine = lines[i + 2].trim();
+      const instructorLine = lines[i + 3].trim();
 
-            schedules.push(schedule);
-        }
+      let subject = stubCodeSubjectLine.slice(1).join(' ');
+      // Check if subject has only one word
+      if (subject.split(' ').length === 1) {
+        subject = '[LAB]';
+      }
 
-        return schedules;
+      const schedule = {
+        stubCode: stubCodeSubjectLine[0],
+        subject: subject,
+        time: timeDayLine[1],
+        day: timeDayLine[2],
+        room: roomLine,
+        instructor: instructorLine
+      };
+
+      schedules.push(schedule);
     }
 
-    // Function to pick an image from the gallery
-    const pickImageGallery = async () => {
-        let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            allowsEditing: true,
-            base64: true,
-            allowsMultipleSelection: false,
+    return schedules;
+  }
+
+  function convertDayAbbreviationToFull(dayAbbreviation) {
+    const daysMapping = {
+      "M": "Monday",
+      "T": "Tuesday",
+      "W": "Wednesday",
+      "Th": "Thursday",
+      "F": "Friday",
+      "S": "Saturday",
+      "TTh": ["Tuesday", "Thursday"],
+      "MW": ["Monday", "Wednesday"],
+      "TBA": "TBA"
+    };
+    return daysMapping[dayAbbreviation] || "Unknown";
+  }
+
+  function convertTimeFormat(time) {
+    const [startTime, endTime] = time.split('-');
+    const convertTo12HourFormat = (rawTime) => {
+      const hours = parseInt(rawTime.substring(0, 2));
+      const minutes = rawTime.substring(2);
+      const period = hours >= 12 ? 'PM' : 'AM';
+      const adjustedHours = hours % 12 || 12;
+      return `${adjustedHours}:${minutes} ${period}`;
+    };
+    return {
+      timeStart: convertTo12HourFormat(startTime),
+      timeEnd: convertTo12HourFormat(endTime)
+    };
+  }
+
+  const addScheduleToFirestore = (schedule) => {
+    firestore.collection(`users/${currentUser.uid}/classSchedules`).add(schedule)
+      .then((docRef) => {
+        console.log('Schedule added with ID: ', docRef.id);
+      })
+      .catch((error) => {
+        console.error('Error adding schedule: ', error);
+      });
+  };
+
+  const performOCR = (file) => {
+    // Reset classSchedule to clear previous data
+    setClassSchedule([]);
+
+    let myHeaders = new Headers();
+    myHeaders.append('apikey', 'FEmvQr5uj99ZUvk3essuYb6P5lLLBS20');
+    myHeaders.append('Content-Type', 'multipart/form-data');
+
+    let raw = file;
+    let requestOptions = {
+      method: 'POST',
+      redirect: 'follow',
+      headers: myHeaders,
+      body: raw,
+    };
+
+    fetch('https://api.apilayer.com/image_to_text/upload', requestOptions)
+      .then((response) => response.json())
+      .then((result) => {
+        const extractedText = result['all_text'];
+        console.log(extractedText);
+        const structuredData = parseCourseData(extractedText);
+        console.log(structuredData);
+        const convertedSchedule = structuredData.map(course => ({
+          ...course,
+          day: convertDayAbbreviationToFull(course.day),
+          time: convertTimeFormat(course.time)
+        }));
+        console.log(convertedSchedule); // Log convertedSchedule here
+        setClassSchedule(convertedSchedule);
+        // Add each schedule to Firebase
+        convertedSchedule.forEach(schedule => {
+          addScheduleToFirestore(schedule);
         });
-        if (!result.cancelled) {
-            performOCR(result.assets[0]);
-            setImage(result.assets[0].uri);
-        }
-    };
+      })
+      .catch((error) => {
+        console.log('Error performing OCR:', error.message);
+        // Alert the user to capture a clearer picture of the RF
+        alert('Error: Unable to extract text from the image. Please capture a clearer picture.');
+      });
+  };
 
-    // Function to pick an image from the camera
-    const pickImageCamera = async () => {
-        let result = await ImagePicker.launchCameraAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            allowsEditing: true,
-            base64: true,
-            allowsMultipleSelection: false,
-        });
-        if (!result.cancelled) {
-            performOCR(result.assets[0]);
-            setImage(result.assets[0].uri);
-        }
-    };
+  const pickImageGallery = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      base64: true,
+      allowsMultipleSelection: false,
+    });
+    if (!result.cancelled) {
+      performOCR(result.assets[0]);
+      setImage(result.assets[0].uri);
+    }
+  };
 
-    // Function to perform OCR on the image
-    const performOCR = (file) => {
-        let myHeaders = new Headers();
-        myHeaders.append('apikey', 'FEmvQr5uj99ZUvk3essuYb6P5lLLBS20');
-        myHeaders.append('Content-Type', 'multipart/form-data');
+  const pickImageCamera = async () => {
+    let result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      base64: true,
+      allowsMultipleSelection: false,
+    });
+    if (!result.cancelled) {
+      performOCR(result.assets[0]);
+      setImage(result.assets[0].uri);
+    }
+  };
 
-        let raw = file;
-        let requestOptions = {
-            method: 'POST',
-            redirect: 'follow',
-            headers: myHeaders,
-            body: raw,
-        };
-
-        fetch('https://api.apilayer.com/image_to_text/upload', requestOptions)
-            .then((response) => response.json())
-            .then((result) => {
-                const extractedText = result['all_text'];
-                const structuredData = parseCourseData(extractedText);
-                setSchedule(structuredData);
-            })
-            .catch((error) => console.log('error', error));
-    };
-
-    return (
-        <SafeAreaView style={styles.container}>
-            <View style={styles.textContainer}>
-                <Text style={styles.heading}>OCR App</Text>
-                <Text style={styles.heading2}>Image to Text App</Text>
-            </View>
-            <View style={styles.imageContainer}>
-                <Button title="Pick an image from gallery" onPress={pickImageGallery} />
-                <Button title="Pick an image from camera" onPress={pickImageCamera} />
-                {image && <Image source={{ uri: image }} style={styles.image} />}
-            </View>
-            <StatusBar style="auto" />
-        </SafeAreaView>
-    );
+  return (
+    <SafeAreaView style={styles.container}>
+      <View style={styles.topContainer}>
+        {/* <Image source={require('./rf_scanner_image.png')} style={styles.rfImage} /> */}
+      </View>
+      <View style={styles.buttonContainer}>
+        <Button
+          title="Pick from Gallery"
+          onPress={pickImageGallery}
+          icon={<MaterialCommunityIcons name="image-multiple" size={24} color="white" />}
+          buttonStyle={styles.button}
+        />
+        <Button
+          title="Pick from Camera"
+          onPress={pickImageCamera}
+          icon={<MaterialCommunityIcons name="camera" size={24} color="white" />}
+          buttonStyle={styles.button}
+        />
+      </View>
+      {image && (
+        <View style={styles.imageContainer}>
+          <Text>Image Preview:</Text>
+          <Image source={{ uri: image }} style={styles.image} />
+        </View>
+      )}
+      <StatusBar style="auto" />
+    </SafeAreaView>
+  );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#F5F5F5', // Light gray background
-        padding: 20,
-    },
-    textContainer: {
-        alignItems: 'center',
-        marginBottom: 40,
-    },
-    heading: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        marginBottom: 10,
-        color: 'green',
-        textAlign: 'center',
-    },
-    heading2: {
-        fontSize: 22,
-        fontWeight: 'bold',
-        marginBottom: 10,
-        color: 'black',
-        textAlign: 'center',
-    },
-    imageContainer: {
-        alignItems: 'center',
-    },
-    image: {
-        width: 400,
-        height: 300,
-        marginTop: 20,
-        resizeMode: 'contain',
-    },
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    padding: 20,
+    marginTop: 50
+  },
+  topContainer: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  rfImage: {
+    width: 300,
+    height: 200,
+    resizeMode: 'contain',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 20,
+  },
+  button: {
+    width: 150,
+    backgroundColor: 'green',
+    borderRadius: 10,
+  },
+  imageContainer: {
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  image: {
+    width: 300,
+    height: 200,
+    resizeMode: 'cover',
+    borderRadius: 10,
+  },
 });

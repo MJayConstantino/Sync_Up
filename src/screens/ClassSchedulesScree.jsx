@@ -1,12 +1,13 @@
+// ScheduleScreen.js
+
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
 import { Agenda } from 'react-native-calendars';
 import { firebase } from '../../firebase-config';
 import Schedule from '../components/Schedules/Schedule';
 import TaskSchedule from '../components/Schedules/TaskSchedule';
 import AddScheduleModal from '../components/Schedules/AddSchedule';
 import ClassSchedule from '../components/Schedules/ClassSchedule';
-import { getDayOfYear, startOfISOWeek } from 'date-fns';
 
 const firestore = firebase.firestore();
 
@@ -20,12 +21,10 @@ const ScheduleScreen = ({ navigation }) => {
       try {
         const schedulesSnapshot = await firestore.collection(`users/${currentUser.uid}/schedules`).get();
         const tasksSnapshot = await firestore.collection(`users/${currentUser.uid}/tasks`).get();
-        const classSchedulesSnapshot = await firestore.collection(`users/${currentUser.uid}/classSchedules`).get();
-        
+        const snapshotclassSchedules = await firestore.collection(`users/${currentUser.uid}/classSchedules`).get();
         const schedules = schedulesSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data(), type: 'schedule' }));
         const tasks = tasksSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data(), type: 'task' }));
-        const classSchedules = classSchedulesSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data(), type: 'classSchedule' }));
-
+        const classSchedules = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data(), type: 'classSchedule' }));
         const combinedItems = {};
 
         schedules.forEach(schedule => {
@@ -44,17 +43,6 @@ const ScheduleScreen = ({ navigation }) => {
           combinedItems[date].push(task);
         });
 
-        classSchedules.forEach(classSchedule => {
-          const day = classSchedule.day; // Assuming day is a string like 'Monday', 'Tuesday', etc.
-          const occurrences = getOccurrencesOfYear(day);
-          occurrences.forEach(date => {
-            if (!combinedItems[date]) {
-              combinedItems[date] = [];
-            }
-            combinedItems[date].push(classSchedule);
-          });
-        });
-
         setItems(combinedItems);
       } catch (error) {
         console.error("Error fetching schedules and tasks:", error);
@@ -63,27 +51,6 @@ const ScheduleScreen = ({ navigation }) => {
 
     fetchSchedulesAndTasks();
   }, [currentUser.uid]);
-
-  const getOccurrencesOfYear = (dayOfWeek) => {
-    const today = new Date();
-    const timezoneOffset = today.getTimezoneOffset() * 60000; // Offset in milliseconds
-    const todayUtc = new Date(today.getTime() - timezoneOffset); // Convert to UTC
-  
-    const dayOfWeekIndex = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].indexOf(dayOfWeek);
-    const firstDayOfWeek = startOfISOWeek(todayUtc);
-    const occurrences = [];
-  
-    for (let i = 0; i < 7; i++) {
-      const occurrenceDate = new Date(firstDayOfWeek);
-      occurrenceDate.setDate(occurrenceDate.getDate() + i); // Move to the next day
-      if (occurrenceDate.getDay() === dayOfWeekIndex) {
-        occurrences.push(occurrenceDate.toISOString().split('T')[0]);
-        break; // Stop iteration once we find the occurrence for the given day
-      }
-    }
-  
-    return occurrences;
-  };
 
   const addNewSchedule = async (newSchedule) => {
     try {
@@ -110,29 +77,53 @@ const ScheduleScreen = ({ navigation }) => {
       );
     } else if (item.type === 'classSchedule') {
       return (
-        <TouchableOpacity onPress={() => handleClassSchedulePress(item)}>
-          <ClassSchedule {...item} />
+        <TouchableOpacity onPress={() => handleTaskPress(item)}>
+          <TaskSchedule {...item} />
         </TouchableOpacity>
       );
     }
   };
 
+  const loadItems = async (day) => {
+    try {
+      const date = day.dateString;
+      const snapshotSchedules = await firestore.collection(`users/${currentUser.uid}/schedules`).where('date', '==', date).get();
+      const schedules = snapshotSchedules.docs.map((doc) => ({ id: doc.id, ...doc.data(), type: 'schedule' }));
+      const snapshotTasks = await firestore.collection(`users/${currentUser.uid}/tasks`).where('date', '==', date).get();
+      const tasks = snapshotTasks.docs.map((doc) => ({ id: doc.id, ...doc.data(), type: 'task' }));
+      const snapshotclassSchedules = await firestore.collection(`users/${currentUser.uid}/classSchedules`).where('day', '==', day).get();
+      const classSchedules = snapshot.docs.map((doc) => doc.data());
+      const newItems = {
+        [date]: [...schedules, ...tasks],
+      };
+      
+      setItems(newItems);
+    } catch (error) {
+      console.error("Error loading items:", error);
+    }
+  };
+
   const handleSchedulePress = (item) => {
+    // Navigate to EditSchedule screen with schedule ID
     navigation.navigate('EditScheduleScreen', { scheduleId: item.id });
   };
 
   const handleTaskPress = (item) => {
+    // Navigate to EditTask screen with task ID
     navigation.navigate('EditTaskScreen', { taskId: item.id });
   };
 
   const handleClassSchedulePress = (item) => {
-    navigation.navigate('EditClassScheduleScreen', { classScheduleId: item.id });
+    // Navigate to EditTask screen with task ID
+    // navigation.navigate('EditTaskScreen', { taskId: item.id });
+    console.log('ehe')
   };
 
   return (
     <View style={styles.container}>
       <Agenda
         items={items}
+        loadItemsForMonth={loadItems}
         renderItem={renderItem}
         // Other Agenda props
       />

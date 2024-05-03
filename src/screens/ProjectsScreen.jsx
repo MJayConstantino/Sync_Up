@@ -1,95 +1,69 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
+import { firebase } from '../../firebase-config';
 import Project from "../components/Projects/Project";
-import { firebase } from '../../firebase-config'
 
-const ProjectScreen = ({ userUid }) => {
+const firestore = firebase.firestore();
+
+const ProjectsScreen = () => {
   const [projects, setProjects] = useState([]);
 
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const projectsRef = firebase.firestore().collection('projects');
-        const snapshot = await projectsRef.where('collaborators', 'array-contains', userUid).get();
-        const userProjects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        setProjects(userProjects);
+        const user = firebase.auth().currentUser;
+        const projectsSnapshot = await firestore.collection("projects").where("collaborators", "array-contains", user.uid).get();
+        const createdByProjectsSnapshot = await firestore.collection("projects").where("createdBy", "==", user.uid).get();
+        const projectsData = projectsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const createdByProjectsData = createdByProjectsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const allProjectsData = [...projectsData, ...createdByProjectsData];
+        setProjects(allProjectsData);
       } catch (error) {
         console.error("Error fetching projects:", error);
       }
     };
-
+  
     fetchProjects();
-  }, [userUid]);
+  }, []);
+  
 
   return (
     <View style={styles.container}>
-      <Text style={styles.sectionTitle}>Project Collaboration</Text>
-      {projects.length === 0 ? (
-        <View style={styles.noProjectsContainer}>
-          <Text style={styles.noProjectsText}>No current projects</Text>
-          <Text style={styles.noProjectsSubText}>Create one or be a collaborator</Text>
-        </View>
-      ) : (
-        <FlatList
-          data={projects}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <Project
-              projectName={item.projectName}
-              groupImage={item.groupImage}
-              time={item.time}
-              day={item.day}
-              progress={item.progress}
-              collaborators={item.collaborators}
-            />
-          )}
+      <Text style={styles.header}>Projects</Text>
+      {projects.map(project => (
+        <Project
+          key={project.id}
+          text={project.projectName}
+          // groupImage="group_image_url" // Replace with actual image URL if available
+          time={project.deadline}
+          day="" // You can calculate the day if needed
+          progress={calculateProgress(project.tasks)} // Pass progress if available
+          collaborators={project.collaborators}
         />
-      )}
-      <TouchableOpacity style={styles.addButton}>
-        <Text style={styles.addButtonText}>Add Project</Text>
-      </TouchableOpacity>
+      ))}
     </View>
   );
+};
+
+// Function to calculate progress based on tasks
+const calculateProgress = (tasks) => {
+  if (!tasks || tasks.length === 0) return 0;
+
+  const completedTasks = tasks.filter(task => task.status === 'completed');
+  return (completedTasks.length / tasks.length) * 100;
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    marginTop: 50,
-    backgroundColor: "#FFFFFF",
+    padding: 20,
+    marginTop: 50
   },
-  sectionTitle: {
-    fontSize: 30,
-    fontWeight: "bold",
-  },
-  noProjectsText: {
+  header: {
     fontSize: 20,
-    marginBottom: 10,
-  },
-  noProjectsSubText: {
-    fontSize: 14,
-    color: "#666",
-  },
-  noProjectsContainer: {
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 300,
-  },
-  addButton: {
-    position: "absolute",
-    bottom: 20,
-    right: 20,
-    backgroundColor: "#03a1fc",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-  },
-  addButtonText: {
-    color: "#fff",
-    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 20,
   },
 });
 
-export default ProjectScreen;
+export default ProjectsScreen;

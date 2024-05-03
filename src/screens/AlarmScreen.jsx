@@ -1,12 +1,9 @@
-import React, { useEffect, useState, useRef } from "react";
-import { StyleSheet, Text, View, Pressable, TextInput, FlatList } from "react-native";
+import React, { useState, useEffect, useRef } from "react";
+import { StyleSheet, Text, View, Pressable, TextInput, ScrollView } from "react-native";
 import * as Notifications from "expo-notifications";
-import { Audio } from "expo-av";
-import { LogBox } from "react-native";
+import { Audio } from "expo-av"; // Import Audio from expo-av
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-LogBox.ignoreLogs(["new NativeEventEmitter"]);
-LogBox.ignoreAllLogs();
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -18,15 +15,16 @@ Notifications.setNotificationHandler({
 
 export default function AlarmClock() {
   const notificationListener = useRef();
-  const [notifications, setNotifications] = useState([]);
-  const [hourr, setHour] = useState("");
-  const [minutee, setMinute] = useState("");
-  const [ampm, setAmpm] = useState("");
-  const [editingId, setEditingId] = useState(null);
-  const [sound, setSound] = useState();
+  const [alarms, setAlarms] = useState([]);
+  const [hour, setHour] = useState("");
+  const [minute, setMinute] = useState("");
+  const [ampm, setAmpm] = useState("AM");
+  const [editMode, setEditMode] = useState(false);
+  const [editId, setEditId] = useState("");
+  const [sound, setSound] = useState(null); // Define sound state
 
   useEffect(() => {
-    loadSound();
+    loadSound(); // Call loadSound function
     getData();
     notificationListener.current = Notifications.addNotificationResponseReceivedListener((notification) => {
       setNotifications((prevNotifications) => [...prevNotifications, notification]);
@@ -41,7 +39,7 @@ export default function AlarmClock() {
     const { sound } = await Audio.Sound.createAsync(
       require("../assets/sounds/alarm.mp3")
     );
-    setSound(sound);
+    setSound(sound); // Set sound state
   };
 
   const playSound = async () => {
@@ -50,16 +48,14 @@ export default function AlarmClock() {
     }
   };
 
-  async function scheduleOrUpdateNotification(hour, minute, ampm) {
-    const newHour = parseInt(hour) + (ampm === "pm" ? 12 : 0);
-    if (editingId !== null) {
-      await Notifications.cancelScheduledNotificationAsync(editingId);
-    }
+  async function scheduleNotification(hour, minute, ampm) {
+    const newHour = ampm === "PM" ? parseInt(hour) + 12 : parseInt(hour);
     const identifier = await Notifications.scheduleNotificationAsync({
       content: {
         title: "Alarm",
         body: "It is time to wake up!",
         data: { data: "Your morning alarm data" },
+        sound: "default", // Use default notification sound
       },
       trigger: {
         hour: newHour,
@@ -67,152 +63,197 @@ export default function AlarmClock() {
         repeats: true,
       },
     });
-    const newNotification = { id: identifier, hour: newHour, minute: parseInt(minute), ampm };
-    setNotifications((prevNotifications) => [...prevNotifications, newNotification]);
-    setEditingId(null);
-    storeData([...notifications, newNotification]);
+    return identifier;
   }
 
-  function editAlarm(id, hour, minute, ampm) {
-    setHour(hour.toString());
-    setMinute(minute.toString());
-    setAmpm(ampm);
-    setEditingId(id);
+  async function addAlarm() {
+    if (editMode) {
+      await removeAlarm(editId);
+    }
+    const newAlarm = {
+      hour: hour,
+      minute: minute,
+      ampm: ampm,
+      id: await scheduleNotification(hour, minute, ampm),
+    };
+    setAlarms([...alarms, newAlarm]);
+    clearInputFields();
+    storeAlarms([...alarms, newAlarm]);
   }
 
-  async function deleteNotificationHandler(id) {
-    // Cancel the scheduled notification
+  async function removeAlarm(id) {
     await Notifications.cancelScheduledNotificationAsync(id);
-  
-    // Remove the deleted alarm from the notifications state
-    const updatedNotifications = notifications.filter((notification) => notification.id !== id);
-    setNotifications(updatedNotifications);
-  
-    // Update AsyncStorage with the updated list of alarms
-    try {
-      await AsyncStorage.setItem("currentAlarms", JSON.stringify(updatedNotifications));
-    } catch (error) {
-      console.error("Error updating AsyncStorage:", error);
+    const updatedAlarms = alarms.filter((alarm) => alarm.id !== id);
+    setAlarms(updatedAlarms);
+    storeAlarms(updatedAlarms);
+    if (editMode && editId === id) {
+      clearInputFields();
+      setEditMode(false);
     }
   }
-  
 
-  async function storeData(data) {
+  async function storeAlarms(alarms) {
     try {
-      await AsyncStorage.setItem("currentAlarms", JSON.stringify(data));
+      await AsyncStorage.setItem("alarms", JSON.stringify(alarms));
     } catch (e) {
-      alert(e);
+      console.log(e);
     }
   }
 
   async function getData() {
     try {
-      const data = await AsyncStorage.getItem("currentAlarms");
-      if (data) {
-        setNotifications(JSON.parse(data));
+      const alarmsData = await AsyncStorage.getItem("alarms");
+      if (alarmsData) {
+        setAlarms(JSON.parse(alarmsData));
       }
     } catch (e) {
-      alert(e);
+      console.log(e);
     }
   }
 
-  const renderAlarmItem = ({ item }) => (
-    <View style={styles.alarmItem}>
-      <Text>{`${item.hour}:${item.minute < 10 ? '0' : ''}${item.minute} ${item.ampm}`}</Text>
-      <Pressable onPress={() => editAlarm(item.id, item.hour, item.minute, item.ampm)}>
-        <Text style={styles.editButton}>Edit</Text>
-      </Pressable>
-      <Pressable onPress={() => deleteNotificationHandler(item.id)}>
-        <Text style={styles.deleteButton}>Delete</Text>
-      </Pressable>
-    </View>
-  );
+  function clearInputFields() {
+    setHour("");
+    setMinute("");
+    setAmpm("AM");
+  }
+
+  function editAlarm(id) {
+    const alarmToEdit = alarms.find((alarm) => alarm.id === id);
+    setHour(alarmToEdit.hour);
+    setMinute(alarmToEdit.minute);
+    setAmpm(alarmToEdit.ampm);
+    setEditId(id);
+    setEditMode(true);
+  }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Alarms</Text>
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.header}>Alarm App</Text>
+      <View style={styles.timeInputContainer}>
+        <TextInput
+          style={styles.timeInput}
+          placeholder="Hour"
+          keyboardType="numeric"
+          value={hour}
+          onChangeText={(text) => setHour(text)}
+        />
+        <Text style={styles.separator}>:</Text>
+        <TextInput
+          style={styles.timeInput}
+          placeholder="Minute"
+          keyboardType="numeric"
+          value={minute}
+          onChangeText={(text) => setMinute(text)}
+        />
       </View>
-      <TextInput
-        style={styles.textInput}
-        placeholder="Enter hour"
-        value={hourr}
-        onChangeText={(text) => setHour(text)}
-      />
-      <TextInput
-        style={styles.textInput}
-        placeholder="Enter minute"
-        value={minutee}
-        onChangeText={(text) => setMinute(text)}
-      />
-      <TextInput
-        style={styles.textInput}
-        placeholder="Enter am or pm"
-        value={ampm}
-        onChangeText={(text) => setAmpm(text)}
-      />
-      <Pressable style={styles.button} onPress={() => scheduleOrUpdateNotification(hourr, minutee, ampm)}>
-        <Text style={styles.buttonText}>Set Alarm</Text>
+      <View style={styles.ampmContainer}>
+        <Pressable
+          style={[styles.ampmButton, ampm === "AM" ? styles.ampmButtonSelected : null]}
+          onPress={() => setAmpm("AM")}
+        >
+          <Text style={styles.ampmButtonText}>AM</Text>
+        </Pressable>
+        <Pressable
+          style={[styles.ampmButton, ampm === "PM" ? styles.ampmButtonSelected : null]}
+          onPress={() => setAmpm("PM")}
+        >
+          <Text style={styles.ampmButtonText}>PM</Text>
+        </Pressable>
+      </View>
+      <Pressable style={styles.button} onPress={addAlarm}>
+        <Text style={styles.buttonText}>{editMode ? "Update Alarm" : "Add Alarm"}</Text>
       </Pressable>
-      <FlatList
-        data={notifications}
-        renderItem={renderAlarmItem}
-        keyExtractor={(item) => item.id} // Assuming notifications have an id property
-      />
-    </View>
+      {alarms.map((alarm) => (
+        <View key={alarm.id} style={styles.alarm}>
+          <Text>{`${alarm.hour}:${alarm.minute} ${alarm.ampm}`}</Text>
+          <Pressable style={styles.smallButton} onPress={() => editAlarm(alarm.id)}>
+            <Text style={styles.buttonText}>Edit</Text>
+          </Pressable>
+          <Pressable style={styles.smallButton} onPress={() => removeAlarm(alarm.id)}>
+            <Text style={styles.buttonText}>Remove</Text>
+          </Pressable>
+        </View>
+      ))}
+    </ScrollView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 50,
-    flex: 1,
+    flexGrow: 1,
     backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
   },
   header: {
-    paddingHorizontal: 16,
+    color: "blue",
+    marginVertical: 20,
+    fontSize: 40,
+    fontWeight: "bold",
   },
-  title: {
-    fontSize: 32,
-    fontWeight: '700',
-    color: '#1d1d1d',
-    marginBottom: 12,
+  timeInputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  timeInput: {
+    width: 60,
+    fontSize: 16,
+    marginHorizontal: 5,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    padding: 10,
+  },
+  separator: {
+    fontSize: 20,
+  },
+  ampmContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: 10,
+  },
+  ampmButton: {
+    backgroundColor: "#ccc",
+    borderRadius: 10,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    marginHorizontal: 5,
+  },
+  ampmButtonSelected: {
+    backgroundColor: "blue",
+  },
+  ampmButtonText: {
+    color: "black",
+    fontWeight: "bold",
+    fontSize: 16,
   },
   button: {
     width: "70%",
     backgroundColor: "blue",
     borderRadius: 18,
-    margin: 15,
-    padding: 5,
+    marginVertical: 10,
+    paddingVertical: 10,
+    alignItems: "center",
+  },
+  smallButton: {
+    backgroundColor: "blue",
+    borderRadius: 18,
+    marginVertical: 5,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    alignItems: "center",
   },
   buttonText: {
     color: "white",
     textAlign: "center",
-    fontSize: 35,
+    fontSize: 16,
     fontWeight: "bold",
   },
-  textInput: {
-    fontSize: 30,
-    margin: 5,
-  },
-  alarmItem: {
+  alarm: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    width: "90%",
-    marginVertical: 5,
-    padding: 10,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 10,
-  },
-  editButton: {
-    color: "green",
-    fontSize: 18,
-    marginRight: 10,
-  },
-  deleteButton: {
-    color: "red",
-    fontSize: 18,
+    width: "70%",
+    marginVertical: 10,
   },
 });
+

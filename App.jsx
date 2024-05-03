@@ -16,10 +16,12 @@ import ScheduleScreen from './src/screens/ScheduleScreen';
 import AlarmScreen from './src/screens/AlarmScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import ProjectsScreen from './src/screens/ProjectsScreen';
+import ProjectTasksScreen from "./src/screens/ProjectTasksScreen";
 import EditScheduleScreen from "./src/screens/EditScheduleScreen";
 import RFScannerScreen from "./src/screens/RFScannerScreen";
 import AppRoot from './src/screens/SplashScreen';
 import EditTaskScreen from "./src/screens/EditTasksScreen";
+import EditClassScheduleScreen from "./src/screens/EditClassScheduleScreen";
 import ChatScreen from "./src/screens/ChatScreen";
 
 const Stack = createStackNavigator();
@@ -158,12 +160,25 @@ export default function App() {
         })}
       >
         <Tab.Screen name="Dashboard" component={DashboardScreen} />
-        <Tab.Screen name="Projects" component={ChatScreen} />
+        <Tab.Screen name="Projects" component={ProjectScreenManager} />
         <Tab.Screen name="Schedule" component={ScheduleScreenManager} />
         <Tab.Screen name="Tasks" component={TaskScreenManager} />
         <Tab.Screen name="Alarm" component={AlarmScreen} />
       </Tab.Navigator>
     );
+  }
+
+  function ProjectScreenManager(){
+    return(
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: false, // Hide header for all screens in this stack
+        }}
+      >
+        <Stack.Screen name="ProjectsScreen" component={ProjectsScreen} />
+        <Stack.Screen name="ProjectTasksScreen" component={ProjectTasksScreen} />
+      </Stack.Navigator>
+    )
   }
 
   function TaskScreenManager(){
@@ -189,6 +204,7 @@ export default function App() {
         <Stack.Screen name="ScheduleScreen" component={ScheduleScreen} />
         <Stack.Screen name="EditScheduleScreen" component={EditScheduleScreen} />
         <Stack.Screen name="EditTaskScreen" component={EditTaskScreen} />
+        <Stack.Screen name="EditClassScheduleScreen" component={EditClassScheduleScreen}/>
       </Stack.Navigator>
     )
   }
