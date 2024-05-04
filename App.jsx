@@ -25,6 +25,7 @@ import EditProjectTaskScreen from "./src/screens/EditProjectTaskScreen";
 import EditClassScheduleScreen from "./src/screens/EditClassScheduleScreen";
 import CreateProjectScreen from "./src/screens/CreateProjectScreen";
 import EditProjectScreen from "./src/screens/EditProjectScreen";
+import ClassScheduleScreen from "./src/screens/ClassSchedulesScreen";
 import ChatScreen from "./src/screens/ChatScreen";
 
 const Stack = createStackNavigator();
@@ -82,6 +83,13 @@ export default function App() {
             icon={({ color, size }) => <Ionicons name="barcode" size={size} color={color} />}
           />
           <DrawerItem
+            label="Class Schedules"
+            onPress={() => props.navigation.navigate('Class Schedules')}
+            icon={({ color, size }) => (
+              <Ionicons name="book" size={size} color={color} />
+            )}
+          />
+          <DrawerItem
             label="Settings"
             onPress={() => props.navigation.navigate('Settings')}
             icon={({ color, size }) => <Ionicons name="settings" size={size} color={color} />}
@@ -130,6 +138,7 @@ export default function App() {
         <Drawer.Screen name="Dashboard" component={HomeTabNavigator} />
         <Drawer.Screen name="Profile" component={ProfileScreen} />
         <Drawer.Screen name="Scan RF" component={RFScannerScreen} />
+        <Drawer.Screen name="Class Schedules" component={ClassScheduleScreen} />
         <Drawer.Screen name="Settings" component={SettingsScreen} />
       </Drawer.Navigator>
     );

@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView, RefreshControl } from "react-native"; // Import TouchableOpacity
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, RefreshControl } from "react-native";
 import { firebase } from '../../firebase-config';
 import Project from "../components/Projects/Project";
-import { useNavigation } from '@react-navigation/native'; // Import useNavigation hook
+import { useNavigation } from '@react-navigation/native';
 
 const firestore = firebase.firestore();
 
 const ProjectsScreen = () => {
   const [projects, setProjects] = useState([]);
-  const navigation = useNavigation(); // Initialize navigation
-  const [refreshing, setRefreshing] = React.useState(false);
-  const [projectAdded, setprojectAdded] = React.useState(false);
+  const navigation = useNavigation();
+  const [refreshing, setRefreshing] = useState(false);
+  const [projectAdded, setProjectAdded] = useState(false);
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -24,18 +24,12 @@ const ProjectsScreen = () => {
       try {
         const user = firebase.auth().currentUser;
         const projectsSnapshot = await firestore.collection("projects").where("collaborators", "array-contains", user.uid).get();
-        const createdByProjectsSnapshot = await firestore.collection("projects").where("createdBy", "==", user.uid).get();
         const projectsData = projectsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        const createdByProjectsData = createdByProjectsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        const allProjectsData = [...projectsData, ...createdByProjectsData];
-
-        // Fetch tasks for each project
-        const projectsWithTasks = await Promise.all(allProjectsData.map(async project => {
+        const projectsWithTasks = await Promise.all(projectsData.map(async project => {
           const tasksSnapshot = await firestore.collection(`projects/${project.id}/tasks`).get();
           const tasksData = tasksSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
           return { ...project, tasks: tasksData };
         }));
-
         setProjects(projectsWithTasks);
       } catch (error) {
         console.error("Error fetching projects:", error);
@@ -45,12 +39,10 @@ const ProjectsScreen = () => {
     fetchProjects();
   }, [projectAdded]);
 
-  // Function to navigate to ProjectTasksScreen
   const handleProjectPress = (projectId) => {
     navigation.navigate('ProjectTasksScreen', { projectId: projectId });
   };
 
-  // Function to handle adding a new project
   const handleAddProject = () => {
     navigation.navigate('CreateProjectScreen');
   };
@@ -59,23 +51,24 @@ const ProjectsScreen = () => {
   return (
     <View style={styles.container}>
       <ScrollView 
-       refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }>
+       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+      >
         <Text style={styles.header}>Projects</Text>
-        {projects.map(project => (
-          <TouchableOpacity key={project.id} onPress={() => handleProjectPress(project.id)}>
-            <Project
-              projectName={project.projectName}
-              // groupImage="group_image_url" // Replace with actual image URL if available
-              deadline={project.deadline}
-              progress={calculateProgress(project.tasks)} // Pass progress if available
-              collaborators={project.collaborators}
-            />
-          </TouchableOpacity>
-        ))}
+        {projects.length === 0 ? (
+          <Text style={styles.noProjectsText}>No projects and collaborations. Press 'Add Project' to create one or become a collaborator.</Text>
+        ) : (
+          projects.map(project => (
+            <TouchableOpacity key={project.id} onPress={() => handleProjectPress(project.id)}>
+              <Project
+                projectName={project.projectName}
+                deadline={project.deadline}
+                progress={calculateProgress(project.tasks)}
+                collaborators={project.collaborators}
+              />
+            </TouchableOpacity>
+          ))
+        )}
       </ScrollView>
-      {/* Add project button */}
       <TouchableOpacity style={styles.addButton} onPress={handleAddProject}>
         <Text style={styles.addButtonText}>Add Project</Text>
       </TouchableOpacity>
@@ -83,7 +76,6 @@ const ProjectsScreen = () => {
   );
 };
 
-// Function to calculate progress based on tasks
 const calculateProgress = (tasks) => {
   if (!tasks || tasks.length === 0) return 0;
 
@@ -103,19 +95,24 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   addButton: {
-    backgroundColor: 'rgba(0, 0, 255, 0.7)', // Slightly lighter blue color
+    backgroundColor: 'rgba(0, 0, 255, 0.7)',
     width: '80%',
     height: 50,
     justifyContent: 'center',
     alignItems: 'center',
-    alignSelf: 'center', // Center the button horizontally
-    borderRadius: 10, // Add border radius
-    marginBottom: 20, // Add bottom margin
+    alignSelf: 'center',
+    borderRadius: 10,
+    marginBottom: 20,
   },
   addButtonText: {
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  noProjectsText: {
+    textAlign: 'center',
+    fontSize: 16,
+    marginBottom: 20,
   },
 });
 

@@ -93,28 +93,30 @@ const ProjectTasksScreen = ({ route }) => {
         </TouchableOpacity>
         <Text style={styles.header}>Project Tasks</Text>
       </View>
-      <FlatList
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-        data={tasks}
-        renderItem={({ item }) => (
-          <TouchableOpacity onPress={() => handleProjectTaskPress(projectId, item)}>
-            <ProjectTask
-              assignedTo={item.assignedTo}
-              taskName={item.taskName}
-              description={item.description}
-              time={item.time}
-              date={item.date}
-              deleteTask={() => deleteTask(item.id)}
-              toggleTaskStatus={() => toggleTaskStatus(item.id, item.status)}
-              taskId={item.id}
-              status={item.status}
-            />
-          </TouchableOpacity>
-        )}
-        keyExtractor={item => item.id}
-      />
+      {tasks.length === 0 ? (
+        <Text style={styles.noTasksText}>No pending tasks. Create one and assign it to a collaborator.</Text>
+      ) : (
+        <FlatList
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+          data={tasks}
+          renderItem={({ item }) => (
+            <TouchableOpacity onPress={() => handleProjectTaskPress(projectId, item)}>
+              <ProjectTask
+                assignedTo={item.assignedTo}
+                taskName={item.taskName}
+                description={item.description}
+                time={item.time}
+                date={item.date}
+                deleteTask={() => deleteTask(item.id)}
+                toggleTaskStatus={() => toggleTaskStatus(item.id, item.status)}
+                taskId={item.id}
+                status={item.status}
+              />
+            </TouchableOpacity>
+          )}
+          keyExtractor={item => item.id}
+        />
+      )}
       <TouchableOpacity style={styles.addButton} onPress={handleOpenModal}>
         <MaterialIcons name="add" size={24} color="#fff" />
       </TouchableOpacity>
@@ -156,6 +158,10 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  noTasksText: {
+    textAlign: 'center',
+    fontSize: 16,
   },
 });
 
