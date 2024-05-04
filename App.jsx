@@ -26,7 +26,7 @@ import EditClassScheduleScreen from "./src/screens/EditClassScheduleScreen";
 import CreateProjectScreen from "./src/screens/CreateProjectScreen";
 import EditProjectScreen from "./src/screens/EditProjectScreen";
 import ClassScheduleScreen from "./src/screens/ClassSchedulesScreen";
-import ChatScreen from "./src/screens/ChatScreen";
+import EditProfileScreen from "./src/screens/EditProfileScreen";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -136,12 +136,25 @@ export default function App() {
         }}
       >
         <Drawer.Screen name="Dashboard" component={HomeTabNavigator} />
-        <Drawer.Screen name="Profile" component={ProfileScreen} />
+        <Drawer.Screen name="Profile" component={ProfileScreenManager} />
         <Drawer.Screen name="Scan RF" component={RFScannerScreen} />
         <Drawer.Screen name="Class Schedules" component={ClassScheduleScreen} />
         <Drawer.Screen name="Settings" component={SettingsScreen} />
       </Drawer.Navigator>
     );
+  }
+
+  function ProfileScreenManager(){
+    return(
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: false, // Hide header for all screens in this stack
+        }}
+      >
+        <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
+        <Stack.Screen name="EditProfileScreen" component={EditProfileScreen} />
+      </Stack.Navigator>
+    )
   }
 
   function HomeTabNavigator() {

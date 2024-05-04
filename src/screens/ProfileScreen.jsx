@@ -1,267 +1,186 @@
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   Image,
   TouchableOpacity,
   useWindowDimensions,
+  StyleSheet,
+  RefreshControl,
+  ScrollView
 } from "react-native";
-import React, { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { COLORS, FONTS, SIZES, images } from "../constants";
-import { StatusBar } from "expo-status-bar";
 import { MaterialIcons } from "@expo/vector-icons";
-import { SceneMap, TabBar, TabView } from "react-native-tab-view";
-import { firebase } from '../../firebase-config'
+import { useNavigation } from '@react-navigation/native';
+import { firebase } from '../../firebase-config';
 
-const Profile = () => {
-  const [name, setName] = useState([]);
+const firestore = firebase.firestore();
+
+const ProfileScreen = () => {
+  const navigation = useNavigation();
   const layout = useWindowDimensions();
-  const [index, setIndex] = useState(0);
+  const currentUser = firebase.auth().currentUser;
+  const [userData, setUserData] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const [profileEdited, setProfileEdited] = useState(false);
 
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
 
   useEffect(() => {
-    firebase.firestore().collection('users')
-    .doc(firebase.auth().currentUser.uid).get()
-    .then((snapshot) => {
-      if(snapshot.exists){
-        setName(snapshot.data())
+    const fetchUserData = async () => {
+      try {
+        const userDoc = await firestore.collection('users').doc(currentUser.uid).get();
+        if (userDoc.exists) {
+          setUserData(userDoc.data());
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
       }
-      else {
-        console.log('User does not exist')
-      }
-    })
-  }, [])
+    };
 
+    fetchUserData();
+  }, [profileEdited]);
 
-  // const [routes] = useState([
-  //   { key: "first", title: "Photos" },
-  //   { key: "second", title: "Likes" },
-  // ]);
-
-  const renderTabBar = (props) => (
-    <TabBar
-      {...props}
-      indicatorStyle={{
-        backgroundColor: COLORS.primary,
-      }}
-      style={{
-        backgroundColor: COLORS.white,
-        height: 44,
-      }}
-      renderLabel={({ focused, route }) => (
-        <Text style={[{ color: focused ? COLORS.black : COLORS.gray }]}>
-          {route.title}
-        </Text>
-      )}
-    />
-  );
   return (
-    <SafeAreaView
-      style={{
-        flex: 1,
-        backgroundColor: COLORS.white,
-      }}
-    >
-      <StatusBar backgroundColor={COLORS.gray} />
-      <View style={{ width: "100%" }}>
-        <Image
-          source={images.cover}
-          resizeMode="cover"
-          style={{
-            height: 228,
-            width: "100%",
-          }}
-        />
-      </View>
-
-      <View style={{ flex: 1, alignItems: "center" }}>
-        <Image
-          source={images.profile}
-          resizeMode="contain"
-          style={{
-            height: 155,
-            width: 155,
-            borderRadius: 999,
-            borderColor: COLORS.primary,
-            borderWidth: 2,
-            marginTop: -90,
-          }}
-        />
-
-        <Text
-          style={{
-            ...FONTS.h3,
-            color: COLORS.primary,
-            marginVertical: 8,
-          }}
-        >
-          {name.firstName} {name.lastName}
-        </Text>
-        <Text
-          style={{
-            color: COLORS.black,
-            ...FONTS.body4,
-          }}
-        >
-          Interior designer
-        </Text>
-
-        <View
-          style={{
-            flexDirection: "row",
-            marginVertical: 6,
-            alignItems: "center",
-          }}
-        >
-          <MaterialIcons name="location-on" size={24} color="black" />
-          <Text
-            style={{
-              ...FONTS.body4,
-              marginLeft: 4,
-            }}
-          >
-            Lagos, Nigeria
-          </Text>
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.header}>User Profile</Text>
+      <ScrollView
+      refreshControl={
+      <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }>
+      <View style={styles.contentContainer} >
+        <View style={styles.profileImageContainer}>
+          <Image
+            source={userData?.imageUrl ? { uri: userData.imageUrl } : { uri: 'http://www.gravatar.com/avatar/?d=mp' }}
+            resizeMode="contain"
+            style={styles.profileImage}
+          />
         </View>
 
-        <View
-          style={{
-            paddingVertical: 8,
-            flexDirection: "row",
-          }}
-        >
-          <View
-            style={{
-              flexDirection: "column",
-              alignItems: "center",
-              marginHorizontal: SIZES.padding,
-            }}
-          >
-            <Text
-              style={{
-                ...FONTS.h2,
-                color: COLORS.primary,
-              }}
-            >
-              122
-            </Text>
-            <Text
-              style={{
-                ...FONTS.body4,
-                color: COLORS.primary,
-              }}
-            >
-              Followers
-            </Text>
-          </View>
-
-          <View
-            style={{
-              flexDirection: "column",
-              alignItems: "center",
-              marginHorizontal: SIZES.padding,
-            }}
-          >
-            <Text
-              style={{
-                ...FONTS.h2,
-                color: COLORS.primary,
-              }}
-            >
-              67
-            </Text>
-            <Text
-              style={{
-                ...FONTS.body4,
-                color: COLORS.primary,
-              }}
-            >
-              Followings
-            </Text>
-          </View>
-
-          <View
-            style={{
-              flexDirection: "column",
-              alignItems: "center",
-              marginHorizontal: SIZES.padding,
-            }}
-          >
-            <Text
-              style={{
-                ...FONTS.h2,
-                color: COLORS.primary,
-              }}
-            >
-              77K
-            </Text>
-            <Text
-              style={{
-                ...FONTS.body4,
-                color: COLORS.primary,
-              }}
-            >
-              Likes
-            </Text>
-          </View>
+        <View style={styles.infoContainer}>
+          <MaterialIcons name="work" size={24} color="#000" />
+          <Text style={styles.infoText}>{userData?.occupation}</Text>
         </View>
 
-        <View style={{ flexDirection: "row" }}>
+        <View style={styles.infoContainer}>
+          <MaterialIcons name="email" size={24} color="#000" />
+          <Text style={styles.infoText}>{userData?.email}</Text>
+        </View>
+
+        <View style={styles.infoContainer}>
+          <MaterialIcons name="location-on" size={24} color="#000" />
+          <Text style={styles.infoText}>{userData?.country}</Text>
+        </View>
+
+        <View style={styles.bioContainer}>
+          <Text style={styles.bioTitle}>Bio:</Text>
+          <Text style={styles.bioText}>{userData?.bio}</Text>
+        </View>
+
+        <View style={styles.buttonContainer}>
           <TouchableOpacity
-            style={{
-              width: 124,
-              height: 36,
-              alignItems: "center",
-              justifyContent: "center",
-              backgroundColor: COLORS.primary,
-              borderRadius: 10,
-              marginHorizontal: SIZES.padding * 2,
-            }}
+            onPress={() => navigation.navigate('EditProfileScreen')}
+            style={styles.button}
           >
-            <Text
-              style={{
-                ...FONTS.body4,
-                color: COLORS.white,
-              }}
-            >
-              Edit Profile
-            </Text>
+            <Text style={styles.buttonText}>Edit Profile</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={{
-              width: 124,
-              height: 36,
-              alignItems: "center",
-              justifyContent: "center",
-              backgroundColor: COLORS.primary,
-              borderRadius: 10,
-              marginHorizontal: SIZES.padding * 2,
-            }}
-          >
-            <Text
-              style={{
-                ...FONTS.body4,
-                color: COLORS.white,
-              }}
-            >
-              Add Friend
-            </Text>
+          <TouchableOpacity style={styles.button} onPress={() => {
+              firebase.auth().signOut();
+            }}>
+            <Text style={styles.buttonText}>Log Out</Text>
           </TouchableOpacity>
         </View>
-      </View>
-
-      {/* <View style={{ flex: 1, marginHorizontal: 22, marginTop: 20 }}>
-        <TabView
-          navigationState={{ index, routes }}
-          renderScene={renderScene}
-          onIndexChange={setIndex}
-          initialLayout={{ width: layout.width }}
-          renderTabBar={renderTabBar}
-        />
-      </View> */}
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
 
-export default Profile;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    marginTop: 50
+  },
+  header: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 12,
+  },
+  contentContainer: {
+    flex: 1,
+    alignItems: "center",
+  },
+  profileImageContainer: {
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    overflow: 'hidden',
+    marginTop: 20,
+    marginBottom: 20,
+  },
+  profileImage: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+    borderColor: "#000",
+    borderWidth: 2,
+  },
+  infoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 8
+  },
+  infoText: {
+    fontSize: 16,
+    color: "#000",
+    marginLeft: 8,
+  },
+  bioContainer: {
+    backgroundColor: '#f5f5f5',
+    padding: 12,
+    marginTop: 12,
+    width: '100%',
+    borderRadius: 10,
+    marginRight: 10,
+    marginLeft: 10,
+  },
+  bioTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 6,
+    textAlign: 'center',
+  },
+  bioText: {
+    fontSize: 16,
+    color: "#000",
+    textAlign: 'center'
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 20,
+  },
+  button: {
+    width: 180,
+    height: 50,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#000",
+    borderRadius: 10,
+    marginHorizontal: 10,
+  },
+  buttonText: {
+    fontSize: 18,
+    color: "#fff",
+  },
+});
+
+export default ProfileScreen;
