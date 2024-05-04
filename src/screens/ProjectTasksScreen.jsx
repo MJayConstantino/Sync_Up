@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { StyleSheet, View, Text, TouchableOpacity, FlatList } from "react-native";
+import React, { useEffect, useState } from "react";
+import { StyleSheet, View, Text, TouchableOpacity, FlatList, RefreshControl } from "react-native";
 import { MaterialIcons } from '@expo/vector-icons';
 import { firebase } from '../../firebase-config';
 import ProjectTask from '../components/Projects/ProjectTask';
@@ -13,6 +13,15 @@ const ProjectTasksScreen = ({ route }) => {
   const [tasks, setTasks] = useState([]);
   const navigation = useNavigation();
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [refreshing, setRefreshing] = React.useState(false);
+  const [taskAdded, setTaskAdded] = React.useState(false);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
 
   React.useEffect(() => {
     const fetchTasks = async () => {
@@ -26,7 +35,7 @@ const ProjectTasksScreen = ({ route }) => {
     };
 
     fetchTasks();
-  }, [projectId]);
+  }, [projectId, taskAdded]);
 
   const handleBack = () => {
     navigation.goBack();
@@ -40,10 +49,16 @@ const ProjectTasksScreen = ({ route }) => {
     setIsModalVisible(false);
   };
 
+  const handleProjectTaskPress = (projectId, item) => {
+    navigation.navigate('EditProjectTaskScreen', { projectId: projectId, taskId: item.id });
+  };
+
   const handleSaveTask = async (newTask) => {
     try {
       await firestore.collection(`projects/${projectId}/tasks`).add(newTask);
+      setTaskAdded()
       handleCloseModal();
+      
     } catch (error) {
       console.error("Error saving task:", error);
     }
@@ -79,9 +94,12 @@ const ProjectTasksScreen = ({ route }) => {
         <Text style={styles.header}>Project Tasks</Text>
       </View>
       <FlatList
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
         data={tasks}
         renderItem={({ item }) => (
-          <TouchableOpacity onPress={() => toggleTaskStatus(item.id, item.status)}>
+          <TouchableOpacity onPress={() => handleProjectTaskPress(projectId, item)}>
             <ProjectTask
               assignedTo={item.assignedTo}
               taskName={item.taskName}

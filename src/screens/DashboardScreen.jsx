@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, RefreshControl } from 'react-native';
 import { firebase } from '../../firebase-config';
 import TaskCard from '../components/Dashboard/TasksCard'; // Corrected import path for TaskCard
 import { ScheduleCard, ScheduleTaskCard } from '../components/Dashboard/ScheduleCard'; // Importing ScheduleCard and TaskCard components
@@ -7,6 +7,7 @@ import { ScheduleCard, ScheduleTaskCard } from '../components/Dashboard/Schedule
 const DashboardScreen = () => {
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = React.useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -27,13 +28,24 @@ const DashboardScreen = () => {
     fetchUserData();
   }, []);
 
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.greeting}>Hello, {name}</Text>
         <Text style={styles.subgreeting}>Let's see what's in store for you today..</Text>
       </View>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView 
+      showsVerticalScrollIndicator={false}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }>
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionHeaderText}>Tasks</Text>
         </View>

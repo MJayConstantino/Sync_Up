@@ -1,17 +1,13 @@
+//note that 12 AM is treated as 00:00 here so 12:34 Am is 00:34 AM
+//For some reason the days are still not working, Error is TypeError: The weekday parameter should be a number
+
 import React, { useState, useEffect, useRef } from "react";
 import { StyleSheet, Text, View, Pressable, TextInput, ScrollView } from "react-native";
 import * as Notifications from "expo-notifications";
-import { Audio } from "expo-av"; // Import Audio from expo-av
+import { Audio } from "expo-av";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldPlaySound: true,
-    shouldShowAlert: true,
-    shouldSetBadge: false,
-  }),
-});
+const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 export default function AlarmClock() {
   const notificationListener = useRef();
@@ -21,10 +17,11 @@ export default function AlarmClock() {
   const [ampm, setAmpm] = useState("AM");
   const [editMode, setEditMode] = useState(false);
   const [editId, setEditId] = useState("");
-  const [sound, setSound] = useState(null); // Define sound state
+  const [sound, setSound] = useState(null);
+  const [selectedDays, setSelectedDays] = useState([]);
 
   useEffect(() => {
-    loadSound(); // Call loadSound function
+    loadSound();
     getData();
     notificationListener.current = Notifications.addNotificationResponseReceivedListener((notification) => {
       setNotifications((prevNotifications) => [...prevNotifications, notification]);
@@ -39,7 +36,7 @@ export default function AlarmClock() {
     const { sound } = await Audio.Sound.createAsync(
       require("../assets/sounds/alarm.mp3")
     );
-    setSound(sound); // Set sound state
+    setSound(sound);
   };
 
   const playSound = async () => {
@@ -48,24 +45,30 @@ export default function AlarmClock() {
     }
   };
 
-  async function scheduleNotification(hour, minute, ampm) {
+  async function scheduleNotification(hour, minute, ampm, days) {
     const newHour = ampm === "PM" ? parseInt(hour) + 12 : parseInt(hour);
+    const trigger = {
+      hour: newHour,
+      minute: parseInt(minute),
+      repeats: true,
+    };
+  
+    if (days && days.length > 0) {
+      trigger.weekday = days.map(dayIndex => (dayIndex + 1) % 7); // Convert to 0-based index
+    }
+  
     const identifier = await Notifications.scheduleNotificationAsync({
       content: {
         title: "Alarm",
         body: "It is time to wake up!",
         data: { data: "Your morning alarm data" },
-        sound: "default", // Use default notification sound
+        sound: "default",
       },
-      trigger: {
-        hour: newHour,
-        minute: parseInt(minute),
-        repeats: true,
-      },
+      trigger: trigger,
     });
     return identifier;
   }
-
+  
   async function addAlarm() {
     if (editMode) {
       await removeAlarm(editId);
@@ -74,7 +77,8 @@ export default function AlarmClock() {
       hour: hour,
       minute: minute,
       ampm: ampm,
-      id: await scheduleNotification(hour, minute, ampm),
+      days: selectedDays,
+      id: await scheduleNotification(hour, minute, ampm, selectedDays),
     };
     setAlarms([...alarms, newAlarm]);
     clearInputFields();
@@ -115,6 +119,7 @@ export default function AlarmClock() {
     setHour("");
     setMinute("");
     setAmpm("AM");
+    setSelectedDays([]);
   }
 
   function editAlarm(id) {
@@ -122,13 +127,22 @@ export default function AlarmClock() {
     setHour(alarmToEdit.hour);
     setMinute(alarmToEdit.minute);
     setAmpm(alarmToEdit.ampm);
+    setSelectedDays(alarmToEdit.days);
     setEditId(id);
     setEditMode(true);
   }
 
+  const toggleDaySelection = (day) => {
+    if (selectedDays.includes(day)) {
+      setSelectedDays(selectedDays.filter((d) => d !== day));
+    } else {
+      setSelectedDays([...selectedDays, day]);
+    }
+  };
+  
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.header}>Alarm App</Text>
+      <Text style={styles.header}>Alarms</Text>
       <View style={styles.timeInputContainer}>
         <TextInput
           style={styles.timeInput}
@@ -160,6 +174,22 @@ export default function AlarmClock() {
           <Text style={styles.ampmButtonText}>PM</Text>
         </Pressable>
       </View>
+      <ScrollView horizontal={true} style={styles.daysScrollView} showsHorizontalScrollIndicator={false}>
+        <View style={styles.daysContainer}>
+          {daysOfWeek.map((day, index) => (
+            <Pressable
+              key={index}
+              style={[
+                styles.dayButton,
+                selectedDays.includes(day) ? styles.dayButtonSelected : null,
+              ]}
+              onPress={() => toggleDaySelection(day)}
+            >
+              <Text style={styles.dayButtonText}>{day.slice(0, 3)}</Text>
+            </Pressable>
+          ))}
+        </View>
+      </ScrollView>
       <Pressable style={styles.button} onPress={addAlarm}>
         <Text style={styles.buttonText}>{editMode ? "Update Alarm" : "Add Alarm"}</Text>
       </Pressable>
@@ -214,8 +244,8 @@ const styles = StyleSheet.create({
   ampmButton: {
     backgroundColor: "#ccc",
     borderRadius: 10,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
     marginHorizontal: 5,
   },
   ampmButtonSelected: {
@@ -224,7 +254,7 @@ const styles = StyleSheet.create({
   ampmButtonText: {
     color: "black",
     fontWeight: "bold",
-    fontSize: 16,
+    fontSize: 14,
   },
   button: {
     width: "70%",
@@ -255,5 +285,29 @@ const styles = StyleSheet.create({
     width: "70%",
     marginVertical: 10,
   },
+  daysScrollView: {
+    marginVertical: 10,
+    maxHeight: 60,
+  },
+  daysContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 20,
+  },
+  dayButton: {
+    backgroundColor: "#ccc",
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    marginHorizontal: 5,
+  },
+  dayButtonSelected: {
+    backgroundColor: "blue",
+  },
+  dayButtonText: {
+    color: "black",
+    fontWeight: "bold",
+    fontSize: 14,
+  },
 });
-

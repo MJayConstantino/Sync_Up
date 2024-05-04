@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, TouchableOpacity, View, ScrollView } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View, ScrollView, RefreshControl } from "react-native";
 import Task from "../components/Tasks/Task";
 import AddTaskModal from "../components/Tasks/AddTask";
 import EditTaskScreen from "./EditTasksScreen";
@@ -15,8 +15,17 @@ export default function TasksScreen({ navigation }) {
   const [taskTime, setTaskTime] = useState("");
   const [taskDate, setTaskDate] = useState("");
   const [taskDescription, setTaskDescription] = useState("");
+  const [refreshing, setRefreshing] = React.useState(false);
+  const [taskAdded, setTaskAdded] = React.useState(false);
   const categories = ["All", "Work", "School", "Home", "Personal"];
   const currentUser = firebase.auth().currentUser;
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
 
   // Function to convert time string to 24-hour format
   const convertTo24HourFormat = (timeStr) => {
@@ -49,7 +58,7 @@ export default function TasksScreen({ navigation }) {
     };
   
     fetchTasks();
-  }, [currentUser.uid]);
+  }, [currentUser.uid, taskAdded]);
 
   const handleTaskPress = (taskId) => {
     navigation.navigate('EditTaskScreen', { taskId: taskId });
@@ -68,8 +77,9 @@ export default function TasksScreen({ navigation }) {
 
       await firestore.collection(`users/${currentUser.uid}/tasks`).add(newTask);
 
-      console.log("Task added successfully!");
 
+      console.log("Task added successfully!");
+      setTaskAdded()
       setIsAddModalVisible(false);
       setEditTaskName("");
       setTaskTime("");
@@ -125,7 +135,12 @@ export default function TasksScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollViewContent}>
+      <ScrollView 
+      contentContainerStyle={styles.scrollViewContent} 
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        >
         <View style={styles.taskWrapper}>
           <Text style={styles.sectionTitle}>Tasks</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoryWrapper}>

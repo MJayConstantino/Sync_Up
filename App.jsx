@@ -23,6 +23,8 @@ import AppRoot from './src/screens/SplashScreen';
 import EditTaskScreen from "./src/screens/EditTasksScreen";
 import EditProjectTaskScreen from "./src/screens/EditProjectTaskScreen";
 import EditClassScheduleScreen from "./src/screens/EditClassScheduleScreen";
+import CreateProjectScreen from "./src/screens/CreateProjectScreen";
+import EditProjectScreen from "./src/screens/EditProjectScreen";
 import ChatScreen from "./src/screens/ChatScreen";
 
 const Stack = createStackNavigator();
@@ -177,6 +179,8 @@ export default function App() {
         }}
       >
         <Stack.Screen name="ProjectsScreen" component={ProjectsScreen} />
+        <Stack.Screen name="CreateProjectScreen" component={CreateProjectScreen} />
+        <Stack.Screen name="EditProjectScreen" component={EditProjectScreen} />
         <Stack.Screen name="ProjectTasksScreen" component={ProjectTasksScreen} />
         <Stack.Screen name="EditProjectTaskScreen" component={EditProjectTaskScreen} />
       </Stack.Navigator>

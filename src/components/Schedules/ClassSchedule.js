@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
   },
   bottomRow: {
     flexDirection: "row",
-    flexWrap: "wrap",
+    justifyContent: "space-between",
     marginTop: 10,
   },
   descriptionText: {
