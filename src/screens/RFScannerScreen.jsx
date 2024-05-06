@@ -171,7 +171,14 @@ export default function RFScannerScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.topContainer}>
         {/* <Image source={require('./rf_scanner_image.png')} style={styles.rfImage} /> */}
+        <Text>Scan your Registration Form</Text>
       </View>
+      <Text>1. Press on the "Pick from Gallery" or "Pick from Camera", to take a clear picture of your registration form.</Text>
+      <Text>2. Once you have picked an image of your RF. Crop into the area with the class schedukes, refer to example image below.</Text>
+      <Text>3. After you have cropped the image, press Okay.</Text>
+      <Text>4. If successful, your schedules will now appear on the schedule screen, else try again with a clearer image.</Text>
+
+
       <View style={styles.buttonContainer}>
         <Button
           title="Pick from Gallery"

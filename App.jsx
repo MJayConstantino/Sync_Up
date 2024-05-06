@@ -27,6 +27,9 @@ import CreateProjectScreen from "./src/screens/CreateProjectScreen";
 import EditProjectScreen from "./src/screens/EditProjectScreen";
 import ClassScheduleScreen from "./src/screens/ClassSchedulesScreen";
 import EditProfileScreen from "./src/screens/EditProfileScreen";
+import ChatListScreen from "./src/screens/ChatListScreen";
+import Chat from "./src/screens/Chat";
+
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -90,6 +93,13 @@ export default function App() {
             )}
           />
           <DrawerItem
+            label="Alarms"
+            onPress={() => props.navigation.navigate('Alarms')}
+            icon={({ color, size }) => (
+              <Ionicons name="clock" size={size} color={color} />
+            )}
+          />
+          <DrawerItem
             label="Settings"
             onPress={() => props.navigation.navigate('Settings')}
             icon={({ color, size }) => <Ionicons name="settings" size={size} color={color} />}
@@ -139,6 +149,7 @@ export default function App() {
         <Drawer.Screen name="Profile" component={ProfileScreenManager} />
         <Drawer.Screen name="Scan RF" component={RFScannerScreen} />
         <Drawer.Screen name="Class Schedules" component={ClassScheduleScreen} />
+        <Drawer.Screen name="Alarms" component={AlarmScreen} />
         <Drawer.Screen name="Settings" component={SettingsScreen} />
       </Drawer.Navigator>
     );
@@ -163,7 +174,7 @@ export default function App() {
         screenOptions={({ route }) => ({
           tabBarIcon: ({ focused, color, size }) => {
             let iconName;
-
+  
             if (route.name === 'Dashboard') {
               iconName = focused ? 'home' : 'home-outline';
             } else if (route.name === 'Schedule') {
@@ -172,10 +183,10 @@ export default function App() {
               iconName = focused ? 'people' : 'people-outline';
             } else if (route.name === 'Tasks') {
               iconName = focused ? 'document-text' : 'document-text-outline';
-            } else if (route.name === 'Alarm') {
-              iconName = focused ? 'alarm' : 'alarm-outline';
+            } else if (route.name === 'Chat') {
+              iconName = focused ? 'chatbox' : 'chatbox-outline'; // Changed the icon name for 'Chat' screen
             }
-
+  
             return <Ionicons name={iconName} size={size} color={color} />;
           },
           tabBarActiveTintColor: 'blue',
@@ -188,10 +199,11 @@ export default function App() {
         <Tab.Screen name="Projects" component={ProjectScreenManager} />
         <Tab.Screen name="Schedule" component={ScheduleScreenManager} />
         <Tab.Screen name="Tasks" component={TaskScreenManager} />
-        <Tab.Screen name="Alarm" component={AlarmScreen} />
+        <Tab.Screen name="Chat" component={ChatNavigator} />
       </Tab.Navigator>
     );
   }
+  
 
   function ProjectScreenManager(){
     return(
@@ -205,6 +217,19 @@ export default function App() {
         <Stack.Screen name="EditProjectScreen" component={EditProjectScreen} />
         <Stack.Screen name="ProjectTasksScreen" component={ProjectTasksScreen} />
         <Stack.Screen name="EditProjectTaskScreen" component={EditProjectTaskScreen} />
+      </Stack.Navigator>
+    )
+  }
+
+  function ChatNavigator(){
+    return(
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: false, // Hide header for all screens in this stack
+        }}
+      >
+        <Stack.Screen name="ChatList" component={ChatListScreen} />
+        <Stack.Screen name="Chat" component={Chat} />
       </Stack.Navigator>
     )
   }
