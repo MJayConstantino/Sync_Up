@@ -70,7 +70,7 @@ const ScheduleScreen = ({ navigation }) => {
 
   const getOccurrencesOfMonth = (dayOfWeek) => {
     const today = new Date();
-    const dayOfWeekIndex = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].indexOf(dayOfWeek);
+    const dayOfWeekIndex = ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', ].indexOf(dayOfWeek);
     const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
     const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
   
@@ -139,16 +139,11 @@ const ScheduleScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <ScrollView
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-        contentContainerStyle={{ flexGrow: 1 }}
-      >
         <Agenda
           items={items}
           renderItem={renderItem}
           // Other Agenda props
         />
-      </ScrollView>
 
       <TouchableOpacity style={styles.addButton} onPress={() => setIsModalVisible(true)}>
         <Text style={styles.addButtonText}>Add Schedule</Text>

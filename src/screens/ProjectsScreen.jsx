@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView, RefreshControl } from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, RefreshControl, ActivityIndicator } from "react-native";
 import { firebase } from '../../firebase-config';
 import Project from "../components/Projects/Project";
 import { useNavigation } from '@react-navigation/native';
@@ -11,6 +11,7 @@ const ProjectsScreen = () => {
   const navigation = useNavigation();
   const [refreshing, setRefreshing] = useState(false);
   const [projectAdded, setProjectAdded] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -33,6 +34,8 @@ const ProjectsScreen = () => {
         setProjects(projectsWithTasks);
       } catch (error) {
         console.error("Error fetching projects:", error);
+      } finally {
+        setLoading(false);
       }
     };
   
@@ -48,7 +51,11 @@ const ProjectsScreen = () => {
   };
   
 
-  return (
+  if (loading) {
+    return (
+      <ActivityIndicator style={{flex: 1, justifyContent: "center", alignItems: "center"}} color="blue" size="large" />
+    )
+  } else return (
     <View style={styles.container}>
       <ScrollView 
        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}

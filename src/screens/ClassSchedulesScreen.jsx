@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, SectionList } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, SectionList, ActivityIndicator } from 'react-native';
 import { firebase } from '../../firebase-config';
 import ClassSchedule from '../components/Schedules/ClassSchedule';
 
@@ -8,6 +8,7 @@ const firestore = firebase.firestore();
 const ClassScheduleScreen = ({ navigation }) => {
   const [classSchedules, setClassSchedules] = useState([]);
   const currentUser = firebase.auth().currentUser;
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchClassSchedules = async () => {
@@ -23,6 +24,8 @@ const ClassScheduleScreen = ({ navigation }) => {
         setClassSchedules(fetchedClassSchedules);
       } catch (error) {
         console.error('Error fetching class schedules:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -60,7 +63,11 @@ const ClassScheduleScreen = ({ navigation }) => {
     <Text style={styles.sectionHeader}>{title}</Text>
   );
 
-  return (
+  if (loading) {
+    return (
+      <ActivityIndicator style={{flex: 1, justifyContent: "center", alignItems: "center"}} color="blue" size="large" />
+    )
+  } else return (
     <View style={styles.container}>
       <Text style={styles.heading}>Class Schedules</Text>
       <SectionList

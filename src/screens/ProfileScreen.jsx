@@ -7,7 +7,8 @@ import {
   useWindowDimensions,
   StyleSheet,
   RefreshControl,
-  ScrollView
+  ScrollView,
+  ActivityIndicator
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -23,6 +24,7 @@ const ProfileScreen = () => {
   const [userData, setUserData] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
   const [profileEdited, setProfileEdited] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -37,16 +39,23 @@ const ProfileScreen = () => {
         const userDoc = await firestore.collection('users').doc(currentUser.uid).get();
         if (userDoc.exists) {
           setUserData(userDoc.data());
+          setProfileEdited(true);
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchUserData();
   }, [profileEdited]);
 
-  return (
+  if(loading){
+    return (
+      <ActivityIndicator style={{flex: 1, justifyContent: "center", alignItems: "center"}} color="blue" size="large" />
+    )
+  } else return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.header}>User Profile</Text>
       <ScrollView

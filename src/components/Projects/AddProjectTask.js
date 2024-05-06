@@ -104,7 +104,8 @@ const AddProjectTaskModal = ({
       date: taskDate,
       assignedTo, 
       description: "",
-      status: "pending"// Include assignedTo in newTask
+      isCompleted: false,
+      createdAt: new Date()// Include assignedTo in newTask
     };
 
     // Invoke onSave function with the newTask object

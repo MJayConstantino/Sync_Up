@@ -1,17 +1,15 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import DeleteBtn from "../Tasks/DeleteBtn"; // Assuming DeleteBtn component is defined elsewhere
-import CheckBox from "../Tasks/CheckBox";
+import DeleteBtn from "./DeleteBtn"; // Assuming DeleteBtn component is defined elsewhere
+import CheckBox from "./CheckBox";
 
-const ProjectTask = ({ assignedTo, taskName, description, time, date, deleteTask, toggleTaskStatus, taskId, status }) => {
+const ProjectTask = ({ assignedTo, taskName, description, time, date, deleteTask, toggleCompleted, taskId, isCompleted }) => {
   // Function to determine the color of the deadline date based on completion status
   const getDeadlineColor = () => {
-    if (status === "completed") {
+    if (isCompleted) {
       return "#00FF00"; // Green if completed before deadline
-    } else if (new Date(date) >= new Date()) {
-      return "#00adf5"; // Blue if not completed but not yet the deadline
-    } else if (status === "pending") {
+    } else if (!isCompleted) {
       return "#FF0000"; // Red if not completed and past the deadline
     }
   };
@@ -31,7 +29,7 @@ const ProjectTask = ({ assignedTo, taskName, description, time, date, deleteTask
 
       <View style={styles.contentContainer}>
         <View style={styles.itemLeft}>
-          <CheckBox taskId={taskId} status={status} toggleTaskStatus={toggleTaskStatus} style={styles.checkBoxMargin} />
+          <CheckBox taskId={taskId} isCompleted={isCompleted} toggleCompleted={toggleCompleted} style={styles.checkBoxMargin} />
           {/* Display the task name */}
           <Text style={styles.taskName}>{taskName}</Text>
         </View>

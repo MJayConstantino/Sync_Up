@@ -4,7 +4,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import DeleteBtn from "./DeleteBtn"; // Assuming DeleteBtn component is defined elsewhere
 import CheckBox from "./CheckBox";
 
-const Task = ({ text, description, category, time, date, deleteTask, toggleTaskStatus, taskId, currentStatus }) => {
+const Task = ({ text, description, category, time, date, deleteTask, toggleCompleted, taskId, isCompleted }) => {
   return (
     <View style={styles.item}>
       <View style={styles.topContainer}>
@@ -16,7 +16,7 @@ const Task = ({ text, description, category, time, date, deleteTask, toggleTaskS
       </View>
       <View style={styles.contentContainer}>
         <View style={styles.itemLeft}>
-          <CheckBox taskId={taskId} currentStatus={currentStatus} toggleTaskStatus={toggleTaskStatus} style={styles.checkBoxMargin} />
+          <CheckBox taskId={taskId} isCompleted={isCompleted} toggleCompleted={toggleCompleted} style={styles.checkBoxMargin} />
           <Text style={styles.textContainer}>{text}</Text>
         </View>
         <DeleteBtn deleteTask={deleteTask} />

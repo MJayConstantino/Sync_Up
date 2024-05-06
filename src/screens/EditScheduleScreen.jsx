@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, TouchableOpacity, View, TextInput, Platform } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View, TextInput, Platform, ActivityIndicator } from "react-native";
 import { MaterialCommunityIcons as Icon } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { format } from 'date-fns';
@@ -20,6 +20,7 @@ const EditScheduleScreen = ({ navigation, route }) => {
   const [selectedTime, setSelectedTime] = useState('');
   const [isEditingEndTime, setIsEditingEndTime] = useState(false); // Declare isEditingEndTime state
   const currentUser = firebase.auth().currentUser;
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchScheduleDetails = async () => {
@@ -40,6 +41,8 @@ const EditScheduleScreen = ({ navigation, route }) => {
       } catch (error) {
         console.error("Error fetching schedule details:", error);
         alert("An error occurred while fetching the schedule. Please try again.");
+      } finally {
+        setLoading(false);
       }
     };
   
@@ -133,7 +136,11 @@ const EditScheduleScreen = ({ navigation, route }) => {
     }
   };
 
-  return (
+  if (loading) {
+    return (
+      <ActivityIndicator style={{flex: 1, justifyContent: "center", alignItems: "center"}} color="blue" size="large" />
+    )
+  } else return (
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>

@@ -26,7 +26,11 @@ const ProjectTasksScreen = ({ route }) => {
   React.useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const tasksSnapshot = await firestore.collection(`projects/${projectId}/tasks`).get();
+        const tasksSnapshot = await firestore
+          .collection(`projects/${projectId}/tasks`)
+          .orderBy("isCompleted", "asc")
+          .orderBy("createdAt", "desc")
+          .get();
         const tasksData = tasksSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         setTasks(tasksData);
       } catch (error) {
@@ -73,12 +77,12 @@ const ProjectTasksScreen = ({ route }) => {
     }
   };
 
-  const toggleTaskStatus = async (taskId, currentStatus) => {
+  const toggleCompleted = async (taskId, completed) => {
     try {
-      const newStatus = currentStatus === "completed" ? "pending" : "completed";
-      await firestore.collection(`projects/${projectId}/tasks`).doc(taskId).update({ status: newStatus });
+      const status = completed? false : true;
+      await firestore.collection(`projects/${projectId}/tasks`).doc(taskId).update({ isCompleted: status });
       setTasks((prevTasks) =>
-        prevTasks.map(task => task.id === taskId ? { ...task, status: newStatus } : task)
+        prevTasks.map(task => task.id === taskId ? { ...task, completed: status } : task)
       );
     } catch (error) {
       console.error("Error toggling task status:", error);
@@ -108,9 +112,9 @@ const ProjectTasksScreen = ({ route }) => {
                 time={item.time}
                 date={item.date}
                 deleteTask={() => deleteTask(item.id)}
-                toggleTaskStatus={() => toggleTaskStatus(item.id, item.status)}
+                toggleCompleted={() => toggleCompleted(item.id, item.isCompleted)}
                 taskId={item.id}
-                status={item.status}
+                isCompleted={item.isCompleted}
               />
             </TouchableOpacity>
           )}

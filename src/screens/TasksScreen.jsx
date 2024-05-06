@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, TouchableOpacity, View, ScrollView, RefreshControl } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View, ScrollView, RefreshControl, ActivityIndicator } from "react-native";
 import Task from "../components/Tasks/Task";
 import AddTaskModal from "../components/Tasks/AddTask";
 import EditTaskScreen from "./EditTasksScreen";
@@ -19,6 +19,7 @@ export default function TasksScreen({ navigation }) {
   const [taskAdded, setTaskAdded] = React.useState(false);
   const categories = ["All", "Work", "School", "Home", "Personal"];
   const currentUser = firebase.auth().currentUser;
+  const [loading, setLoading] = useState(true);
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -49,16 +50,23 @@ export default function TasksScreen({ navigation }) {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const snapshot = await firestore.collection(`users/${currentUser.uid}/tasks`).get();
+        const snapshot = await firestore
+          .collection(`users/${currentUser.uid}/tasks`)
+          .orderBy("isCompleted", "asc")
+          .orderBy("createdAt", "desc") // Order tasks by createdAt in descending order
+          .get();
         const tasks = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
         setTaskItems(tasks.sort(sortByTime)); // Sort tasks by time
       } catch (error) {
         console.error("Error fetching tasks:", error);
+      } finally {
+        setLoading(false);
       }
     };
   
     fetchTasks();
   }, [currentUser.uid, taskAdded]);
+  
 
   const handleTaskPress = (taskId) => {
     navigation.navigate('EditTaskScreen', { taskId: taskId });
@@ -72,7 +80,8 @@ export default function TasksScreen({ navigation }) {
         time: taskTime,
         date: taskDate,
         description: taskDescription,
-        status: "not finished", // Initial status
+        isCompleted: false, // Initial status
+        createdAt: new Date()
       };
 
       await firestore.collection(`users/${currentUser.uid}/tasks`).add(newTask);
@@ -97,14 +106,14 @@ export default function TasksScreen({ navigation }) {
     setIsAddModalVisible(true);
   };
 
-  const toggleTaskStatus = async (taskId, currentStatus) => {
+  const toggleCompleted = async (taskId, isCompleted) => {
     try {
-      const updatedStatus = currentStatus === "finished" ? "not finished" : "finished";
-      await firestore.collection(`users/${currentUser.uid}/tasks`).doc(taskId).update({ status: updatedStatus });
+      const updatedStatus = isCompleted ? false : true;
+      await firestore.collection(`users/${currentUser.uid}/tasks`).doc(taskId).update({ isCompleted: updatedStatus });
 
       const updatedTasks = taskItems.map((task) => {
         if (task.id === taskId) {
-          return { ...task, status: updatedStatus };
+          return { ...task, isCompleted: updatedStatus };
         }
         return task;
       });
@@ -133,7 +142,11 @@ export default function TasksScreen({ navigation }) {
     }
   };
 
-  return (
+  if (loading) {
+    return (
+      <ActivityIndicator style={{flex: 1, justifyContent: "center", alignItems: "center"}} color="blue" size="large" />
+    )
+  } else return (
     <View style={styles.container}>
       <ScrollView 
       contentContainerStyle={styles.scrollViewContent} 
@@ -173,8 +186,8 @@ export default function TasksScreen({ navigation }) {
                 date={item.date}
                 category={item.category}
                 taskId={item.id}
-                currentStatus={item.status}
-                toggleTaskStatus={toggleTaskStatus} // Pass toggleTaskStatus function here
+                isCompleted={item.isCompleted}
+                toggleCompleted={toggleCompleted} // Pass toggleTaskStatus function here
               />
             </TouchableOpacity>
           ))}
@@ -271,3 +284,4 @@ const styles = StyleSheet.create({
     color: "#666",
   },
 });
+

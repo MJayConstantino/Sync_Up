@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, FlatList } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, FlatList, ActivityIndicator } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { MaterialIcons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -21,6 +21,7 @@ const CreateProjectScreen = () => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const currentUser = firebase.auth().currentUser;
   const navigation = useNavigation(); // Initialize navigation
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Fetch existing emails from users collection
@@ -31,6 +32,8 @@ const CreateProjectScreen = () => {
         setExistingEmails(emails);
       } catch (error) {
         console.error("Error fetching existing emails:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -122,7 +125,11 @@ const CreateProjectScreen = () => {
     setShowSuggestions(false);
   };
 
-  return (
+  if (loading) {
+    return (
+      <ActivityIndicator style={{flex: 1, justifyContent: "center", alignItems: "center"}} color="blue" size="large" />
+    )
+  } else return (
     <MenuProvider>
       <View style={styles.container}>
         <View style={styles.headerContainer}>

@@ -86,11 +86,11 @@ export default function RFScannerScreen() {
   const performOCR = (file) => {
     // Reset classSchedule to clear previous data
     setClassSchedule([]);
-
+  
     let myHeaders = new Headers();
     myHeaders.append('apikey', 'FEmvQr5uj99ZUvk3essuYb6P5lLLBS20');
     myHeaders.append('Content-Type', 'multipart/form-data');
-
+  
     let raw = file;
     let requestOptions = {
       method: 'POST',
@@ -98,7 +98,7 @@ export default function RFScannerScreen() {
       headers: myHeaders,
       body: raw,
     };
-
+  
     fetch('https://api.apilayer.com/image_to_text/upload', requestOptions)
       .then((response) => response.json())
       .then((result) => {
@@ -112,11 +112,26 @@ export default function RFScannerScreen() {
           time: convertTimeFormat(course.time)
         }));
         console.log(convertedSchedule); // Log convertedSchedule here
-        setClassSchedule(convertedSchedule);
-        // Add each schedule to Firebase
-        convertedSchedule.forEach(schedule => {
-          addScheduleToFirestore(schedule);
-        });
+        
+        // Delete existing documents from the classSchedules collection
+        firestore.collection(`users/${currentUser.uid}/classSchedules`).get()
+          .then(querySnapshot => {
+            const batch = firestore.batch();
+            querySnapshot.forEach(doc => {
+              batch.delete(doc.ref);
+            });
+            return batch.commit();
+          })
+          .then(() => {
+            console.log("Existing schedules deleted successfully.");
+            // Add each schedule to Firebase
+            convertedSchedule.forEach(schedule => {
+              addScheduleToFirestore(schedule);
+            });
+          })
+          .catch(error => {
+            console.error("Error deleting existing schedules:", error);
+          });
       })
       .catch((error) => {
         console.log('Error performing OCR:', error.message);
@@ -124,6 +139,7 @@ export default function RFScannerScreen() {
         alert('Error: Unable to extract text from the image. Please capture a clearer picture.');
       });
   };
+  
 
   const pickImageGallery = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({

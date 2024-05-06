@@ -6,7 +6,8 @@ import {
     Image,
     TextInput,
     Modal,
-    StyleSheet
+    StyleSheet,
+    ActivityIndicator
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -30,6 +31,7 @@ const EditProfileScreen = ({ navigation }) => {
     const currentUser = firebase.auth().currentUser;
     const [occupation, setOccupation] = useState("");
     const [bio, setBio] = useState("");
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -45,6 +47,8 @@ const EditProfileScreen = ({ navigation }) => {
                 setBio(userData.bio);
             } catch (error) {
                 console.log("Error getting profile details", error);
+            } finally {
+                setLoading(false);
             }
         };
     
@@ -84,7 +88,11 @@ const EditProfileScreen = ({ navigation }) => {
         }
     };
 
-    return (
+    if (loading){
+        return (
+            <ActivityIndicator style={{flex: 1, justifyContent: "center", alignItems: "center"}} color="blue" size="large" />
+          )
+    } else return (
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>

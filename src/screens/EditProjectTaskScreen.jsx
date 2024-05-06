@@ -20,6 +20,7 @@ const EditProjectTaskScreen = ({ navigation, route }) => {
   const [isTimePickerVisible, setIsTimePickerVisible] = useState(false);
   const [selectedDate, setSelectedDate] = useState(""); 
   const [selectedTime, setSelectedTime] = useState("");
+  const [loading, setLoading] = useState(true);
   const currentUser = firebase.auth().currentUser;
 
   useEffect(() => {
@@ -41,6 +42,8 @@ const EditProjectTaskScreen = ({ navigation, route }) => {
       } catch (error) {
         console.error("Error fetching task details:", error);
         alert("An error occurred while fetching the task. Please try again.");
+      } finally {
+        setLoading(false);
       }
     };
   
@@ -153,7 +156,11 @@ const EditProjectTaskScreen = ({ navigation, route }) => {
     </View>
   ));
 
-  return (
+  if (loading) {
+    return (
+      <ActivityIndicator style={{flex: 1, justifyContent: "center", alignItems: "center"}} color="blue" size="large" />
+    )
+  } else return (
     <MenuProvider>
       <View style={styles.container}>
         <View style={styles.header}>

@@ -2,25 +2,29 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { firebase } from '../../../firebase-config';
 
-const TaskCard = ({ title, status, onPress }) => {
+const TaskCard = ({ title, completed, onPress }) => {
   const [taskCount, setTaskCount] = useState(0);
 
   useEffect(() => {
     const fetchTaskCount = async () => {
       try {
         const currentUser = firebase.auth().currentUser;
-        const snapshot = await firebase.firestore().collection(`users/${currentUser.uid}/tasks`).where('status', '==', status).get();
+        const snapshot = await firebase.firestore()
+          .collection(`users/${currentUser.uid}/tasks`)
+          .where('completed', '==', true) // Filter tasks where completed is true
+          .get();
         setTaskCount(snapshot.size);
       } catch (error) {
         console.error('Error fetching task count:', error);
       }
     };
-
+  
     fetchTaskCount();
-  }, [status]);
+  }, [completed]);
+  
 
   // Define the card color based on the status
-  const cardColor = status === 'not finished' ? '#FFCCCC' : '#CCFFCC';
+  const cardColor = completed? '#FFCCCC' : '#CCFFCC';
 
   return (
     <TouchableOpacity onPress={onPress} style={[styles.card, { backgroundColor: cardColor }]}>

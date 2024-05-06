@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, TouchableOpacity, View, TextInput, Platform } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View, TextInput, Platform, ActivityIndicator } from "react-native";
 import { MaterialCommunityIcons as Icon } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { format } from 'date-fns';
@@ -19,6 +19,7 @@ const EditClassScheduleScreen = ({ navigation, route }) => {
   const [isTimePickerVisible, setIsTimePickerVisible] = useState(false);
   const [selectedTime, setSelectedTime] = useState('');
   const [isEditingEndTime, setIsEditingEndTime] = useState(false); // Declare isEditingEndTime state
+  const [loading, setLoading] = useState(true);
   const currentUser = firebase.auth().currentUser;
 
   useEffect(() => {
@@ -35,6 +36,7 @@ const EditClassScheduleScreen = ({ navigation, route }) => {
           setTimeEnd(classScheduleData.time.timeEnd);
           setInstructor(classScheduleData.instructor);
           setRoom(classScheduleData.room);
+          setLoading(false);
         } else {
           alert("Schedule not found!");
           navigation.goBack(); // Navigate back if schedule not found
@@ -42,7 +44,9 @@ const EditClassScheduleScreen = ({ navigation, route }) => {
       } catch (error) {
         console.error("Error fetching schedule details:", error);
         alert("An error occurred while fetching the schedule. Please try again.");
-      }
+      } finally {
+        setLoading(false)
+      };
     };
   
     if (classScheduleId) {
@@ -119,7 +123,11 @@ const EditClassScheduleScreen = ({ navigation, route }) => {
     }
   };
 
-  return (
+  if (loading) {
+    return (
+      <ActivityIndicator style={{flex: 1, justifyContent: "center", alignItems: "center"}} color="blue" size="large" />
+    )
+  } else return (
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>

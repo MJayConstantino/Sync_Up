@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, TouchableOpacity, View, TextInput, Platform } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View, TextInput, Platform, ActivityIndicator } from "react-native";
 import { MaterialCommunityIcons as Icon } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { format } from 'date-fns';
@@ -20,6 +20,7 @@ const EditProjectScreen = ({ navigation, route }) => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const currentUser = firebase.auth().currentUser;
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchTaskDetails = async () => {
@@ -62,6 +63,8 @@ const EditProjectScreen = ({ navigation, route }) => {
         setCollaborators(validCollaborators);
       } catch (error) {
         console.error("Error fetching collaborators:", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchCollaborators();
@@ -151,7 +154,11 @@ const EditProjectScreen = ({ navigation, route }) => {
     </View>
   ));
 
-  return (
+  if (loading) {
+    return (
+      <ActivityIndicator style={{flex: 1, justifyContent: "center", alignItems: "center"}} color="blue" size="large" />
+    )
+  } else return (
     <MenuProvider>
       <View style={styles.container}>
         <View style={styles.header}>

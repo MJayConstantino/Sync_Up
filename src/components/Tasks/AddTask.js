@@ -90,7 +90,7 @@ const AddTaskModal = ({
       time: taskTime,
       date: taskDate,
       description: taskDescription,
-      status: "not finished",
+      isCompleted: false
     };
 
     // Invoke onSave function with the newTask object

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, RefreshControl, ActivityIndicator } from 'react-native';
 import { firebase } from '../../firebase-config';
 import TaskCard from '../components/Dashboard/TasksCard'; // Corrected import path for TaskCard
 import { ScheduleCard, ScheduleTaskCard } from '../components/Dashboard/ScheduleCard'; // Importing ScheduleCard and TaskCard components
@@ -35,7 +35,11 @@ const DashboardScreen = () => {
     }, 2000);
   }, []);
 
-  return (
+  if (loading){
+    return (
+      <ActivityIndicator style={{flex: 1, justifyContent: "center", alignItems: "center"}} color="blue" size="large" />
+    )
+  } else return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.greeting}>Hello, {name}</Text>
@@ -50,8 +54,8 @@ const DashboardScreen = () => {
           <Text style={styles.sectionHeaderText}>Tasks</Text>
         </View>
         <View style={styles.taskContainer}>
-          <TaskCard title="Unfinished Tasks" status="not finished" />
-          <TaskCard title="Finished Tasks" status="finished" />
+          <TaskCard title="Pending Tasks" completed = {false} />
+          <TaskCard title="Completed Tasks" completed = {true} />
         </View>
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionHeaderText}>Schedule</Text>
