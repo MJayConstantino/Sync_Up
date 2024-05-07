@@ -13,7 +13,6 @@ import DashboardScreen from "./src/screens/DashboardScreen";
 import ProfileScreen from './src/screens/ProfileScreen';
 import TasksScreen from './src/screens/TasksScreen';
 import ScheduleScreen from './src/screens/ScheduleScreen';
-import AlarmScreen from './src/screens/AlarmScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import ProjectsScreen from './src/screens/ProjectsScreen';
 import ProjectTasksScreen from "./src/screens/ProjectTasksScreen";
@@ -93,13 +92,6 @@ export default function App() {
             )}
           />
           <DrawerItem
-            label="Alarms"
-            onPress={() => props.navigation.navigate('Alarms')}
-            icon={({ color, size }) => (
-              <Ionicons name="time" size={size} color={color} />
-            )}
-          />
-          <DrawerItem
             label="Settings"
             onPress={() => props.navigation.navigate('Settings')}
             icon={({ color, size }) => <Ionicons name="settings" size={size} color={color} />}
@@ -149,7 +141,6 @@ export default function App() {
         <Drawer.Screen name="Profile" component={ProfileScreenManager} />
         <Drawer.Screen name="Scan RF" component={RFScannerScreen} />
         <Drawer.Screen name="Class Schedules" component={ClassScheduleManager} />
-        <Drawer.Screen name="Alarms" component={AlarmScreen} />
         <Drawer.Screen name="Settings" component={SettingsScreen} />
       </Drawer.Navigator>
     );
