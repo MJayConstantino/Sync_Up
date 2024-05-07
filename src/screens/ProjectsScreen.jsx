@@ -86,7 +86,7 @@ const ProjectsScreen = () => {
 const calculateProgress = (tasks) => {
   if (!tasks || tasks.length === 0) return 0;
 
-  const completedTasks = tasks.filter(task => task.status === 'completed');
+  const completedTasks = tasks.filter(task => task.completed === true);
   return (completedTasks.length / tasks.length) * 100;
 };
 
