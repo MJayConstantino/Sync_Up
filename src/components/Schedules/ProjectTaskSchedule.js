@@ -2,15 +2,12 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-const ProjectTaskSchedule = ({ taskName, time, description, category }) => {
+const ProjectTaskSchedule = ({ taskName, time, description, date }) => {
   return (
     <View style={[styles.item, { backgroundColor: "transparent" }]}>
-      <View style={[styles.categoryContainer, { backgroundColor: "#00adf5" }]}>
-        <Text style={styles.categoryText}>{category}</Text>
-      </View>
       <View style={styles.timeContainer}>
         <MaterialCommunityIcons name="clock-outline" size={15} color="#000" />
-        <Text style={styles.timeText}>{time}</Text>
+        <Text style={styles.timeText}>{date}  {time}</Text>
       </View>
       <View style={styles.topContainer}>
         <Text style={styles.scheduleName}>{taskName}</Text>

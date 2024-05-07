@@ -19,10 +19,13 @@ import DateTimePicker from "@react-native-community/datetimepicker"
 import { firebase } from '../../firebase-config';
 
 const firestore = firebase.firestore();
+const DEFAULT_PROFILE_PIC = 'https://firebasestorage.googleapis.com/v0/b/syncup-4b36a.appspot.com/o/profilepic.png?alt=media&token=4f9acff6-166b-4e21-9ac8-42bc5f441e63';
+
 
 const EditProfileScreen = ({ navigation }) => {
-    const [selectedImage, setSelectedImage] = useState("http://www.gravatar.com/avatar/?d=mp");
-    const [name, setName] = useState("");
+    const [selectedImage, setSelectedImage] = useState(DEFAULT_PROFILE_PIC);
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [country, setCountry] = useState("");
@@ -38,7 +41,8 @@ const EditProfileScreen = ({ navigation }) => {
             try {
                 const userDoc = await firestore.collection("users").doc(currentUser.uid).get();
                 const userData = userDoc.data();
-                setName(userData.firstName); // Assuming firstName is a field in your Firebase user data
+                setFirstName(userData.firstName);
+                setLastName(userData.lastName); // Assuming firstName is a field in your Firebase user data
                 setEmail(userData.email);
                 setCountry(userData.country);
                 setSelectedStartDate(userData.birthDate ? new Date(userData.birthDate) : new Date()); // Assuming birthDate is a field in your Firebase user data
@@ -116,11 +120,19 @@ const EditProfileScreen = ({ navigation }) => {
 
                 <View style={styles.formContainer}>
                     <View style={styles.inputContainer}>
-                        <Text style={styles.label}>Name</Text>
+                        <Text style={styles.label}>First Name</Text>
                         <View style={styles.textInputContainer}>
                             <TextInput
-                                value={name}
-                                onChangeText={(value) => setName(value)}
+                                value={firstName}
+                                onChangeText={(value) => setFirstName(value)}
+                                style={styles.textInput}
+                            />
+                        </View>
+                        <Text style={styles.label}>Last Name</Text>
+                        <View style={styles.textInputContainer}>
+                            <TextInput
+                                value={lastName}
+                                onChangeText={(value) => setLastName(value)}
                                 style={styles.textInput}
                             />
                         </View>

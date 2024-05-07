@@ -4,6 +4,7 @@ import { Button, StyleSheet, Text, Image, SafeAreaView, View } from 'react-nativ
 import * as ImagePicker from 'expo-image-picker';
 import { firebase } from '../../firebase-config';
 import { MaterialCommunityIcons } from '@expo/vector-icons'; // Importing icon library
+import { ScrollView } from 'react-native-gesture-handler';
 
 const firestore = firebase.firestore();
 
@@ -45,15 +46,16 @@ export default function RFScannerScreen() {
 
   function convertDayAbbreviationToFull(dayAbbreviation) {
     const daysMapping = {
-      "M": "Monday",
-      "T": "Tuesday",
-      "W": "Wednesday",
-      "Th": "Thursday",
-      "F": "Friday",
-      "S": "Saturday",
+      "M": ["Monday"],
+      "T": ["Tuesday"],
+      "W": ["Wednesday"],
+      "Th": ["Thursday"],
+      "F": ["Friday"],
+      "S": ["Saturday"],
+      "MT": ["Monday", "Tuesday"],
       "TTh": ["Tuesday", "Thursday"],
       "MW": ["Monday", "Wednesday"],
-      "TBA": "TBA"
+      "TBA": ["TBA"]
     };
     return daysMapping[dayAbbreviation] || "Unknown";
   }
@@ -109,7 +111,8 @@ export default function RFScannerScreen() {
         const convertedSchedule = structuredData.map(course => ({
           ...course,
           day: convertDayAbbreviationToFull(course.day),
-          time: convertTimeFormat(course.time)
+          time: convertTimeFormat(course.time),
+          timeValue: getTimeValue(convertTimeFormat(course.time).timeStart)
         }));
         console.log(convertedSchedule); // Log convertedSchedule here
         
@@ -139,6 +142,16 @@ export default function RFScannerScreen() {
         alert('Error: Unable to extract text from the image. Please capture a clearer picture.');
       });
   };
+  
+  function getTimeValue(timeStart) {
+    const [time, period] = timeStart.split(' ');
+    const [hours, minutes] = time.split(':');
+    let timeValue = parseInt(hours) * 100 + parseInt(minutes);
+    if (period === 'PM' && hours !== '12') {
+      timeValue += 1200;
+    }
+    return timeValue;
+  }
   
 
   const pickImageGallery = async () => {
@@ -171,13 +184,16 @@ export default function RFScannerScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.topContainer}>
         {/* <Image source={require('./rf_scanner_image.png')} style={styles.rfImage} /> */}
-        <Text>Scan your Registration Form</Text>
+        <Text style={styles.title}>Scan your Registration Form</Text>
       </View>
-      <Text>1. Press on the "Pick from Gallery" or "Pick from Camera", to take a clear picture of your registration form.</Text>
-      <Text>2. Once you have picked an image of your RF. Crop into the area with the class schedukes, refer to example image below.</Text>
-      <Text>3. After you have cropped the image, press Okay.</Text>
-      <Text>4. If successful, your schedules will now appear on the schedule screen, else try again with a clearer image.</Text>
-
+      <ScrollView showsVerticalScrollIndicator={false}>
+      <View style={styles.instructionsContainer}>
+        <Text style={styles.instruction}>1. Press on the "Pick from Gallery" or "Pick from Camera", to take a clear picture of your registration form.</Text>
+        <Text style={styles.instruction}>2. Once you have picked an image of your RF. Crop into the area with the class schedules, refer to the example image below.</Text>
+        <Image source={require('../assets/rf.jpg')} style={styles.exampleImage} />
+        <Text style={styles.instruction}>3. After you have cropped the image, press crop.</Text>
+        <Text style={styles.instruction}>4. If successful, your schedules will now appear on the schedule screen, else try again with a clearer image.</Text>
+      </View>
 
       <View style={styles.buttonContainer}>
         <Button
@@ -195,11 +211,12 @@ export default function RFScannerScreen() {
       </View>
       {image && (
         <View style={styles.imageContainer}>
-          <Text>Image Preview:</Text>
+          <Text style={styles.imagePreviewText}>Image Preview:</Text>
           <Image source={{ uri: image }} style={styles.image} />
         </View>
       )}
       <StatusBar style="auto" />
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -209,16 +226,29 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     padding: 20,
-    marginTop: 50
+    paddingTop: 35
   },
   topContainer: {
     alignItems: 'center',
     marginBottom: 20,
   },
-  rfImage: {
-    width: 300,
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  instructionsContainer: {
+    marginBottom: 20,
+  },
+  instruction: {
+    fontSize: 16,
+    marginBottom: 10,
+  },
+  exampleImage: {
+    width: '100%',
     height: 200,
     resizeMode: 'contain',
+    marginBottom: 10,
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -233,6 +263,11 @@ const styles = StyleSheet.create({
   imageContainer: {
     alignItems: 'center',
     marginTop: 20,
+  },
+  imagePreviewText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
   },
   image: {
     width: 300,

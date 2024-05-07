@@ -96,7 +96,7 @@ export default function App() {
             label="Alarms"
             onPress={() => props.navigation.navigate('Alarms')}
             icon={({ color, size }) => (
-              <Ionicons name="clock" size={size} color={color} />
+              <Ionicons name="time" size={size} color={color} />
             )}
           />
           <DrawerItem
@@ -148,11 +148,24 @@ export default function App() {
         <Drawer.Screen name="Dashboard" component={HomeTabNavigator} />
         <Drawer.Screen name="Profile" component={ProfileScreenManager} />
         <Drawer.Screen name="Scan RF" component={RFScannerScreen} />
-        <Drawer.Screen name="Class Schedules" component={ClassScheduleScreen} />
+        <Drawer.Screen name="Class Schedules" component={ClassScheduleManager} />
         <Drawer.Screen name="Alarms" component={AlarmScreen} />
         <Drawer.Screen name="Settings" component={SettingsScreen} />
       </Drawer.Navigator>
     );
+  }
+
+  function ClassScheduleManager(){
+    return(
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: false, // Hide header for all screens in this stack
+        }}
+      >
+        <Stack.Screen name="ClassScheduleScreen" component={ClassScheduleScreen} />
+        <Stack.Screen name="EditClassScheduleScreen" component={EditClassScheduleScreen} />
+      </Stack.Navigator>
+    )
   }
 
   function ProfileScreenManager(){
@@ -258,6 +271,8 @@ export default function App() {
         <Stack.Screen name="EditScheduleScreen" component={EditScheduleScreen} />
         <Stack.Screen name="EditTaskScreen" component={EditTaskScreen} />
         <Stack.Screen name="EditClassScheduleScreen" component={EditClassScheduleScreen}/>
+        <Stack.Screen name="EditProjectTaskScreen" component={EditProjectTaskScreen}/>
+        <Stack.Screen name="EditProjectScreen" component={EditProjectScreen}/>
       </Stack.Navigator>
     )
   }

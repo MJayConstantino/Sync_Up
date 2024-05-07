@@ -15,6 +15,7 @@ const ClassScheduleScreen = ({ navigation }) => {
       try {
         const snapshotClassSchedules = await firestore
           .collection(`users/${currentUser.uid}/classSchedules`)
+          .orderBy("timeValue", "asc")
           .get();
         const fetchedClassSchedules = snapshotClassSchedules.docs.map((doc) => ({
           id: doc.id,
@@ -37,8 +38,8 @@ const ClassScheduleScreen = ({ navigation }) => {
   };
 
   const groupClassSchedulesByDay = () => {
+    const daysOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday', 'TBA'];
     const groupedData = {};
-
     classSchedules.forEach((classSchedule) => {
       const day = classSchedule.day;
       if (!groupedData[day]) {
@@ -46,11 +47,11 @@ const ClassScheduleScreen = ({ navigation }) => {
       }
       groupedData[day].push(classSchedule);
     });
-
-    return Object.entries(groupedData).map(([day, schedules]) => ({
+    const sortedData = daysOrder.map((day) => ({
       title: day,
-      data: schedules,
+      data: groupedData[day] || [],
     }));
+    return sortedData.filter((section) => section.data.length > 0 || section.title === 'TBA');
   };
 
   const renderItem = ({ item }) => (
@@ -59,8 +60,13 @@ const ClassScheduleScreen = ({ navigation }) => {
     </TouchableOpacity>
   );
 
-  const renderSectionHeader = ({ section: { title } }) => (
-    <Text style={styles.sectionHeader}>{title}</Text>
+  const renderSectionHeader = ({ section: { title, data } }) => (
+    <View>
+      <Text style={styles.sectionHeader}>{title}</Text>
+      {data.length === 0 && title !== 'TBA' && (
+        <Text style={styles.noClassesText}>No scheduled classes for this day.</Text>
+      )}
+    </View>
   );
 
   if (loading) {
@@ -84,7 +90,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    marginTop: 50,
     padding: 16,
   },
   heading: {
@@ -97,6 +102,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     backgroundColor: '#f0f0f0',
     padding: 8,
+  },
+  noClassesText: {
+    fontSize: 16,
+    color: '#777',
+    paddingTop: 8, // or adjust as needed to align with your design
   },
 });
 

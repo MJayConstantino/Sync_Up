@@ -16,6 +16,8 @@ import { useNavigation } from '@react-navigation/native';
 import { firebase } from '../../firebase-config';
 
 const firestore = firebase.firestore();
+const DEFAULT_PROFILE_PIC = 'https://firebasestorage.googleapis.com/v0/b/syncup-4b36a.appspot.com/o/profilepic.png?alt=media&token=4f9acff6-166b-4e21-9ac8-42bc5f441e63';
+
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
@@ -59,52 +61,80 @@ const ProfileScreen = () => {
     <SafeAreaView style={styles.container}>
       <Text style={styles.header}>User Profile</Text>
       <ScrollView
-      refreshControl={
-      <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }>
-      <View style={styles.contentContainer} >
-        <View style={styles.profileImageContainer}>
-          <Image
-            source={userData?.imageUrl ? { uri: userData.imageUrl } : { uri: 'http://www.gravatar.com/avatar/?d=mp' }}
-            resizeMode="contain"
-            style={styles.profileImage}
-          />
-        </View>
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        <View style={styles.contentContainer}>
+          <View style={styles.profileImageContainer}>
+            <Image
+              source={
+                userData?.imageUrl ? { uri: userData.imageUrl } : { uri: DEFAULT_PROFILE_PIC }
+              }
+              resizeMode="contain"
+              style={styles.profileImage}
+            />
+          </View>
+          <View style={styles.infoContainer}>
+            <View style={styles.inputBox}>
+              <MaterialIcons name="person" size={24} color="#000" />
+              <Text style={styles.infoText}>
+                {userData?.firstName}  {userData?.lastName}
+              </Text>
+            </View>
+          </View>
 
-        <View style={styles.infoContainer}>
-          <MaterialIcons name="work" size={24} color="#000" />
-          <Text style={styles.infoText}>{userData?.occupation}</Text>
-        </View>
+          <View style={styles.infoContainer}>
+            <View style={styles.inputBox}>
+              <MaterialIcons name="work" size={24} color="#000" />
+              <Text style={styles.infoText}>
+                {userData?.occupation || 'No set occupation'}
+              </Text>
+            </View>
+          </View>
 
-        <View style={styles.infoContainer}>
-          <MaterialIcons name="email" size={24} color="#000" />
-          <Text style={styles.infoText}>{userData?.email}</Text>
-        </View>
+          <View style={styles.infoContainer}>
+            <View style={styles.inputBox}>
+              <MaterialIcons name="email" size={24} color="#000" />
+              <Text style={styles.infoText}>
+                {userData?.email || 'No set email'}
+              </Text>
+            </View>
+          </View>
 
-        <View style={styles.infoContainer}>
-          <MaterialIcons name="location-on" size={24} color="#000" />
-          <Text style={styles.infoText}>{userData?.country}</Text>
-        </View>
+          <View style={styles.infoContainer}>
+            <View style={styles.inputBox}>
+              <MaterialIcons name="location-on" size={24} color="#000" />
+              <Text style={styles.infoText}>
+                {userData?.country || 'No set nationality'}
+              </Text>
+            </View>
+          </View>
 
-        <View style={styles.bioContainer}>
-          <Text style={styles.bioTitle}>Bio:</Text>
-          <Text style={styles.bioText}>{userData?.bio}</Text>
-        </View>
+          <View style={styles.bioContainer}>
+            <Text style={styles.bioTitle}>Bio:</Text>
+            <Text style={styles.bioText}>
+              {userData?.bio || 'No set bio'}
+            </Text>
+          </View>
 
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            onPress={() => navigation.navigate('EditProfileScreen')}
-            style={styles.button}
-          >
-            <Text style={styles.buttonText}>Edit Profile</Text>
-          </TouchableOpacity>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('EditProfileScreen')}
+              style={styles.button}
+            >
+              <Text style={styles.buttonText}>Edit Profile</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity style={styles.button} onPress={() => {
-              firebase.auth().signOut();
-            }}>
-            <Text style={styles.buttonText}>Log Out</Text>
-          </TouchableOpacity>
-        </View>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => {
+                firebase.auth().signOut();
+              }}
+            >
+              <Text style={styles.buttonText}>Log Out</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -115,7 +145,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    marginTop: 50
+    paddingTop: 25
+    
   },
   header: {
     fontSize: 24,
@@ -189,6 +220,15 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 18,
     color: "#fff",
+  },
+  inputBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderWidth: 1,
+    borderRadius: 8,
+    borderColor: '#ccc',
   },
 });
 

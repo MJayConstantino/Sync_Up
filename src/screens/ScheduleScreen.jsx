@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, RefreshControl, ActivityIndicator } from 'react-native';
 import { Agenda } from 'react-native-calendars';
 import { firebase } from '../../firebase-config';
 import Schedule from '../components/Schedules/Schedule';
 import TaskSchedule from '../components/Schedules/TaskSchedule';
 import AddScheduleModal from '../components/Schedules/AddSchedule';
 import ClassSchedule from '../components/Schedules/ClassSchedule';
+import ProjectSchedule from '../components/Schedules/ProjectSchedule';
+import ProjectTaskSchedule from '../components/Schedules/ProjectTaskSchedule';
 import { getDayOfYear, startOfISOWeek } from 'date-fns';
 
 const firestore = firebase.firestore();
@@ -16,72 +18,103 @@ const ScheduleScreen = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
   const [addedSchedule, setAddedSchedule] = useState(false);
   const currentUser = firebase.auth().currentUser;
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-  const fetchSchedulesAndTasks = async () => {
-    try {
-      const schedulesSnapshot = await firestore.collection(`users/${currentUser.uid}/schedules`).get();
-      const tasksSnapshot = await firestore.collection(`users/${currentUser.uid}/tasks`).get();
-      const classSchedulesSnapshot = await firestore.collection(`users/${currentUser.uid}/classSchedules`).get();
+    const fetchSchedulesAndTasks = async () => {
+      try {
+        const schedulesSnapshot = await firestore.collection(`users/${currentUser.uid}/schedules`).get();
+        const tasksSnapshot = await firestore.collection(`users/${currentUser.uid}/tasks`).get();
+        const classSchedulesSnapshot = await firestore
+          .collection(`users/${currentUser.uid}/classSchedules`)
+          .orderBy("timeValue", "asc")
+          .get();
 
-      const schedules = schedulesSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data(), type: 'schedule' }));
-      const tasks = tasksSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data(), type: 'task' }));
-      const classSchedules = classSchedulesSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data(), type: 'classSchedule' }));
+        const schedules = schedulesSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data(), type: 'schedule' }));
+        const tasks = tasksSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data(), type: 'task' }));
+        const classSchedules = classSchedulesSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data(), type: 'classSchedule' }));
 
-      const combinedItems = {};
+        const combinedItems = {};
 
-      schedules.forEach(schedule => {
-        const date = schedule.date;
-        if (!combinedItems[date]) {
-          combinedItems[date] = [];
-        }
-        combinedItems[date].push(schedule);
-      });
+        schedules.forEach(schedule => {
+          const date = schedule.date;
+          if (!combinedItems[date]) {
+            combinedItems[date] = [];
+          }
+          combinedItems[date].push(schedule);
+        });
 
-      tasks.forEach(task => {
-        const date = task.date;
-        if (!combinedItems[date]) {
-          combinedItems[date] = [];
-        }
-        combinedItems[date].push(task);
-      });
+        tasks.forEach(task => {
+          const date = task.date;
+          if (!combinedItems[date]) {
+            combinedItems[date] = [];
+          }
+          combinedItems[date].push(task);
+        });
 
-      classSchedules.forEach(classSchedule => {
-        const days = Array.isArray(classSchedule.day) ? classSchedule.day : [classSchedule.day];
-        days.forEach(day => {
-          const occurrences = getOccurrencesOfMonth(day);
-          occurrences.forEach(date => {
-            if (!combinedItems[date]) {
-              combinedItems[date] = [];
-            }
-            combinedItems[date].push(classSchedule);
+        classSchedules.forEach(classSchedule => {
+          const days = Array.isArray(classSchedule.day) ? classSchedule.day : [classSchedule.day];
+          days.forEach(day => {
+            const occurrences = getOccurrencesOfMonth(day);
+            occurrences.forEach(date => {
+              if (!combinedItems[date]) {
+                combinedItems[date] = [];
+              }
+              combinedItems[date].push(classSchedule);
+            });
           });
         });
-      });
 
-      setItems(combinedItems);
-    } catch (error) {
-      console.error("Error fetching schedules and tasks:", error);
-    }
-  };
+        // Fetch projects where the user is a collaborator
+        const projectsSnapshot = await firestore.collection('projects').where('collaborators', 'array-contains', currentUser.uid).get();
+        const projects = projectsSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data(), type: 'project' }));
 
-  fetchSchedulesAndTasks();
-}, [currentUser.uid, addedSchedule]);
+        projects.forEach(async project => {
+          combinedItems[project.deadline] = combinedItems[project.deadline] || [];
+          combinedItems[project.deadline].push(project);
+        
+          try {
+            // Fetch project tasks assigned to the user
+            const projectTasksSnapshot = await firestore.collection(`projects/${project.id}/tasks`).where('assignedTo', 'array-contains', currentUser.uid).get();
+            const projectTasks = projectTasksSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data(), type: 'projectTask' }));
+        
+            projectTasks.forEach(projectTask => {
+              const date = projectTask.date;
+              if (!combinedItems[date]) {
+                combinedItems[date] = [];
+              }
+              combinedItems[date].push(projectTask);
+            });
+          } catch (error) {
+            console.error(`Error fetching project tasks for project ${project.id}:`, error);
+          }
+        });
+
+        setItems(combinedItems);
+      } catch (error) {
+        console.error("Error fetching schedules and tasks:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSchedulesAndTasks();
+  }, [currentUser.uid, addedSchedule]);
 
   const getOccurrencesOfMonth = (dayOfWeek) => {
     const today = new Date();
     const dayOfWeekIndex = ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', ].indexOf(dayOfWeek);
     const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
     const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-  
+
     const occurrences = [];
-  
+
     for (let date = firstDayOfMonth; date <= lastDayOfMonth; date.setDate(date.getDate() + 1)) {
       if (date.getDay() === dayOfWeekIndex) {
         occurrences.push(date.toISOString().split('T')[0]);
       }
     }
-  
+
     return occurrences;
   };
 
@@ -115,6 +148,18 @@ const ScheduleScreen = ({ navigation }) => {
           <ClassSchedule {...item} />
         </TouchableOpacity>
       );
+    } else if (item.type === 'project') {
+      return (
+        <TouchableOpacity onPress={() => handleProjectPress(item)}>
+          <ProjectSchedule {...item} />
+        </TouchableOpacity>
+      );
+    } else if (item.type === 'projectTask') {
+      return (
+        <TouchableOpacity onPress={() => handleProjectTaskPress(item)}>
+          <ProjectTaskSchedule {...item} />
+        </TouchableOpacity>
+      );
     }
   };
 
@@ -130,6 +175,14 @@ const ScheduleScreen = ({ navigation }) => {
     navigation.navigate('EditClassScheduleScreen', { classScheduleId: item.id });
   };
 
+  const handleProjectPress = (item) => {
+    navigation.navigate('EditProjectScreen', { projectId: item.id });
+  };
+
+  const handleProjectTaskPress = (item) => {
+    navigation.navigate('EditProjectTaskScreen', { projectTaskId: item.id });
+  };
+
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
     setTimeout(() => {
@@ -137,7 +190,11 @@ const ScheduleScreen = ({ navigation }) => {
     }, 2000);
   }, []);
 
-  return (
+  if (loading) {
+    return (
+      <ActivityIndicator style={{flex: 1, justifyContent: "center", alignItems: "center"}} color="blue" size="large" />
+    )
+  } else return (
     <View style={styles.container}>
         <Agenda
           items={items}
