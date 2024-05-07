@@ -4,10 +4,10 @@ import { View, Text, StyleSheet } from 'react-native';
 import { firebase } from '../../../firebase-config';
 
 const NextWeekEventsCard = () => {
-  const [nextWeekEvents, setNextWeekEvents] = useState([]);
+  const [nextWeekEventsCount, setNextWeekEventsCount] = useState(0);
 
   useEffect(() => {
-    const fetchNextWeekEvents = async () => {
+    const fetchNextWeekEventsCount = async () => {
       try {
         const currentUser = firebase.auth().currentUser;
         const eventsCollection = firebase.firestore().collection(`users/${currentUser.uid}/events`);
@@ -20,25 +20,23 @@ const NextWeekEventsCard = () => {
         // Query events for next week
         const snapshot = await eventsCollection.where('date', '>=', nextWeekStartDate).where('date', '<', nextWeekEndDate).get();
         
-        // Extract event data from the snapshot
-        const nextWeekEventsData = snapshot.docs.map(doc => doc.data());
+        // Get the count of documents in the snapshot
+        const count = snapshot.size;
         
-        // Update state with next week events
-        setNextWeekEvents(nextWeekEventsData);
+        // Update state with next week events count
+        setNextWeekEventsCount(count);
       } catch (error) {
-        console.error('Error fetching next week events:', error);
+        console.error('Error fetching next week events count:', error);
       }
     };
   
-    fetchNextWeekEvents();
+    fetchNextWeekEventsCount();
   }, []);
 
   return (
-    <View style={styles.card}>
-      <Text style={styles.title}>Next Week's Events</Text>
-      {nextWeekEvents.map((event, index) => (
-        <Text key={index}>{event.title} - {event.date}</Text>
-      ))}
+    <View style={[styles.card, styles.weekly]}>
+      <Text style={styles.title}>Next Week's Events Count</Text>
+      <Text>{nextWeekEventsCount}</Text>
     </View>
   );
 };
@@ -55,6 +53,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
+  },
+  weekly: {
+    backgroundColor: '#FFD700', // Orange-yellowish color for weekly cards
   },
 });
 

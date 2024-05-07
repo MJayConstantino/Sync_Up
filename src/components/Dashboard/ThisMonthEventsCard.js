@@ -1,4 +1,3 @@
-// ThisMonthEventsCard.js
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { firebase } from '../../../firebase-config';
@@ -34,7 +33,7 @@ const ThisMonthEventsCard = () => {
   }, []);
 
   return (
-    <View style={styles.card}>
+    <View style={[styles.card, styles.monthly]}>
       <Text style={styles.title}>This Month's Events Count</Text>
       <Text>{thisMonthEventsCount}</Text>
     </View>
@@ -53,6 +52,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
+  },
+  monthly: {
+    backgroundColor: '#FFA500', // Orange color for monthly cards
   },
 });
 

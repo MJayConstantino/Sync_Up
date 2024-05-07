@@ -58,14 +58,16 @@ const FilterButtons = ({ onFilterChange }) => {
   );
 };
 
-const ScheduleScreen = ({ navigation }) => {
+const ScheduleScreen = ({ navigation, route }) => {
   const [items, setItems] = useState({});
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [addedSchedule, setAddedSchedule] = useState(false);
   const currentUser = firebase.auth().currentUser;
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState('ALL');
+  const { params = {} } = route;
+  const { filter: initialFilter = 'ALL' } = params;
+  const [filter, setFilter] = useState(initialFilter);
 
   useEffect(() => {
     const fetchSchedulesAndTasks = async () => {
@@ -152,7 +154,7 @@ const ScheduleScreen = ({ navigation }) => {
     };
 
     fetchSchedulesAndTasks();
-  }, [currentUser.uid, addedSchedule]);
+  }, [currentUser.uid, addedSchedule, filter]);
 
   const getOccurrencesOfMonth = (dayOfWeek) => {
     const today = new Date();

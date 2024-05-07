@@ -48,7 +48,7 @@ const DashboardScreen = () => {
     return (
       <ActivityIndicator style={{ flex: 1, justifyContent: "center", alignItems: "center" }} color="00adf5" size="large" />
     )
-  } else return (
+  } else   return (
     <View style={styles.container}>
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -65,9 +65,21 @@ const DashboardScreen = () => {
         </View>
         <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
           <View style={styles.scheduleContainer}>
-            <ScheduleCard title="Today's Events" date={getCurrentDate()} onPress={() => navigation.navigate('Schedule')} />
-            <ScheduleTaskCard title="Today's Tasks" date={getCurrentDate()} onPress={() => navigation.navigate('Schedule')} />
-            <ClassScheduleCard title="Today's Classes" date={getCurrentDate()} onPress={() => navigation.navigate('Schedule')} />
+          <ScheduleCard
+            title="Today's Events"
+            date={getCurrentDate()}
+            onPress={() => navigation.navigate('Schedule', { params: { filter: 'Events' } })}
+          />
+          <ScheduleTaskCard
+            title="Today's Tasks"
+            date={getCurrentDate()}
+            onPress={() => navigation.navigate('Schedule', { params: { filter: 'Tasks' } })}
+          />
+          <ClassScheduleCard
+            title="Today's Classes"
+            date={getCurrentDate()}
+            onPress={() => navigation.navigate('Schedule', { params: { filter: 'ClassSchedules' } })}
+          />
           </View>
         </ScrollView>
 
@@ -104,13 +116,14 @@ const DashboardScreen = () => {
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionHeaderText}>Projects</Text>
         </View>
-        <TouchableOpacity style={styles.smallCardContainer} onPress={() => navigation.navigate('Projects')}>
-          <ProjectCard />
-        </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('Projects')}>
+            <ProjectCard title="Current Projects"/>
+          </TouchableOpacity>
       </ScrollView>
     </View>
   );
 };
+
 
 // Function to get the current date in the format YYYY-MM-DD
 const getCurrentDate = () => {

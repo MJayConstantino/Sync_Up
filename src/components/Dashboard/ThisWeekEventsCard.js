@@ -1,4 +1,3 @@
-// ThisWeekEventsCard.js
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { firebase } from '../../../firebase-config';
@@ -10,7 +9,7 @@ const ThisWeekEventsCard = () => {
     const fetchThisWeekEventsCount = async () => {
       try {
         const currentUser = firebase.auth().currentUser;
-        const eventsCollection = firebase.firestore().collection(`users/${currentUser.uid}/events`);
+        const eventsCollection = firebase.firestore().collection(`users/${currentUser.uid}/schedules`);
 
         // Get the start and end dates for this week
         const today = new Date();
@@ -34,7 +33,7 @@ const ThisWeekEventsCard = () => {
   }, []);
 
   return (
-    <View style={styles.card}>
+    <View style={[styles.card, styles.weekly]}>
       <Text style={styles.title}>This Week's Events Count</Text>
       <Text>{thisWeekEventsCount}</Text>
     </View>
@@ -53,6 +52,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
+  },
+  weekly: {
+    backgroundColor: '#FFD700', // Orange-yellowish color for weekly cards
   },
 });
 
