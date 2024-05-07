@@ -77,7 +77,8 @@ const EditProfileScreen = ({ navigation }) => {
     const handleSaveChanges = async () => {
         try {
             await firestore.collection("users").doc(currentUser.uid).update({
-                firstName: name,
+                firstName: firstName,
+                lastName: lastName,
                 email: email,
                 country: country,
                 occupation: occupation,
