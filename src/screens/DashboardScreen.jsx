@@ -58,8 +58,8 @@ const DashboardScreen = () => {
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionHeaderText}>Schedules</Text>
         </View>
-        <View style={styles.scheduleContainer}>
-          <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} >
+        <View style={[styles.scheduleContainer, { paddingHorizontal: 10 }]}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingRight: 10 }}>
             <ScheduleCard title="Today's Events" date={getCurrentDate()} />
             <ScheduleTaskCard title="Today's Tasks" date={getCurrentDate()} />
             <ClassScheduleCard title="Today's Classes" date={getCurrentDate()} />
@@ -133,7 +133,6 @@ const styles = StyleSheet.create({
   },
   scheduleContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     marginBottom: 20,
   }
 });
