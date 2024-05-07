@@ -7,7 +7,7 @@ const Schedule = ({ scheduleName, timeStart, timeEnd, description, date }) => {
     <View style={[styles.item, { backgroundColor: "transparent" }]}>
       <View style={styles.timeContainer}>
         <MaterialCommunityIcons name="clock-outline" size={15} color="#000" />
-        <Text style={styles.timeText}>{timeStart}-{timeEnd}</Text>
+        <Text style={styles.timeText}>{timeStart} -{timeEnd}</Text>
       </View>
       <View style={styles.topContainer}>
         <Text style={styles.scheduleName}>{scheduleName}</Text>

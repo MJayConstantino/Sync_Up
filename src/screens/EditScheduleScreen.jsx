@@ -103,6 +103,15 @@ const EditScheduleScreen = ({ navigation, route }) => {
     }
   };
   
+  function getTimeValue(taskTime) {
+    const [time, period] = taskTime.split(' ');
+    const [hours, minutes] = time.split(':');
+    let timeValue = parseInt(hours) * 100 + parseInt(minutes);
+    if (period === 'PM' && hours !== '12') {
+      timeValue += 1200;
+    }
+    return timeValue;
+  }
 
   const handleSaveSchedule = async () => {
     if (!scheduleName) {
@@ -116,6 +125,7 @@ const EditScheduleScreen = ({ navigation, route }) => {
       timeEnd,
       date,
       description,
+      timeValue: getTimeValue(timeStart)
     };
 
     try {

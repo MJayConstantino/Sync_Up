@@ -70,8 +70,14 @@ const ScheduleScreen = ({ navigation }) => {
   useEffect(() => {
     const fetchSchedulesAndTasks = async () => {
       try {
-        const schedulesSnapshot = await firestore.collection(`users/${currentUser.uid}/schedules`).get();
-        const tasksSnapshot = await firestore.collection(`users/${currentUser.uid}/tasks`).get();
+        const schedulesSnapshot = await firestore
+          .collection(`users/${currentUser.uid}/schedules`)
+          .orderBy("timeValue", "asc")
+          .get();
+        const tasksSnapshot = await firestore
+          .collection(`users/${currentUser.uid}/tasks`)
+          .orderBy("timeValue", "asc")
+          .get();
         const classSchedulesSnapshot = await firestore
           .collection(`users/${currentUser.uid}/classSchedules`)
           .orderBy("timeValue", "asc")

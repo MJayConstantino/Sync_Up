@@ -76,6 +76,8 @@ const AddTaskModal = ({
     }
   };
 
+
+
   const handleSaveTask = () => {
     // Basic validation (optional)
     if (!taskName) {
@@ -90,7 +92,8 @@ const AddTaskModal = ({
       time: taskTime,
       date: taskDate,
       description: taskDescription,
-      isCompleted: false
+      isCompleted: false,
+
     };
 
     // Invoke onSave function with the newTask object
