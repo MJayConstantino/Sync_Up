@@ -64,7 +64,7 @@ export default function AlarmClock() {
   async function playAlarmSound() {
     try {
       const { sound } = await Audio.Sound.createAsync(
-        require('./sounds/01. Highway To Oblivion.mp3')
+        require('../assets/alarm.mp3')
       );
       setSound(sound);
       await sound.playAsync();
@@ -135,7 +135,7 @@ export default function AlarmClock() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.header}>Alarm App</Text>
+      <Text style={styles.header}>Alarms</Text>
       <View style={styles.timeInputContainer}>
         <TextInput
           style={styles.timeInput}
@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   header: {
-    color: "blue",
+    color: "black",
     marginVertical: 20,
     fontSize: 40,
     fontWeight: "bold",
@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
   },
   ampmButtonSelected: {
-    backgroundColor: "blue",
+    backgroundColor: "#2196F3",
   },
   ampmButtonText: {
     color: "black",
@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
   },
   button: {
     width: "70%",
-    backgroundColor: "blue",
+    backgroundColor: "#2196F3",
     borderRadius: 18,
     marginVertical: 10,
     paddingVertical: 10,

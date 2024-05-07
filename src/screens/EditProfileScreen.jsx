@@ -94,7 +94,7 @@ const EditProfileScreen = ({ navigation }) => {
 
     if (loading){
         return (
-            <ActivityIndicator style={{flex: 1, justifyContent: "center", alignItems: "center"}} color="blue" size="large" />
+            <ActivityIndicator style={{flex: 1, justifyContent: "center", alignItems: "center"}} color="00adf5" size="large" />
           )
     } else return (
         <SafeAreaView style={styles.container}>

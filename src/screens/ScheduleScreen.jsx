@@ -175,36 +175,45 @@ const ScheduleScreen = ({ navigation }) => {
       console.error("Error adding schedule:", error);
     }
   };
+  
 
-  const renderItem = (item) => {
+  const renderItem = (item, isFirst) => {
+    const backgroundColor = item.type === 'schedule' ? 'yellow'
+      : item.type === 'task' || item.type === 'projectTask' ? 'blue'
+      : item.type === 'project' ? 'red'
+      : item.type === 'classSchedule' ? 'green'
+      : 'gray';
+  
+    const borderColor = isFirst ? backgroundColor : 'transparent';
+  
     if (item.type === 'schedule') {
       return (
         <TouchableOpacity onPress={() => handleSchedulePress(item)}>
-          <Schedule {...item} />
+          <Schedule {...item} backgroundColor={backgroundColor} borderColor={borderColor} />
         </TouchableOpacity>
       );
     } else if (item.type === 'task') {
       return (
         <TouchableOpacity onPress={() => handleTaskPress(item)}>
-          <TaskSchedule {...item} />
+          <TaskSchedule {...item} backgroundColor={backgroundColor} borderColor={borderColor} />
         </TouchableOpacity>
       );
     } else if (item.type === 'classSchedule') {
       return (
         <TouchableOpacity onPress={() => handleClassSchedulePress(item)}>
-          <ClassSchedule {...item} />
+          <ClassSchedule {...item} backgroundColor={backgroundColor} borderColor={borderColor} />
         </TouchableOpacity>
       );
     } else if (item.type === 'project') {
       return (
         <TouchableOpacity onPress={() => handleProjectPress(item)}>
-          <ProjectSchedule {...item} />
+          <ProjectSchedule {...item} backgroundColor={backgroundColor} borderColor={borderColor} />
         </TouchableOpacity>
       );
     } else if (item.type === 'projectTask') {
       return (
         <TouchableOpacity onPress={() => handleProjectTaskPress(item)}>
-          <ProjectTaskSchedule {...item} />
+          <ProjectTaskSchedule {...item} backgroundColor={backgroundColor} borderColor={borderColor} />
         </TouchableOpacity>
       );
     }
@@ -271,7 +280,7 @@ const ScheduleScreen = ({ navigation }) => {
 
   if (loading) {
     return (
-      <ActivityIndicator style={{flex: 1, justifyContent: "center", alignItems: "center"}} color="blue" size="large" />
+      <ActivityIndicator style={{flex: 1, justifyContent: "center", alignItems: "center"}} color="#00adf5" size="large" />
     )
   } else return (
     <View style={styles.container}>

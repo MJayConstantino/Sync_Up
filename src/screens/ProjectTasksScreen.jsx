@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View, Text, TouchableOpacity, FlatList, RefreshControl } from "react-native";
+import { StyleSheet, View, Text, TouchableOpacity, FlatList, RefreshControl, ActivityIndicator } from "react-native";
 import { MaterialIcons } from '@expo/vector-icons';
 import { firebase } from '../../firebase-config';
 import ProjectTask from '../components/Projects/ProjectTask';
@@ -15,6 +15,7 @@ const ProjectTasksScreen = ({ route }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [refreshing, setRefreshing] = React.useState(false);
   const [taskAdded, setTaskAdded] = React.useState(false);
+  const [loading, setLoading] = useState(true);
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -35,6 +36,8 @@ const ProjectTasksScreen = ({ route }) => {
         setTasks(tasksData);
       } catch (error) {
         console.error("Error fetching tasks:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -89,7 +92,11 @@ const ProjectTasksScreen = ({ route }) => {
     }
   };
   
-  return (
+  if (loading) {
+    return (
+      <ActivityIndicator style={{flex: 1, justifyContent: "center", alignItems: "center"}} color="#00adf5" size="large" />
+    )
+  } else return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
         <TouchableOpacity onPress={handleBack} style={styles.backButton}>
