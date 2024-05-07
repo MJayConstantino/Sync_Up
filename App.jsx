@@ -229,11 +229,11 @@ export default function App() {
     return(
       <Stack.Navigator
         screenOptions={{
-          headerShown: false, // Hide header for all screens in this stack
+          headerShown: true, // Hide header for all screens in this stack
         }}
       >
-        <Stack.Screen name="ChatList" component={ChatListScreen} />
-        <Stack.Screen name="Chat" component={Chat} />
+        <Stack.Screen name="Chat" component={ChatListScreen} />
+        <Stack.Screen name="ChatRoom" component={Chat} />
       </Stack.Navigator>
     )
   }
