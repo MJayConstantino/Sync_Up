@@ -10,7 +10,8 @@ const firebaseConfig = {
     storageBucket: "syncup-4b36a.appspot.com",
     messagingSenderId: "764482763036",
     appId: "1:764482763036:web:0d254343332553f1fda2d9",
-    measurementId: "G-RHDYG3ZD0F"
+    measurementId: "G-RHDYG3ZD0F",
+    databaseURL: 'https://syncup-4b36a-default-rtdb.asia-southeast1.firebasedatabase.app/',
   };
 
 if (!firebase.apps.length){

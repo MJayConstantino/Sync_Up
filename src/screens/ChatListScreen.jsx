@@ -83,7 +83,7 @@ const ChatListScreen = () => {
       updateDoc(messageDoc, { read: true });
     }
 
-    navigation.navigate('Chat', {
+    navigation.navigate('ChatScreen', {
       chatRoomId,
       userName: user.name,
     });
