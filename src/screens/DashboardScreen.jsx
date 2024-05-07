@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, RefreshControl, ActivityIndicator } from 'react-native';
 import { firebase } from '../../firebase-config';
-import TaskCard from '../components/Dashboard/TasksCard'; // Corrected import path for TaskCard
-import { ScheduleCard, ScheduleTaskCard } from '../components/Dashboard/ScheduleCard'; // Importing ScheduleCard and TaskCard components
+import TaskCard from '../components/Dashboard/TasksCard';
+import ScheduleCard from '../components/Dashboard/ScheduleCard';
+import ScheduleTaskCard from '../components/Dashboard/ScheduleTaskCard';
+import ClassScheduleCard from '../components/Dashboard/ClassScheduleCard';
+import ProjectCard from '../components/Dashboard/ProjectCard';
 
 const DashboardScreen = () => {
   const [name, setName] = useState('');
@@ -14,7 +17,7 @@ const DashboardScreen = () => {
       try {
         const snapshot = await firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).get();
         if (snapshot.exists) {
-          setName(snapshot.data().firstName); // Updated to get the firstName directly
+          setName(snapshot.data().firstName);
         } else {
           console.log('User does not exist');
         }
@@ -35,35 +38,48 @@ const DashboardScreen = () => {
     }, 2000);
   }, []);
 
-  if (loading){
+  if (loading) {
     return (
-      <ActivityIndicator style={{flex: 1, justifyContent: "center", alignItems: "center"}} color="00adf5" size="large" />
+      <ActivityIndicator style={{ flex: 1, justifyContent: "center", alignItems: "center" }} color="00adf5" size="large" />
     )
   } else return (
     <View style={styles.container}>
+      <ScrollView
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }>
       <View style={styles.header}>
         <Text style={styles.greeting}>Hello, {name}</Text>
         <Text style={styles.subgreeting}>Let's see what's in store for you today..</Text>
       </View>
-      <ScrollView 
-      showsVerticalScrollIndicator={false}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }>
+      
+        {/* Schedule Section */}
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionHeaderText}>Schedules</Text>
+        </View>
+        <View style={styles.scheduleContainer}>
+          <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} >
+            <ScheduleCard title="Today's Events" date={getCurrentDate()} />
+            <ScheduleTaskCard title="Today's Tasks" date={getCurrentDate()} />
+            <ClassScheduleCard title="Today's Classes" date={getCurrentDate()} />
+          </ScrollView>
+        </View>
+
+        {/* Tasks Section */}
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionHeaderText}>Tasks</Text>
         </View>
         <View style={styles.taskContainer}>
-          <TaskCard title="Pending Tasks" completed = {false} />
-          <TaskCard title="Completed Tasks" completed = {true} />
+          <TaskCard title="Pending Tasks" isCompleted={false} />
+          <TaskCard title="Completed Tasks" isCompleted={true} />
         </View>
+
+        {/* Projects Section */}
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionHeaderText}>Schedule</Text>
+          <Text style={styles.sectionHeaderText}>Projects</Text>
         </View>
-        <View style={styles.scheduleContainer}>
-        <ScheduleCard title="Today's Events" date={getCurrentDate()} />
-        <ScheduleTaskCard title="Today's Tasks" date={getCurrentDate()} />
-        </View>
+        <ProjectCard title="Current Projects" date={getCurrentDate()}/>
       </ScrollView>
     </View>
   );

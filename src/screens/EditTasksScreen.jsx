@@ -90,6 +90,16 @@ const EditTaskScreen = ({ navigation, route }) => {
     }
   };
 
+  function getTimeValue(taskTime) {
+    const [time, period] = taskTime.split(' ');
+    const [hours, minutes] = time.split(':');
+    let timeValue = parseInt(hours) * 100 + parseInt(minutes);
+    if (period === 'PM' && hours !== '12') {
+      timeValue += 1200;
+    }
+    return timeValue;
+  }
+
   const handleSaveTask = async () => {
     if (!taskName) {
       alert("Please enter a task name.");
@@ -102,6 +112,7 @@ const EditTaskScreen = ({ navigation, route }) => {
       time: taskTime,
       date: taskDate,
       description: taskDescription,
+      timeValue: getTimeValue(taskTime),
     };
 
     try {

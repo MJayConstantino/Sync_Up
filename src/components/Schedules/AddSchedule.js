@@ -66,26 +66,39 @@ const AddScheduleModal = ({
     }
   };
 
+  function getTimeValue(taskTime) {
+    const [time, period] = taskTime.split(' ');
+    const [hours, minutes] = time.split(':');
+    let timeValue = parseInt(hours) * 100 + parseInt(minutes);
+    if (period === 'PM' && hours !== '12') {
+      timeValue += 1200;
+    }
+    return timeValue;
+  }
+
   const handleSaveSchedule = () => {
     const newSchedule = {
       scheduleName,
       timeStart: format(selectedStartTime, "hh:mm aa"),
       timeEnd: format(selectedEndTime, "hh:mm aa"),
       date: format(selectedDate, "yyyy-MM-dd"),
-      description: 'Sample Description', 
+      description: '', 
+      createdAt: new Date(),
+      timeValue: getTimeValue(format(selectedStartTime, "hh:mm aa"))
     };
 
     onSave(newSchedule);
     onDismiss();
 
     setScheduleName("");
-    setSelectedDate(new Date());
-    setSelectedStartTime(new Date());
-    setSelectedEndTime(new Date());
+    setSelectedDate("");
+    setSelectedStartTime("");
+    setSelectedEndTime("");
   };
 
   const handleCancel = () => {
     // Clear input fields
+    setScheduleName("");
     setSelectedDate("");
     setSelectedStartTime("");
     setSelectedEndTime("");
