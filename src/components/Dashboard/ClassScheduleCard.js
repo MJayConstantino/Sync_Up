@@ -2,21 +2,29 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { firebase } from '../../../firebase-config';
 
-const ScheduleCard = ({ title, date, onPress }) => {
-  const [itemCount, setItemCount] = useState(0);
+const ClassScheduleCard = ({ title, date, onPress }) => {
+  const [classCount, setClassCount] = useState(0);
 
   useEffect(() => {
-    const fetchItemCount = async () => {
+    const fetchClassCount = async () => {
       try {
         const currentUser = firebase.auth().currentUser;
-        const snapshot = await firebase.firestore().collection(`users/${currentUser.uid}/schedules`).where('date', '==', date).get();
-        setItemCount(snapshot.size);
+        const classSchedulesCollection = firebase.firestore().collection(`users/${currentUser.uid}/classSchedules`);
+        
+        // Get the snapshot of class schedules where the day matches the current day
+        const snapshot = await classSchedulesCollection.where('day', '==', date).get();
+        
+        // Get the count of documents in the snapshot
+        const count = snapshot.size;
+        
+        // Update the class count state
+        setClassCount(count);
       } catch (error) {
-        console.error('Error fetching item count:', error);
+        console.error('Error fetching class count:', error);
       }
     };
-
-    fetchItemCount();
+  
+    fetchClassCount();
   }, [date]);
 
   return (
@@ -24,18 +32,17 @@ const ScheduleCard = ({ title, date, onPress }) => {
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.date}>{date}</Text>
       <View style={styles.itemCountContainer}>
-        <Text style={styles.itemCount}>{itemCount}</Text>
+        <Text style={styles.itemCount}>{classCount}</Text>
       </View>
     </TouchableOpacity>
   );
 };
 
-
 const styles = StyleSheet.create({
   card: {
     borderRadius: 10,
     padding: 20,
-    marginBottom: 20,
+    marginRight: 10,
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
@@ -65,4 +72,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ScheduleCard;
+export default ClassScheduleCard;
