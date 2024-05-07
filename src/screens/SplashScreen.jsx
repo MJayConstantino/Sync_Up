@@ -8,12 +8,12 @@ const SplashScreen = ({ navigation }) => {
   useEffect(() => {
     const animation = Animated.sequence([
       Animated.parallel([
-        Animated.timing(textImagePosition, {
+        Animated.timing(mainImagePosition, {
           toValue: -60, // left
           duration: 1000,
           useNativeDriver: true,
         }),
-        Animated.timing(mainImagePosition, {
+        Animated.timing(textImagePosition, {
           toValue: 60, // right
           duration: 1000,
           useNativeDriver: true,
@@ -36,19 +36,19 @@ const SplashScreen = ({ navigation }) => {
       <Animated.View
         style={[
           styles.imageContainer,
-          { transform: [{ translateX: mainImagePosition }] },
+          { transform: [{ translateX: textImagePosition }] },
         ]}
       >
-        <Image source={require('../assets/splash1.png')} style={styles.image} />
+        <Image source={require('../assets/splash2.png')} style={styles.image} />
       </Animated.View>
 
       <Animated.View
         style={[
           styles.imageContainer,
-          { transform: [{ translateX: textImagePosition }] },
+          { transform: [{ translateX: mainImagePosition }] },
         ]}
       >
-        <Image source={require('../assets/splash2.png')} style={styles.image} />
+        <Image source={require('../assets/splash1.png')} style={styles.image} />
       </Animated.View>
     </View>
   );
