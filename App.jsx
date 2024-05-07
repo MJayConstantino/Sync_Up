@@ -233,7 +233,7 @@ export default function App() {
         }}
       >
         <Stack.Screen name="Chat" component={ChatListScreen} />
-        <Stack.Screen name="ChatScreen" component={Chat} />
+        <Stack.Screen name="ChatRoom" component={Chat} />
       </Stack.Navigator>
     )
   }
