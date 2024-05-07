@@ -38,19 +38,19 @@ const ScheduleTaskCard = ({ title, date, onPress }) => {
       flexDirection: 'column',
       justifyContent: 'center',
       alignItems: 'center',
-      height: 200,
+      height: 150,
       backgroundColor: '#FFFFFF',
       borderWidth: 0.3,
       marginRight: 20
     },
     title: {
-      fontSize: 18,
+      fontSize: 16,
       fontWeight: 'bold',
-      marginBottom: 10,
+      marginBottom: 5,
     },
     date: {
-      fontSize: 16,
-      marginBottom: 10,
+      fontSize: 14,
+      marginBottom: 5,
     },
     itemCountContainer: {
       backgroundColor: '#4B98FF',
@@ -59,7 +59,7 @@ const ScheduleTaskCard = ({ title, date, onPress }) => {
       paddingVertical: 8,
     },
     itemCount: {
-      fontSize: 20,
+      fontSize: 18,
       fontWeight: 'bold',
       color: '#FFFFFF',
     },

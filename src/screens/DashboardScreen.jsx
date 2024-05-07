@@ -1,16 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, RefreshControl, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, RefreshControl, ActivityIndicator, TouchableOpacity} from 'react-native';
 import { firebase } from '../../firebase-config';
+import { useNavigation } from '@react-navigation/native';
 import TaskCard from '../components/Dashboard/TasksCard';
 import ScheduleCard from '../components/Dashboard/ScheduleCard';
 import ScheduleTaskCard from '../components/Dashboard/ScheduleTaskCard';
 import ClassScheduleCard from '../components/Dashboard/ClassScheduleCard';
 import ProjectCard from '../components/Dashboard/ProjectCard';
+import ThisWeekEventsCard from '../components/Dashboard/ThisWeekEventsCard';
+import NextWeekEventsCard from '../components/Dashboard/NextWeekEventsCard';
+import ThisMonthEventsCard from '../components/Dashboard/ThisMonthEventsCard';
+import NextMonthEventsCard from '../components/Dashboard/NextMonthEventsCard';
 
 const DashboardScreen = () => {
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = React.useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -31,12 +37,12 @@ const DashboardScreen = () => {
     fetchUserData();
   }, []);
 
-  const onRefresh = React.useCallback(() => {
+  const onRefresh = () => {
     setRefreshing(true);
     setTimeout(() => {
       setRefreshing(false);
     }, 2000);
-  }, []);
+  };
 
   if (loading) {
     return (
@@ -45,25 +51,44 @@ const DashboardScreen = () => {
   } else return (
     <View style={styles.container}>
       <ScrollView
-          showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }>
-      <View style={styles.header}>
-        <Text style={styles.greeting}>Hello, {name}</Text>
-        <Text style={styles.subgreeting}>Let's see what's in store for you today..</Text>
-      </View>
-      
+        showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+      >
+        <View style={styles.header}>
+          <Text style={styles.greeting}>Hello, {name}</Text>
+          <Text style={styles.subgreeting}>Let's see what's in store for you today..</Text>
+        </View>
+
         {/* Schedule Section */}
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionHeaderText}>Schedules</Text>
         </View>
-        <View style={[styles.scheduleContainer, { paddingHorizontal: 10 }]}>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingRight: 10 }}>
-            <ScheduleCard title="Today's Events" date={getCurrentDate()} />
-            <ScheduleTaskCard title="Today's Tasks" date={getCurrentDate()} />
-            <ClassScheduleCard title="Today's Classes" date={getCurrentDate()} />
-          </ScrollView>
+        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+          <View style={styles.scheduleContainer}>
+            <ScheduleCard title="Today's Events" date={getCurrentDate()} onPress={() => navigation.navigate('Schedule')} />
+            <ScheduleTaskCard title="Today's Tasks" date={getCurrentDate()} onPress={() => navigation.navigate('Schedule')} />
+            <ClassScheduleCard title="Today's Classes" date={getCurrentDate()} onPress={() => navigation.navigate('Schedule')} />
+          </View>
+        </ScrollView>
+
+        {/* This Week's and Next Week's Events */}
+        <View style={styles.rowContainer}>
+          <TouchableOpacity style={styles.smallCardContainer} onPress={() => navigation.navigate('Schedule')}>
+            <ThisWeekEventsCard />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.smallCardContainer} onPress={() => navigation.navigate('Schedule')}>
+            <NextWeekEventsCard />
+          </TouchableOpacity>
+        </View>
+
+        {/* This Month's and Next Month's Events */}
+        <View style={styles.rowContainer}>
+          <TouchableOpacity style={styles.smallCardContainer} onPress={() => navigation.navigate('Schedule')}>
+            <ThisMonthEventsCard />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.smallCardContainer} onPress={() => navigation.navigate('Schedule')}>
+            <NextMonthEventsCard />
+          </TouchableOpacity>
         </View>
 
         {/* Tasks Section */}
@@ -71,15 +96,17 @@ const DashboardScreen = () => {
           <Text style={styles.sectionHeaderText}>Tasks</Text>
         </View>
         <View style={styles.taskContainer}>
-          <TaskCard title="Pending Tasks" isCompleted={false} />
-          <TaskCard title="Completed Tasks" isCompleted={true} />
+          <TaskCard title="Pending Tasks" isCompleted={false} onPress={() => navigation.navigate('Tasks')} />
+          <TaskCard title="Completed Tasks" isCompleted={true} onPress={() => navigation.navigate('Tasks')} />
         </View>
 
         {/* Projects Section */}
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionHeaderText}>Projects</Text>
         </View>
-        <ProjectCard title="Current Projects" date={getCurrentDate()}/>
+        <TouchableOpacity style={styles.smallCardContainer} onPress={() => navigation.navigate('Projects')}>
+          <ProjectCard />
+        </TouchableOpacity>
       </ScrollView>
     </View>
   );
@@ -126,6 +153,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#333333',
   },
+  rowContainer: {
+    flexDirection: 'row',
+    marginBottom: 20,
+    justifyContent: 'space-between',
+  },
   taskContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -134,7 +166,18 @@ const styles = StyleSheet.create({
   scheduleContainer: {
     flexDirection: 'row',
     marginBottom: 20,
-  }
+  },
+  smallCardContainer: {
+    width: '45%', // Adjust the width to fit two cards in a row
+    borderRadius: 10,
+    padding: 10,
+    marginRight: 10,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 0.3,
+  },
 });
 
 export default DashboardScreen;
