@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { firebase } from '../../../firebase-config';
 
-const ProjectCard = ({ onPress }) => {
+const ProjectCard = ({ title, onPress }) => {
   const [projectCount, setProjectCount] = useState(0);
 
   useEffect(() => {
@@ -12,7 +12,7 @@ const ProjectCard = ({ onPress }) => {
         const projectsCollection = firebase.firestore().collection('projects');
 
         // Query projects where the user is a collaborator
-        const snapshot = await projectsCollection.where(`collaborators.${currentUser.uid}`, '==', true).get();
+        const snapshot = await projectsCollection.where('collaborators', 'array-contains', currentUser.uid).get();
         
         // Get the count of documents in the snapshot
         const count = snapshot.size;
@@ -29,7 +29,7 @@ const ProjectCard = ({ onPress }) => {
 
   return (
     <TouchableOpacity onPress={onPress} style={styles.card}>
-      <Text style={styles.title}>Projects</Text>
+      <Text style={styles.title}>{title}</Text>
       <View style={styles.itemCountContainer}>
         <Text style={styles.itemCount}>{projectCount}</Text>
       </View>

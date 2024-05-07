@@ -40,7 +40,8 @@ const ScheduleTaskCard = ({ title, date, onPress }) => {
       alignItems: 'center',
       height: 200,
       backgroundColor: '#FFFFFF',
-      borderWidth: 0.3
+      borderWidth: 0.3,
+      marginRight: 20
     },
     title: {
       fontSize: 18,

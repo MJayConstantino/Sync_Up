@@ -11,8 +11,8 @@ const ClassScheduleCard = ({ title, date, onPress }) => {
         const currentUser = firebase.auth().currentUser;
         const classSchedulesCollection = firebase.firestore().collection(`users/${currentUser.uid}/classSchedules`);
         
-        // Get the snapshot of class schedules where the day matches the current day
-        const snapshot = await classSchedulesCollection.where('day', '==', date).get();
+        // Get the snapshot of class schedules where the day array includes today's day
+        const snapshot = await classSchedulesCollection.where('day', 'array-contains', getCurrentDay()).get();
         
         // Get the count of documents in the snapshot
         const count = snapshot.size;
@@ -25,7 +25,14 @@ const ClassScheduleCard = ({ title, date, onPress }) => {
     };
   
     fetchClassCount();
-  }, [date]);
+  }, []);
+
+  // Function to get the current day (e.g., "Monday", "Tuesday", etc.)
+  const getCurrentDay = () => {
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const todayIndex = new Date().getDay(); // 0 for Sunday, 1 for Monday, etc.
+    return days[todayIndex];
+  };
 
   return (
     <TouchableOpacity onPress={onPress} style={styles.card}>
@@ -48,7 +55,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: 200,
     backgroundColor: '#FFFFFF',
-    borderWidth: 0.3
+    borderWidth: 0.3,
+    marginRight: 20
   },
   title: {
     fontSize: 18,
