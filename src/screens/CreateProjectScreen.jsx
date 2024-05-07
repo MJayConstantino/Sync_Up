@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, FlatList, ActivityIndicator } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { View, Text, TouchableOpacity, TextInput, ActivityIndicator, StyleSheet, FlatList } from "react-native";
 import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons as Icon } from "@expo/vector-icons";
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { firebase } from '../../firebase-config';
 import { format } from 'date-fns';
+import { firebase } from '../../firebase-config';
 import { Menu, MenuOption, MenuOptions, MenuTrigger, MenuProvider } from 'react-native-popup-menu';
 
 const firestore = firebase.firestore();
 
-const CreateProjectScreen = () => {
+const CreateProjectScreen = ({ navigation }) => {
   const [projectName, setProjectName] = useState("");
   const [deadline, setDeadline] = useState("");
   const [collaborators, setCollaborators] = useState([]);
@@ -20,11 +20,9 @@ const CreateProjectScreen = () => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const currentUser = firebase.auth().currentUser;
-  const navigation = useNavigation(); // Initialize navigation
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch existing emails from users collection
     const fetchExistingEmails = async () => {
       try {
         const usersSnapshot = await firestore.collection("users").get();
@@ -42,24 +40,21 @@ const CreateProjectScreen = () => {
 
   const handleCreateProject = async () => {
     try {
-      // Validate input
       if (!projectName.trim()) {
         setErrorMessage("Please enter a project name.");
         return;
       }
 
-      // Create the project data
       const projectData = {
         projectName,
         deadline,
         collaborators,
         createdBy: currentUser.uid,
+        createdAt: new Date()
       };
 
-      // Add the project to Firestore
       await firestore.collection("projects").add(projectData);
 
-      // Reset the form
       setProjectName("");
       setDeadline("");
       setCollaborators([]);
@@ -138,75 +133,80 @@ const CreateProjectScreen = () => {
             <MaterialIcons name="close" size={24} color="black" />
           </TouchableOpacity>
         </View>
-        <TextInput
-          style={styles.input}
-          placeholder="Project Name"
-          value={projectName}
-          onChangeText={text => setProjectName(text)}
-        />
-        <Text style={styles.deadlineText}>Set Deadline</Text>
-        <TouchableOpacity style={styles.input} onPress={() => setShowDatePicker(true)}>
-          <Text>
-            {deadline ? format(deadline, "yyyy-MM-dd") : 'Set Date'}
-          </Text>
-        </TouchableOpacity>
-        {showDatePicker && (
-          <DateTimePicker
-          value={deadline ? new Date(deadline) : new Date()}
-          mode="date"
-          display="default"
-          onChange={(event, selectedDate) => {
-            setShowDatePicker(false);
-            if (selectedDate) {
-              const formattedDate = format(selectedDate, "yyyy-MM-dd");
-              setDeadline(formattedDate);
-            }
-          }}
-        />
-        )}
 
-        <View style={styles.collaboratorInputContainer}>
+        <View style={styles.formContainer}>
           <TextInput
-            style={[styles.input, styles.collaboratorInput]}
-            placeholder="Collaborator Email"
-            value={collaboratorEmail}
-            onChangeText={handleInputChange}
+            style={styles.input}
+            placeholder="Project Name"
+            value={projectName}
+            onChangeText={text => setProjectName(text)}
           />
-          <TouchableOpacity style={styles.addButton} onPress={handleAddCollaborator}>
-            <Text style={styles.buttonText}>Add</Text>
+          
+
+          <View style={styles.collaboratorInputContainer}>
+            <TextInput
+              style={[styles.input, styles.collaboratorInput]}
+              placeholder="Collaborator Email"
+              value={collaboratorEmail}
+              onChangeText={handleInputChange}
+            />
+            <TouchableOpacity style={styles.addButton} onPress={handleAddCollaborator}>
+              <Text style={styles.buttonText}>Add</Text>
+            </TouchableOpacity>
+          </View>
+          {errorMessage ? <Text style={styles.errorMessage}>{errorMessage}</Text> : null}
+          <Menu
+            opened={showSuggestions}
+            onBackdropPress={() => setShowSuggestions(false)}
+          >
+            <MenuTrigger />
+            <MenuOptions>
+              <FlatList
+                data={suggestions}
+                renderItem={({ item }) => (
+                  <MenuOption onSelect={() => handleSelectSuggestion(item)}>
+                    <Text>{item}</Text>
+                  </MenuOption>
+                )}
+                keyExtractor={(item, index) => index.toString()}
+              />
+            </MenuOptions>
+          </Menu>
+          <View style={styles.collaboratorsContainer}>
+            {collaborators.map((collaboratorId, index) => (
+              <View key={index} style={styles.collaboratorItem}>
+                <Text>{collaboratorId}</Text>
+                <TouchableOpacity onPress={() => handleRemoveCollaborator(index)}>
+                  <MaterialIcons name="clear" size={20} color="red" />
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
+          <TouchableOpacity style={styles.dateButton} onPress={() => setShowDatePicker(true)}>
+            <Icon name="calendar" size={20} color="#ccc" />
+              <Text style={styles.dateButtonText}>
+                {deadline ? format(deadline, "yyyy-MM-dd") : 'Set Date'}
+              </Text>
+          </TouchableOpacity>
+          {showDatePicker && (
+            <DateTimePicker
+            value={deadline ? new Date(deadline) : new Date()}
+            mode="date"
+            display="default"
+            style={styles.datePicker}
+            onChange={(event, selectedDate) => {
+              setShowDatePicker(false);
+              if (selectedDate) {
+                const formattedDate = format(selectedDate, "yyyy-MM-dd");
+                setDeadline(formattedDate);
+              }
+            }}
+          />
+          )}
+          <TouchableOpacity style={styles.createButton} onPress={handleCreateProject}>
+            <Text style={styles.buttonText}>Create Project</Text>
           </TouchableOpacity>
         </View>
-        {errorMessage ? <Text style={styles.errorMessage}>{errorMessage}</Text> : null}
-        <Menu
-          opened={showSuggestions}
-          onBackdropPress={() => setShowSuggestions(false)}
-        >
-          <MenuTrigger />
-          <MenuOptions>
-            <FlatList
-              data={suggestions}
-              renderItem={({ item }) => (
-                <MenuOption onSelect={() => handleSelectSuggestion(item)}>
-                  <Text>{item}</Text>
-                </MenuOption>
-              )}
-              keyExtractor={(item, index) => index.toString()}
-            />
-          </MenuOptions>
-        </Menu>
-        <View style={styles.collaboratorsContainer}>
-          {collaborators.map((collaboratorId, index) => (
-            <View key={index} style={styles.collaboratorItem}>
-              <Text>{collaboratorId}</Text>
-              <TouchableOpacity onPress={() => handleRemoveCollaborator(index)}>
-                <MaterialIcons name="clear" size={20} color="red" />
-              </TouchableOpacity>
-            </View>
-          ))}
-        </View>
-        <TouchableOpacity style={styles.createButton} onPress={handleCreateProject}>
-          <Text style={styles.buttonText}>Create Project</Text>
-        </TouchableOpacity>
       </View>
     </MenuProvider>
   );
@@ -215,8 +215,10 @@ const CreateProjectScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#f2f2f2",
     padding: 20,
-    paddingTop: 25
+    paddingTop: 25,
+    marginTop: 50
   },
   headerContainer: {
     flexDirection: 'row',
@@ -228,19 +230,25 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
   },
+  formContainer: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 20,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
   input: {
-    width: "100%",
-    height: 40,
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 5,
-    paddingHorizontal: 10,
+    padding: 10,
     marginBottom: 10,
-    justifyContent: 'center',
-  },
-  deadlineText: {
-    fontSize: 16,
-    marginBottom: 5,
   },
   collaboratorInputContainer: {
     flexDirection: 'row',
@@ -249,39 +257,57 @@ const styles = StyleSheet.create({
   },
   collaboratorInput: {
     flex: 1,
+    marginRight: 10,
   },
   addButton: {
-    backgroundColor: "blue",
-    padding: 10,
+    backgroundColor: "#2196F3",
     borderRadius: 5,
-    marginLeft: 10,
+    paddingHorizontal: 15,
+    paddingVertical: 8,
   },
   createButton: {
-    backgroundColor: "green",
-    padding: 10,
-    borderRadius: 10,
-    marginTop: 10,
-    alignItems: 'center',
+    backgroundColor: "#2196F3",
+      borderRadius: 5,
+      paddingVertical: 12,
+      alignItems: "center",
   },
   buttonText: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
   },
-  autocompleteContainer: {
-    marginBottom: 10,
-  },
   collaboratorsContainer: {
-    marginBottom: 10,
+    marginBottom: 20,
   },
   collaboratorItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#f2f2f2",
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
     marginBottom: 5,
   },
   errorMessage: {
     color: "red",
     marginBottom: 10,
+  },
+  dateButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f2f2f2",
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    marginBottom: 20,
+  },
+  dateButtonText: {
+    marginLeft: 10,
+    color: "#666",
+  },
+  datePicker: {
+    marginBottom: 20,
   },
 });
 

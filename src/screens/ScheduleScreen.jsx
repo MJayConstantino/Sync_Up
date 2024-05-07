@@ -12,6 +12,52 @@ import { getDayOfYear, startOfISOWeek } from 'date-fns';
 
 const firestore = firebase.firestore();
 
+const FilterButtons = ({ onFilterChange }) => {
+  const [selectedFilter, setSelectedFilter] = useState('ALL');
+
+  const handleFilterPress = (filter) => {
+    setSelectedFilter(filter);
+    onFilterChange(filter);
+  };
+
+  return (
+    <View style={styles.filterContainer}>
+      <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterScrollContainer}>
+        <TouchableOpacity
+          style={[styles.filterButton, selectedFilter === 'ALL' && styles.selectedFilterButton]}
+          onPress={() => handleFilterPress('ALL')}
+        >
+          <Text style={[styles.filterButtonText, selectedFilter === 'ALL' && styles.selectedFilterButtonText]}>ALL</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.filterButton, selectedFilter === 'Events' && styles.selectedFilterButton]}
+          onPress={() => handleFilterPress('Events')}
+        >
+          <Text style={[styles.filterButtonText, selectedFilter === 'Events' && styles.selectedFilterButtonText]}>Events</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.filterButton, selectedFilter === 'Projects' && styles.selectedFilterButton]}
+          onPress={() => handleFilterPress('Projects')}
+        >
+          <Text style={[styles.filterButtonText, selectedFilter === 'Projects' && styles.selectedFilterButtonText]}>Projects</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.filterButton, selectedFilter === 'Tasks' && styles.selectedFilterButton]}
+          onPress={() => handleFilterPress('Tasks')}
+        >
+          <Text style={[styles.filterButtonText, selectedFilter === 'Tasks' && styles.selectedFilterButtonText]}>Tasks</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.filterButton, selectedFilter === 'ClassSchedules' && styles.selectedFilterButton]}
+          onPress={() => handleFilterPress('ClassSchedules')}
+        >
+          <Text style={[styles.filterButtonText, selectedFilter === 'ClassSchedules' && styles.selectedFilterButtonText]}>Class Schedules</Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </View>
+  );
+};
+
 const ScheduleScreen = ({ navigation }) => {
   const [items, setItems] = useState({});
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -19,6 +65,7 @@ const ScheduleScreen = ({ navigation }) => {
   const [addedSchedule, setAddedSchedule] = useState(false);
   const currentUser = firebase.auth().currentUser;
   const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState('ALL');
 
   useEffect(() => {
     const fetchSchedulesAndTasks = async () => {
@@ -190,14 +237,47 @@ const ScheduleScreen = ({ navigation }) => {
     }, 2000);
   }, []);
 
+  const filterItems = (items, filter) => {
+    if (filter === 'ALL') {
+      return items;
+    }
+
+    const filteredItems = {};
+
+    Object.entries(items).forEach(([date, dateItems]) => {
+      const filteredDateItems = dateItems.filter((item) => {
+        if (filter === 'Events') {
+          return item.type === 'schedule';
+        } else if (filter === 'Projects') {
+          return item.type === 'project';
+        } else if (filter === 'Tasks') {
+          return item.type === 'task' || item.type === 'projectTask';
+        } else if (filter === 'ClassSchedules') {
+          return item.type === 'classSchedule';
+        }
+      });
+
+      if (filteredDateItems.length > 0) {
+        filteredItems[date] = filteredDateItems;
+      }
+    });
+
+    return filteredItems;
+  };
+
+  const handleFilterChange = (filter) => {
+    setFilter(filter);
+  };
+
   if (loading) {
     return (
       <ActivityIndicator style={{flex: 1, justifyContent: "center", alignItems: "center"}} color="blue" size="large" />
     )
   } else return (
     <View style={styles.container}>
+      <FilterButtons onFilterChange={handleFilterChange} />
         <Agenda
-          items={items}
+          items={filterItems(items, filter)}
           renderItem={renderItem}
           // Other Agenda props
         />
@@ -219,7 +299,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    marginTop: 50
+    paddingTop: 25
   },
   addButton: {
     position: 'absolute',
@@ -234,6 +314,35 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#ffffff',
     fontWeight: 'bold',
+  },
+  filterContainer: {
+    backgroundColor: '#fff',
+    elevation: 4, // Add elevation for a slight shadow effect
+    paddingVertical: 5, // Add some vertical padding for spacing
+  },
+  filterScrollContainer: {
+    flexDirection: 'row',
+    paddingTop: 10,
+    paddingHorizontal: 10,
+    marginBottom: 10,
+    maxHeight: 50
+  },
+  filterButton: {
+    backgroundColor: '#f2f2f2',
+    borderRadius: 20,
+    paddingVertical: 6, // Reduced vertical padding
+    paddingHorizontal: 12, // Reduced horizontal padding
+    marginHorizontal: 5,
+  },
+  selectedFilterButton: {
+    backgroundColor: '#00adf5',
+  },
+  filterButtonText: {
+    fontSize: 12, // Reduced font size
+    color: '#333',
+  },
+  selectedFilterButtonText: {
+    color: '#fff',
   },
 });
 
