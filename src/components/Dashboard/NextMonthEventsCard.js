@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { firebase } from '../../../firebase-config';
+import { format } from 'date-fns';
 
 const NextMonthEventsCard = () => {
   const [nextMonthEventsCount, setNextMonthEventsCount] = useState(0);
