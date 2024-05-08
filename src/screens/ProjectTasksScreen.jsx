@@ -5,6 +5,8 @@ import { firebase } from '../../firebase-config';
 import ProjectTask from '../components/Projects/ProjectTask';
 import { useNavigation } from '@react-navigation/native';
 import AddProjectTaskModal from "../components/Projects/AddProjectTask";
+import { Swipeable } from 'react-native-gesture-handler';
+
 
 const firestore = firebase.firestore();
 
@@ -14,6 +16,7 @@ const ProjectTasksScreen = ({ route }) => {
   const navigation = useNavigation();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [taskAdded, setTaskAdded] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const onRefresh = React.useCallback(() => {
@@ -46,8 +49,8 @@ const ProjectTasksScreen = ({ route }) => {
     setIsModalVisible(false);
   };
 
-  const handleProjectTaskPress = (projectId, item) => {
-    navigation.navigate('EditProjectTaskScreen', { projectId: projectId, taskId: item.id });
+  const handleProjectTaskPress = (itemId) => {
+    navigation.navigate('EditProjectTaskScreen', { projectId: projectId, taskId: itemId });
   };
 
   const handleSaveTask = async (newTask) => {
@@ -62,15 +65,30 @@ const ProjectTasksScreen = ({ route }) => {
   const deleteTask = async (taskId) => {
     try {
       await firestore.collection(`projects/${projectId}/tasks`).doc(taskId).delete();
+      setTasks((prevTasks) => prevTasks.filter(task => task.id !== taskId));
     } catch (error) {
       console.error("Error deleting task:", error);
     }
   };
 
+  const renderRightActions = (projectId, taskId) => (
+    <View style={styles.rightActions}>
+      <TouchableOpacity onPress={() => handleProjectTaskPress(taskId)} style={[styles.actionButton, styles.editButton]}>
+        <Text style={styles.editText}>Edit</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => deleteTask(taskId)} style={[styles.actionButton, styles.deleteButton]}>
+        <Text style={styles.deleteText}>Delete</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
   const toggleCompleted = async (taskId, completed) => {
     try {
       const status = completed? false : true;
       await firestore.collection(`projects/${projectId}/tasks`).doc(taskId).update({ isCompleted: status });
+      setTasks((prevTasks) =>
+        prevTasks.map(task => task.id === taskId ? { ...task, completed: status } : task)
+      );
     } catch (error) {
       console.error("Error toggling task status:", error);
     }
@@ -95,7 +113,7 @@ const ProjectTasksScreen = ({ route }) => {
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
           data={tasks}
           renderItem={({ item }) => (
-            <TouchableOpacity onPress={() => handleProjectTaskPress(projectId, item)}>
+            <Swipeable key={item.id} renderRightActions={() => renderRightActions(projectId, item.id)}>
               <ProjectTask
                 assignedTo={item.assignedTo}
                 taskName={item.taskName}
@@ -107,7 +125,7 @@ const ProjectTasksScreen = ({ route }) => {
                 taskId={item.id}
                 isCompleted={item.isCompleted}
               />
-            </TouchableOpacity>
+            </Swipeable>
           )}
           keyExtractor={item => item.id}
         />
@@ -157,6 +175,35 @@ const styles = StyleSheet.create({
   noTasksText: {
     textAlign: 'center',
     fontSize: 16,
+  },
+  rightActions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    flex: 1,
+  },
+  actionButton: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: "45%",
+    height: '90%',
+    borderRadius: 20,
+    marginTop: 10,
+    marginLeft: 25,
+  },
+  deleteButton: {
+    backgroundColor: 'pink',
+  },
+  editButton: {
+    backgroundColor: 'lightblue',
+  },
+  deleteText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  editText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 });
 

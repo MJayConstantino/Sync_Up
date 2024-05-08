@@ -1,7 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import DeleteBtn from "./DeleteBtn"; // Assuming DeleteBtn component is defined elsewhere
 import CheckBox from "./CheckBox";
 
 const ProjectTask = ({ assignedTo, taskName, description, time, date, deleteTask, toggleCompleted, taskId, isCompleted }) => {
@@ -33,7 +32,6 @@ const ProjectTask = ({ assignedTo, taskName, description, time, date, deleteTask
           {/* Display the task name */}
           <Text style={styles.taskName}>{taskName}</Text>
         </View>
-        <DeleteBtn deleteTask={deleteTask} />
       </View>
       <View style={styles.bottomRow}>
         {/* Display the description */}

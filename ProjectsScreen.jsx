@@ -11,6 +11,7 @@ const ProjectsScreen = () => {
   const [projects, setProjects] = useState([]);
   const navigation = useNavigation();
   const [refreshing, setRefreshing] = useState(false);
+  const [projectAdded, setProjectAdded] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const onRefresh = React.useCallback(() => {
@@ -21,30 +22,26 @@ const ProjectsScreen = () => {
   }, []);
 
   useEffect(() => {
-    const unsubscribe = firestore.collection("projects")
-      .onSnapshot(snapshot => {
+    const fetchProjects = async () => {
+      try {
         const user = firebase.auth().currentUser;
-        const projectsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        const filteredProjects = projectsData.filter(project => project.collaborators.includes(user.uid));
-        fetchProjectTasks(filteredProjects);
-      });
-
-    return () => unsubscribe(); // Unsubscribe when the component unmounts
-  }, []);
-
-  const fetchProjectTasks = async (projectsData) => {
-    try {
-      const projectsWithTasks = await Promise.all(projectsData.map(async project => {
-        const tasksSnapshot = await firestore.collection(`projects/${project.id}/tasks`).get();
-        const tasksData = tasksSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        return { ...project, tasks: tasksData };
-      }));
-      setProjects(projectsWithTasks);
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching project tasks:", error);
-    }
-  };
+        const projectsSnapshot = await firestore.collection("projects").where("collaborators", "array-contains", user.uid).get();
+        const projectsData = projectsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const projectsWithTasks = await Promise.all(projectsData.map(async project => {
+          const tasksSnapshot = await firestore.collection(`projects/${project.id}/tasks`).get();
+          const tasksData = tasksSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          return { ...project, tasks: tasksData };
+        }));
+        setProjects(projectsWithTasks);
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    fetchProjects();
+  }, [projectAdded]);
 
   const handleProjectPress = (projectId) => {
     navigation.navigate('ProjectTasksScreen', { projectId: projectId });
@@ -76,11 +73,12 @@ const ProjectsScreen = () => {
       </TouchableOpacity>
     </View>
   );
+
   
 
   if (loading) {
     return (
-      <ActivityIndicator style={{flex: 1, justifyContent: "center", alignItems: "center"}} color="#00adf5" size="large" />
+      <ActivityIndicator style={{flex: 1, justifyContent: "center", alignItems: "center"}} color="blue" size="large" />
     )
   } else return (
     <View style={styles.container}>
@@ -92,7 +90,7 @@ const ProjectsScreen = () => {
           <Text style={styles.noProjectsText}>No projects and collaborations. Press 'Add Project' to create one or become a collaborator.</Text>
         ) : (
           projects.map(project => (
-            <Swipeable key={project.id} renderRightActions={() => renderRightActions(project.id)}>  
+          <Swipeable key={project.id} renderRightActions={() => renderRightActions(project.id)}>  
             <TouchableOpacity key={project.id} onPress={() => handleProjectPress(project.id)}>
               <Project
                 projectName={project.projectName}
@@ -115,7 +113,7 @@ const ProjectsScreen = () => {
 const calculateProgress = (tasks) => {
   if (!tasks || tasks.length === 0) return 0;
 
-  const completedTasks = tasks.filter(task => task.completed === true);
+  const completedTasks = tasks.filter(task => task.status === 'completed');
   return (completedTasks.length / tasks.length) * 100;
 };
 
@@ -159,11 +157,10 @@ const styles = StyleSheet.create({
   actionButton: {
     justifyContent: 'center',
     alignItems: 'center',
-    width: "45%",
+    width: 100,
     height: '85%',
     borderRadius: 20,
-    marginLeft: 25,
-    marginVertical: 20
+    marginLeft: 10,
   },
   deleteButton: {
     backgroundColor: 'pink',
@@ -182,4 +179,3 @@ const styles = StyleSheet.create({
 });
 
 export default ProjectsScreen;
-
