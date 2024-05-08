@@ -159,10 +159,10 @@ const styles = StyleSheet.create({
   actionButton: {
     justifyContent: 'center',
     alignItems: 'center',
-    width: "45%",
+    width: 100,
     height: '85%',
     borderRadius: 20,
-    marginLeft: 25,
+    marginLeft: 20,
     marginVertical: 20
   },
   deleteButton: {

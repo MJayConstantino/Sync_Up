@@ -185,11 +185,11 @@ const styles = StyleSheet.create({
   actionButton: {
     justifyContent: 'center',
     alignItems: 'center',
-    width: "45%",
+    width: 100,
     height: '90%',
     borderRadius: 20,
     marginTop: 10,
-    marginLeft: 25,
+    marginLeft: 20,
   },
   deleteButton: {
     backgroundColor: 'pink',

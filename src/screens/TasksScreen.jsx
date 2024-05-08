@@ -1,13 +1,10 @@
-//May delay yung alarm for some reason, check pls
-
 import React, { useState, useEffect } from "react";
 import { StyleSheet, Text, TouchableOpacity, View, ScrollView, RefreshControl, ActivityIndicator } from "react-native";
 import Task from "../components/Tasks/Task";
 import AddTaskModal from "../components/Tasks/AddTask";
 import EditTaskScreen from "./EditTasksScreen";
 import { firebase } from "../../firebase-config";
-import * as Notifications from 'expo-notifications';
-
+import { Swipeable } from 'react-native-gesture-handler';
 
 const firestore = firebase.firestore();
 
@@ -89,48 +86,6 @@ export default function TasksScreen({ navigation }) {
     }
   };
 
-  // Function to request notification permissions
-const getNotificationPermission = async () => {
-  const { status } = await Notifications.requestPermissionsAsync();
-  if (status !== 'granted') {
-    alert('Notification permission denied. Please enable notifications in device settings to receive reminders.');
-    return false;
-  }
-  return true;
-};
-
-// Function to schedule notification
-const setAlarm = async (date, time, taskName) => {
-  try {
-    // Ensure notification permission is granted
-    const permissionGranted = await getNotificationPermission();
-    if (!permissionGranted) {
-      throw new Error('Notification permission not granted');
-    }
-
-    // Parse date and time strings to create a Date object
-    const newDate = new Date(date);
-    const [hours, minutes] = time.split(':');
-    newDate.setHours(hours, minutes);
-
-    // Schedule a notification with the task name as the body
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: 'Task Reminder',
-        body: taskName,
-      },
-      trigger: {
-        date: newDate,
-      },
-    });
-
-    console.log('Alarm scheduled successfully');
-  } catch (error) {
-    console.error('Error scheduling alarm:', error.message);
-  }
-};
-  
-
   const openAddModal = () => {
     // Check if the selected category is an empty string
     const updatedCategory = selectedCategory.trim() === "" ? "All" : selectedCategory.trim();
@@ -174,9 +129,21 @@ const setAlarm = async (date, time, taskName) => {
     }
   };
 
+  // Function to schedule notification
+  const renderRightActions = (taskId) => (
+    <View style={styles.rightActions}>
+      <TouchableOpacity onPress={() => navigation.navigate('EditTaskScreen', { taskId: taskId })} style={[styles.actionButton, styles.editButton]}>
+        <Text style={styles.editText}>Edit</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => deleteTask(taskId)} style={[styles.actionButton, styles.deleteButton]}>
+        <Text style={styles.deleteText}>Delete</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
   if (loading) {
     return (
-      <ActivityIndicator style={{flex: 1, justifyContent: "center", alignItems: "center"}} color="blue" size="large" />
+      <ActivityIndicator style={{flex: 1, justifyContent: "center", alignItems: "center"}} color="#00adf5" size="large" />
     )
   } else return (
     <View style={styles.container}>
@@ -209,6 +176,7 @@ const setAlarm = async (date, time, taskName) => {
           ) : (
             <View style={styles.items}>
             {filterTasks(taskItems).map((item, index) => (
+            <Swipeable key={item.id} renderRightActions={() => renderRightActions(item.id)}>
             <TouchableOpacity key={item.id} onPress={() => handleTaskPress(item.id)}>
               <Task
                 text={item.taskName}
@@ -222,7 +190,8 @@ const setAlarm = async (date, time, taskName) => {
                 toggleCompleted={toggleCompleted} // Pass toggleTaskStatus function here
               />
             </TouchableOpacity>
-          ))}
+            </Swipeable>  
+            ))}
             </View>
           )}
         </View>
@@ -314,5 +283,34 @@ const styles = StyleSheet.create({
   noTasksSubText: {
     fontSize: 14,
     color: "#666",
+  },
+  rightActions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    flex: 1,
+  },
+  actionButton: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 100,
+    height: '90%',
+    borderRadius: 20,
+    marginTop: 10,
+    marginLeft: 10,
+  },
+  deleteButton: {
+    backgroundColor: 'pink',
+  },
+  editButton: {
+    backgroundColor: 'lightblue',
+  },
+  deleteText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  editText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 });
