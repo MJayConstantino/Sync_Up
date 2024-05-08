@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { firebase } from "../../../firebase-config";// Import your Firebase configuration file
+import { firebase } from "../../../firebase-config"; // Import your Firebase configuration file
 
 const Project = ({ projectName, deadline, collaborators, progress }) => {
   const [collaboratorImages, setCollaboratorImages] = useState([]);
@@ -17,41 +17,54 @@ const Project = ({ projectName, deadline, collaborators, progress }) => {
 
   // Calculate progress status color based on completion percentage
   let progressColor;
+  let statusText;
   if (progress >= 100) {
     progressColor = "#00FF00"; // Green for completed
-  } else if (progress >= 50) {
-    progressColor = "#FFA500"; // Orange for 50% or above done
+    statusText = "Completed";
+  } else if (progress > 0) {
+    progressColor = "#FFA500"; // Orange for in-progress
+    statusText = "In Progress";
   } else {
-    progressColor = "#FF0000"; // Red for less than 50% or overdue
+    progressColor = "#FF0000"; // Red for not started
+    statusText = "Not Started";
   }
 
   return (
     <View style={styles.item}>
       <View style={styles.topContainer}>
         <View style={styles.deadlineContainer}>
-          <MaterialCommunityIcons name="clock-outline" size={15} color="#FFFFFF" />
+          <MaterialCommunityIcons name="calendar" size={20} color="#FFFFFF" />
           <View style={styles.deadlineTextContainer}>
             <Text style={styles.deadlineText}>{deadline}</Text>
           </View>
         </View>
-        <View style={[styles.statusIndicator, { backgroundColor: progressColor }]}>
-          <Text style={styles.statusText}>{progress >= 100 ? "Completed" : progress + "%"}</Text>
+        {/* Circular progress bar */}
+        <View style={[styles.progressContainer, { borderColor: progressColor }]}>
+          <View style={[styles.progressBar, { backgroundColor: progressColor }]}>
+            <Text style={[styles.progressText, { color: progress >= 100 ? "#FFFFFF" : "#000000" }]}>
+              {progress.toFixed(2)}%
+            </Text>
+          </View>
         </View>
       </View>
       <View style={styles.contentContainer}>
         <View style={styles.itemLeft}>
           <Text style={styles.textContainer}>{projectName}</Text>
         </View>
+        {/* Placeholder for collaborator images */}
+        <View style={styles.collaboratorContainer}>
+          {collaboratorImages.map((imageUrl, index) => (
+            <Image
+              key={index}
+              source={{ uri: imageUrl }}
+              style={styles.collaboratorAvatar}
+            />
+          ))}
+        </View>
       </View>
-      <View style={styles.collaboratorContainer}>
-        {/* Display avatars of collaborators */}
-        {collaboratorImages.map((imageUrl, index) => (
-          <Image
-            key={index}
-            source={{ uri: imageUrl }}
-            style={styles.collaboratorAvatar}
-          />
-        ))}
+      {/* Status box */}
+      <View style={[styles.statusBox, { backgroundColor: progressColor }]}>
+        <Text style={styles.statusText}>{statusText}</Text>
       </View>
     </View>
   );
@@ -90,6 +103,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 10,
   },
@@ -109,11 +123,30 @@ const styles = StyleSheet.create({
     borderRadius: 15, // Make it circular
     marginRight: 5,
   },
-  statusIndicator: {
-    backgroundColor: "#00FF00", // Default color is green
+  progressContainer: {
+    borderWidth: 2,
+    borderRadius: 50,
+    width: 50,
+    height: 50,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  progressBar: {
+    borderRadius: 50,
+    width: "100%",
+    height: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  progressText: {
+    fontSize: 12,
+  },
+  statusBox: {
     borderRadius: 20,
     paddingVertical: 5,
     paddingHorizontal: 10,
+    alignSelf: "flex-start",
+    marginBottom: 10,
   },
   statusText: {
     color: "#FFFFFF",

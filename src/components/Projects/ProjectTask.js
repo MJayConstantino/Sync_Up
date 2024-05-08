@@ -16,7 +16,7 @@ const ProjectTask = ({ assignedTo, taskName, description, time, date, deleteTask
         {/* Deadline icon */}
         <MaterialCommunityIcons name="calendar" size={20} color="#FFFFFF" />
         {/* Deadline text */}
-        <Text style={styles.deadlineText}>{date}</Text>
+        <Text style={styles.deadlineText}> {date}</Text>
       </View>
 
       {/* Time container */}
@@ -64,8 +64,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   deadlineText: {
-    fontSize: 22,
-    fontWeight: "bold",
+    fontSize: 18,
+    color: "#FFFFFF"
   },
   timeContainer: {
     flexDirection: "row",

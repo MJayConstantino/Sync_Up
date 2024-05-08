@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useLayoutEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { GiftedChat, Message } from 'react-native-gifted-chat';
-import { collection, query, orderBy, onSnapshot, where } from 'firebase/firestore'; // Import 'where' correctly
+import { collection, query, orderBy, onSnapshot, where, addDoc } from 'firebase/firestore'; // Import 'where' correctly
 import { firebase } from '../../firebase-config';
 import { useRoute, useNavigation } from '@react-navigation/native';
 

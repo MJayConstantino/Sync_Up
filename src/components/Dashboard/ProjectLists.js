@@ -13,21 +13,23 @@ const ProjectList = () => {
       .collection('projects')
       .where('collaborators', 'array-contains', currentUser.uid)
       .onSnapshot((snapshot) => {
-        const fetchedProjects = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-          tasksCount: (doc.data().tasks || []).filter((task) => task.assignedTo.includes(currentUser.uid)).length,
-        }));
+        const fetchedProjects = snapshot.docs.map((doc) => {
+          const projectData = doc.data();
+          const totalTasks = (projectData.tasks || []).length;
+          const completedTasks = (projectData.tasks || []).filter((task) => task.isCompleted).length;
+          const progress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+
+          return {
+            id: doc.id,
+            ...projectData,
+            tasksCount: (projectData.tasks || []).length,
+            progress: progress.toFixed(2),
+          };
+        });
         setProjects(fetchedProjects);
       });
     return () => unsubscribe();
   }, [currentUser.uid]);
-
-  const calculateProgress = (project) => {
-    const totalTasks = (project.tasks || []).length;
-    const completedTasks = (project.tasks || []).filter((task) => task.isCompleted).length;
-    return totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
-  };
 
   const getPendingTasksCount = (project) => {
     const pendingTasks = (project.tasks || []).filter((task) => !task.isCompleted);
@@ -39,11 +41,11 @@ const ProjectList = () => {
       {projects.map((project) => (
         <TouchableOpacity
           key={project.id}
-          onPress={() => navigation.navigate('ProjectDetails', { projectId: project.id })}
+          onPress={() => navigation.navigate('Projects', { projectId: project.id })}
           style={styles.projectCard}
         >
           <Text style={styles.projectName}>{project.projectName}</Text>
-          <Text style={styles.projectProgress}>Progress: {calculateProgress(project)}%</Text>
+          <Text style={styles.projectProgress}>Progress: {project.progress}%</Text>
           <Text style={styles.projectTasks}>Pending Tasks: {getPendingTasksCount(project)}</Text>
         </TouchableOpacity>
       ))}
@@ -81,33 +83,33 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   projectListContainer: {
-    height: 200,
+    height: 200, // Reduced height
   },
   projectCard: {
-    backgroundColor: 'red', // Change the background color to red
+    backgroundColor: 'red',
     borderRadius: 10,
-    padding: 10,
+    padding: 8, // Reduced padding
     marginRight: 10,
-    width: 250,
-    justifyContent: 'center', // Center content vertically
-    alignItems: 'center', // Center content horizontally
+    width: 200, // Reduced width
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   projectName: {
-    fontSize: 20, // Increase font size
+    fontSize: 16, // Reduced font size
     fontWeight: 'bold',
-    marginBottom: 10, // Increase margin for spacing
-    color: 'white', // Set text color to white for better visibility
+    marginBottom: 5, // Reduced margin
+    color: 'white',
   },
   projectProgress: {
-    fontSize: 16, // Increase font size
-    marginBottom: 10, // Increase margin for spacing
-    color: 'white', // Set text color to white for better visibility
+    fontSize: 14, // Reduced font size
+    marginBottom: 5, // Reduced margin
+    color: 'white',
   },
   projectTasks: {
-    fontSize: 16, // Increase font size
+    fontSize: 14, // Reduced font size
     fontWeight: 'bold',
-    marginBottom: 10, // Increase margin for spacing
-    color: 'white', // Set text color to white for better visibility
+    marginBottom: 5, // Reduced margin
+    color: 'white',
   },
 });
 
