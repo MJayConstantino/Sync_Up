@@ -12,20 +12,24 @@ const ProjectList = () => {
     const unsubscribe = firebase.firestore()
       .collection('projects')
       .where('collaborators', 'array-contains', currentUser.uid)
-      .onSnapshot((snapshot) => {
-        const fetchedProjects = snapshot.docs.map((doc) => {
-          const projectData = doc.data();
-          const totalTasks = (projectData.tasks || []).length;
-          const completedTasks = (projectData.tasks || []).filter((task) => task.isCompleted).length;
-          const progress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+      .onSnapshot(async (snapshot) => {
+        const fetchedProjects = await Promise.all(
+          snapshot.docs.map(async (doc) => {
+            const projectData = doc.data();
+            const tasksSnapshot = await firebase.firestore().collection(`projects/${doc.id}/tasks`).get();
+            const tasks = tasksSnapshot.docs.map((taskDoc) => taskDoc.data());
+            const completedTasks = tasks.filter((task) => task.isCompleted).length;
+            const totalTasks = tasks.length;
+            const progress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
 
-          return {
-            id: doc.id,
-            ...projectData,
-            tasksCount: (projectData.tasks || []).length,
-            progress: progress.toFixed(2),
-          };
-        });
+            return {
+              id: doc.id,
+              ...projectData,
+              tasks,
+              progress: progress.toFixed(2),
+            };
+          })
+        );
         setProjects(fetchedProjects);
       });
     return () => unsubscribe();
@@ -45,14 +49,13 @@ const ProjectList = () => {
           style={styles.projectCard}
         >
           <Text style={styles.projectName}>{project.projectName}</Text>
-          <Text style={styles.projectProgress}>Progress: {project.progress}%</Text>
           <Text style={styles.projectTasks}>Pending Tasks: {getPendingTasksCount(project)}</Text>
         </TouchableOpacity>
       ))}
     </ScrollView>
   );
 };
-  
+
 const styles = StyleSheet.create({
   card: {
     borderRadius: 10,
