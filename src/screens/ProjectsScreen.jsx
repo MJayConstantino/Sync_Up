@@ -10,7 +10,6 @@ const ProjectsScreen = () => {
   const [projects, setProjects] = useState([]);
   const navigation = useNavigation();
   const [refreshing, setRefreshing] = useState(false);
-  const [projectAdded, setProjectAdded] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const onRefresh = React.useCallback(() => {
@@ -21,26 +20,30 @@ const ProjectsScreen = () => {
   }, []);
 
   useEffect(() => {
-    const fetchProjects = async () => {
-      try {
+    const unsubscribe = firestore.collection("projects")
+      .onSnapshot(snapshot => {
         const user = firebase.auth().currentUser;
-        const projectsSnapshot = await firestore.collection("projects").where("collaborators", "array-contains", user.uid).get();
-        const projectsData = projectsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        const projectsWithTasks = await Promise.all(projectsData.map(async project => {
-          const tasksSnapshot = await firestore.collection(`projects/${project.id}/tasks`).get();
-          const tasksData = tasksSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-          return { ...project, tasks: tasksData };
-        }));
-        setProjects(projectsWithTasks);
-      } catch (error) {
-        console.error("Error fetching projects:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-  
-    fetchProjects();
-  }, [projectAdded]);
+        const projectsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const filteredProjects = projectsData.filter(project => project.collaborators.includes(user.uid));
+        fetchProjectTasks(filteredProjects);
+      });
+
+    return () => unsubscribe(); // Unsubscribe when the component unmounts
+  }, []);
+
+  const fetchProjectTasks = async (projectsData) => {
+    try {
+      const projectsWithTasks = await Promise.all(projectsData.map(async project => {
+        const tasksSnapshot = await firestore.collection(`projects/${project.id}/tasks`).get();
+        const tasksData = tasksSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        return { ...project, tasks: tasksData };
+      }));
+      setProjects(projectsWithTasks);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching project tasks:", error);
+    }
+  };
 
   const handleProjectPress = (projectId) => {
     navigation.navigate('ProjectTasksScreen', { projectId: projectId });

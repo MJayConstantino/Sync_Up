@@ -121,7 +121,10 @@ const ScheduleScreen = ({ navigation, route }) => {
         });
 
         // Fetch projects where the user is a collaborator
-        const projectsSnapshot = await firestore.collection('projects').where('collaborators', 'array-contains', currentUser.uid).get();
+        const projectsSnapshot = await firestore
+          .collection('projects')
+          .where('collaborators', 'array-contains', currentUser.uid)
+          .get();
         const projects = projectsSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data(), type: 'project' }));
 
         projects.forEach(async project => {

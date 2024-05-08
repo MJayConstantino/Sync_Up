@@ -16,11 +16,9 @@ export default function TasksScreen({ navigation }) {
   const [taskDate, setTaskDate] = useState("");
   const [taskDescription, setTaskDescription] = useState("");
   const [refreshing, setRefreshing] = useState(false);
-  const [taskAdded, setTaskAdded] = useState(false);
+  const [loading, setLoading] = useState(true);
   const categories = ["All", "Work", "School", "Home", "Personal"];
   const currentUser = firebase.auth().currentUser;
-  const [loading, setLoading] = useState(true);
-  const [taskToggled, setTaskToggled] = useState(false);
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -28,6 +26,20 @@ export default function TasksScreen({ navigation }) {
       setRefreshing(false);
     }, 2000);
   }, []);
+
+  useEffect(() => {
+    const unsubscribe = firestore
+      .collection(`users/${currentUser.uid}/tasks`)
+      .orderBy("isCompleted", "asc")
+      .orderBy("createdAt", "desc")
+      .onSnapshot((snapshot) => {
+        const tasks = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        setTaskItems(tasks.sort(sortByTime));
+        setLoading(false);
+      });
+
+    return () => unsubscribe();
+  }, [currentUser.uid]);
 
   // Function to convert time string to 24-hour format
   const convertTo24HourFormat = (timeStr) => {
@@ -48,55 +60,11 @@ export default function TasksScreen({ navigation }) {
     return aTime - bTime;
   };
 
-  useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const snapshot = await firestore
-          .collection(`users/${currentUser.uid}/tasks`)
-          .orderBy("isCompleted", "asc")
-          .orderBy("createdAt", "desc") // Order tasks by createdAt in descending order
-          .get();
-        const tasks = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-        setTaskItems(tasks.sort(sortByTime)); // Sort tasks by time
-      } catch (error) {
-        console.error("Error fetching tasks:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-  
-    fetchTasks();
-  }, [currentUser.uid, taskAdded]);
-  
-  useEffect(() => {
-    if (taskAdded || taskToggled) {
-      fetchTasks(); // Fetch tasks again
-      setTaskToggled(false); // Reset taskToggled state
-    }
-  }, [taskAdded, taskToggled])
-
-  const fetchTasks = async () => {
-    try {
-      const snapshot = await firestore
-        .collection(`users/${currentUser.uid}/tasks`)
-        .orderBy("isCompleted", "asc")
-        .orderBy("createdAt", "desc") // Order tasks by createdAt in descending order
-        .get();
-      const tasks = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      setTaskItems(tasks.sort(sortByTime)); // Sort tasks by time
-    } catch (error) {
-      console.error("Error fetching tasks:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-  
-
   const handleTaskPress = (taskId) => {
     navigation.navigate('EditTaskScreen', { taskId: taskId });
   };
 
-  function getTimeValue(taskTime) {
+  const getTimeValue = (taskTime) => {
     const [time, period] = taskTime.split(' ');
     const [hours, minutes] = time.split(':');
     let timeValue = parseInt(hours) * 100 + parseInt(minutes);
@@ -104,7 +72,7 @@ export default function TasksScreen({ navigation }) {
       timeValue += 1200;
     }
     return timeValue;
-  }
+  };
 
   const addNewTask = async () => {
     try {
@@ -114,16 +82,14 @@ export default function TasksScreen({ navigation }) {
         time: taskTime,
         date: taskDate,
         description: taskDescription,
-        isCompleted: false, // Initial status
+        isCompleted: false,
         createdAt: new Date(),
         timeValue: getTimeValue(taskTime),
       };
 
       await firestore.collection(`users/${currentUser.uid}/tasks`).add(newTask);
 
-
       console.log("Task added successfully!");
-      setTaskAdded(true);
       setIsAddModalVisible(false);
       setEditTaskName("");
       setTaskTime("");
@@ -135,7 +101,6 @@ export default function TasksScreen({ navigation }) {
   };
 
   const openAddModal = () => {
-    // Check if the selected category is an empty string
     const updatedCategory = selectedCategory.trim() === "" ? "All" : selectedCategory.trim();
     setSelectedCategory(updatedCategory);
     setIsAddModalVisible(true);
@@ -143,17 +108,8 @@ export default function TasksScreen({ navigation }) {
 
   const toggleCompleted = async (taskId, isCompleted) => {
     try {
-      const updatedStatus = !isCompleted; // Toggle the completion status
+      const updatedStatus = !isCompleted;
       await firestore.collection(`users/${currentUser.uid}/tasks`).doc(taskId).update({ isCompleted: updatedStatus });
-
-      const updatedTasks = taskItems.map((task) => {
-        if (task.id === taskId) {
-          return { ...task, isCompleted: updatedStatus };
-        }
-        return task;
-      });
-      setTaskItems(updatedTasks);
-      setTaskToggled(true); // Set taskToggled state to trigger refresh
     } catch (error) {
       console.error("Error updating task status:", error);
     }
@@ -162,9 +118,6 @@ export default function TasksScreen({ navigation }) {
   const deleteTask = async (taskId) => {
     try {
       await firestore.collection(`users/${currentUser.uid}/tasks`).doc(taskId).delete();
-
-      const updatedTasks = taskItems.filter((task) => task.id !== taskId);
-      setTaskItems(updatedTasks);
     } catch (error) {
       console.error("Error deleting task:", error);
     }
@@ -172,9 +125,9 @@ export default function TasksScreen({ navigation }) {
 
   const filterTasks = (items) => {
     if (selectedCategory === "All") {
-      return items; // Show all tasks
+      return items;
     } else {
-      return items.filter((item) => item.category === selectedCategory).sort(sortByTime); // Filter based on selected category and sort by time
+      return items.filter((item) => item.category === selectedCategory).sort(sortByTime);
     }
   };
 
@@ -197,7 +150,7 @@ export default function TasksScreen({ navigation }) {
               <TouchableOpacity
                 key={category}
                 style={[styles.categoryButton, { backgroundColor: selectedCategory === category ? "#03a1fc" : "#D6D6D6" }]}
-                onPress={() => setSelectedCategory(category === null ? "All" : category)} // Set "All" for "None"
+                onPress={() => setSelectedCategory(category === null ? "All" : category)}
               >
                 <Text style={[styles.categoryText, { color: selectedCategory === category ? "#FFFFFF" : "#000000" }]}>
                   {category}
@@ -223,7 +176,7 @@ export default function TasksScreen({ navigation }) {
                 category={item.category}
                 taskId={item.id}
                 isCompleted={item.isCompleted}
-                toggleCompleted={toggleCompleted} // Pass toggleTaskStatus function here
+                toggleCompleted={toggleCompleted}
               />
             </TouchableOpacity>
           ))}
@@ -242,8 +195,8 @@ export default function TasksScreen({ navigation }) {
         onSave={addNewTask}
         taskName={editTaskName}
         setTaskName={setEditTaskName}
-        taskDate={taskDate} // Updated to `taskDate` from `taskDay`
-        setTaskDate={setTaskDate} // Updated to `setTaskDate` from `setTaskDay`
+        taskDate={taskDate}
+        setTaskDate={setTaskDate}
         taskTime={taskTime}
         setTaskTime={setTaskTime}
         taskDescription={taskDescription}

@@ -13,8 +13,7 @@ const ProjectTasksScreen = ({ route }) => {
   const [tasks, setTasks] = useState([]);
   const navigation = useNavigation();
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [refreshing, setRefreshing] = React.useState(false);
-  const [taskAdded, setTaskAdded] = React.useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const onRefresh = React.useCallback(() => {
@@ -24,25 +23,16 @@ const ProjectTasksScreen = ({ route }) => {
     }, 2000);
   }, []);
 
-  React.useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const tasksSnapshot = await firestore
-          .collection(`projects/${projectId}/tasks`)
-          .orderBy("isCompleted", "asc")
-          .orderBy("createdAt", "desc")
-          .get();
-        const tasksData = tasksSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  useEffect(() => {
+    const unsubscribe = firestore.collection(`projects/${projectId}/tasks`)
+      .onSnapshot(snapshot => {
+        const tasksData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         setTasks(tasksData);
-      } catch (error) {
-        console.error("Error fetching tasks:", error);
-      } finally {
         setLoading(false);
-      }
-    };
+      });
 
-    fetchTasks();
-  }, [projectId, taskAdded]);
+    return () => unsubscribe(); // Unsubscribe when the component unmounts
+  }, [projectId]);
 
   const handleBack = () => {
     navigation.goBack();
@@ -63,9 +53,7 @@ const ProjectTasksScreen = ({ route }) => {
   const handleSaveTask = async (newTask) => {
     try {
       await firestore.collection(`projects/${projectId}/tasks`).add(newTask);
-      setTaskAdded()
       handleCloseModal();
-      
     } catch (error) {
       console.error("Error saving task:", error);
     }
@@ -74,7 +62,6 @@ const ProjectTasksScreen = ({ route }) => {
   const deleteTask = async (taskId) => {
     try {
       await firestore.collection(`projects/${projectId}/tasks`).doc(taskId).delete();
-      setTasks((prevTasks) => prevTasks.filter(task => task.id !== taskId));
     } catch (error) {
       console.error("Error deleting task:", error);
     }
@@ -84,9 +71,6 @@ const ProjectTasksScreen = ({ route }) => {
     try {
       const status = completed? false : true;
       await firestore.collection(`projects/${projectId}/tasks`).doc(taskId).update({ isCompleted: status });
-      setTasks((prevTasks) =>
-        prevTasks.map(task => task.id === taskId ? { ...task, completed: status } : task)
-      );
     } catch (error) {
       console.error("Error toggling task status:", error);
     }
