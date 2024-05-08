@@ -13,7 +13,6 @@ import { MaterialCommunityIcons as Icon } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { format } from 'date-fns';
 import { Menu, MenuOption, MenuOptions, MenuTrigger, MenuProvider } from 'react-native-popup-menu';
-import * as Notifications from "expo-notifications"; // Import Notifications
 
 const AddTaskModal = ({
   isVisible,
@@ -32,20 +31,20 @@ const AddTaskModal = ({
 }) => {
   const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
   const [isTimePickerVisible, setIsTimePickerVisible] = useState(false);
-  const [selectedDate, setSelectedDate] = useState('');
-  const [selectedTime, setSelectedTime] = useState('');
+  const [selectedDate, setSelectedDate] = useState(''); // Initialize selectedDate
+  const [selectedTime, setSelectedTime] = useState(''); // New state for selected time
   const taskNameInputRef = useRef(null);
 
   const openDatePicker = () => {
     setIsDatePickerVisible(true);
     setIsTimePickerVisible(false);
-    Keyboard.dismiss();
+    Keyboard.dismiss(); // Close soft keyboard if open
   };
 
   const openTimePicker = () => {
     setIsTimePickerVisible(true);
     setIsDatePickerVisible(false);
-    Keyboard.dismiss();
+    Keyboard.dismiss(); // Close soft keyboard if open
   };
 
   const closeDateTimePicker = () => {
@@ -58,7 +57,7 @@ const AddTaskModal = ({
       setSelectedDate(selectedDate);
       const formattedDate = format(selectedDate, "yyyy-MM-dd");
       if (isDatePickerVisible) {
-        setTaskDate(formattedDate);
+        setTaskDate(formattedDate); // If date picker was visible, update taskDate
       }
 
       closeDateTimePicker();
@@ -68,73 +67,61 @@ const AddTaskModal = ({
   const handleTimeChange = (event, selectedTime) => {
     if (selectedTime) {
       setSelectedTime(selectedTime);
-      const formattedTime = format(selectedTime, "HH:mm aa");
+      const formattedTime = format(selectedTime, "hh:mm aa");
 
       if (isTimePickerVisible) {
-        setTaskTime(formattedTime);
+        setTaskTime(formattedTime); // If time picker was visible, update taskTime
       }
       closeDateTimePicker();
     }
   };
 
+
+
   const handleSaveTask = () => {
+    // Basic validation (optional)
     if (!taskName) {
       alert("Please enter a task name.");
       return;
     }
 
+    // Set task information with selected category
     const newTask = {
       taskName,
       category: selectedCategory !== "All" ? selectedCategory : null,
       time: taskTime,
       date: taskDate,
       description: taskDescription,
-      isCompleted: false
+      isCompleted: false,
+
     };
 
+    // Invoke onSave function with the newTask object
     onSave(newTask);
+
+    // Close the modal
     onDismiss();
+
+    // Clear input fields
     setTaskName("");
     setTaskTime("");
     setSelectedTime("");
-    setTaskDate("");
-    setSelectedDate("");
+    setTaskDate(""); // Clear taskDate
+    setSelectedDate(""); // Clear selectedDate
     setTaskDescription("");
     setSelectedCategory("All");
-
-    // Set alarm when task is saved
-    setAlarm(selectedDate, selectedTime, taskName);
   };
-
-  const setAlarm = (date, time, taskName) => {
-    const newDate = new Date(date);
-    const newHour = time.getHours();
-    const newMinute = time.getMinutes();
-  
-    newDate.setHours(newHour, newMinute);
-  
-    // Schedule a notification with the task name as the body
-    Notifications.scheduleNotificationAsync({
-      content: {
-        title: "Task Reminder",
-        body: taskName,
-      },
-      trigger: {
-        date: newDate,
-      },
-    });
-  };
-  
-  
 
   const handleCancel = () => {
+    // Clear input if taskName is not empty
     setTaskName("");
     setTaskTime("");
     setSelectedTime("");
-    setTaskDate("");
-    setSelectedDate("");
+    setTaskDate(""); // Clear taskDate
+    setSelectedDate(""); // Clear selectedDate
     setTaskDescription("");
     setSelectedCategory("All");
+    // Call the onDismiss function to close the modal
     onDismiss();
   };
 
@@ -154,7 +141,9 @@ const AddTaskModal = ({
                     onChangeText={setTaskName}
                   />
 
+                  {/* Category Button */}
                   <View style={styles.buttonRow}>
+                    {/* Category Button */}
                     <Menu>
                       <MenuTrigger style={styles.categoryButton}>
                         <Text style={styles.categoryButtonText}>
@@ -181,6 +170,7 @@ const AddTaskModal = ({
                       </MenuOptions>
                     </Menu>
 
+                    {/* Date Button */}
                     <TouchableOpacity style={styles.dateButton} onPress={openDatePicker}>
                       <Icon name="calendar" size={20} color="#ccc" />
                       <Text style={styles.timeButtonText}>
@@ -188,6 +178,7 @@ const AddTaskModal = ({
                       </Text>
                     </TouchableOpacity>
 
+                    {/* Time Button */}
                     <TouchableOpacity style={styles.timeButton} onPress={openTimePicker}>
                       <Icon name="clock" size={20} color="#ccc" />
                       <Text style={styles.timeButtonText}>
