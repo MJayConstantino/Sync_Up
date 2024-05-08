@@ -58,43 +58,48 @@ export default function App() {
 
   function CustomDrawerContent(props) {
     return (
-      <View style={{ flex: 1 }}>
+      <View style={{ flex: 1, backgroundColor: "#0859C6", }}>
         <DrawerContentScrollView {...props}>
           {/* Custom top section with logo placeholder */}
-          <View style={{ alignItems: 'center', marginTop: 20, marginBottom: 20 }}>
+          <View style={{ alignItems: 'center', marginTop: 20, marginBottom: 20, }}>
             <Image
               source={require('./src/assets/icon.png')}
-              style={{ width: 100, height: 100, marginBottom: 10, resizeMode: 'contain' }}
+              style={{ width: 100, height: 100, marginBottom: 10, resizeMode: 'contain'}}
             />
-            <Text style={{ fontSize: 18, fontWeight: 'bold' }}>SyncUp</Text>
+            <Text style={{ fontSize: 18, fontWeight: 'bold', color: "yellow" }}>SyncUp</Text>
           </View>
           {/* Your custom drawer content goes here */}
           <DrawerItem
             label="Profile"
             onPress={() => props.navigation.navigate('Profile')}
-            icon={({ color, size }) => <Ionicons name="person" size={size} color={color} />}
+            icon={({ color, size }) => <Ionicons name="person" size={size} color="white" />}
+            labelStyle={{ color: "white" }}
           />
           <DrawerItem
             label="Dashboard"
             onPress={() => props.navigation.navigate('Dashboard')}
-            icon={({ color, size }) => <Ionicons name="home" size={size} color={color} />}
+            icon={({ color, size }) => <Ionicons name="home" size={size} color="white" />}
+            labelStyle={{ color: "white" }}
           />
           <DrawerItem
             label="Scan RF"
             onPress={() => props.navigation.navigate('Scan RF')}
-            icon={({ color, size }) => <Ionicons name="barcode" size={size} color={color} />}
+            icon={({ color, size }) => <Ionicons name="barcode" size={size} color="white" />}
+            labelStyle={{ color: "white" }}
           />
           <DrawerItem
             label="Class Schedules"
             onPress={() => props.navigation.navigate('Class Schedules')}
             icon={({ color, size }) => (
-              <Ionicons name="book" size={size} color={color} />
+              <Ionicons name="book" size={size} color="white" />
             )}
+            labelStyle={{ color: "white" }}
           />
           <DrawerItem
             label="Settings"
             onPress={() => props.navigation.navigate('Settings')}
-            icon={({ color, size }) => <Ionicons name="settings" size={size} color={color} />}
+            icon={({ color, size }) => <Ionicons name="settings" size={size} color="white" />}
+            labelStyle={{ color: "white" }}
           />
         </DrawerContentScrollView>
         {/* Bottom section for Sign Out */}
@@ -109,19 +114,31 @@ export default function App() {
                 alert(error)
               })
             }}
-            icon={({ color, size }) => <Ionicons name="key" size={size} color={color} />}
+            icon={({ color, size }) => <Ionicons name="key" size={size} color="white" />}
+            labelStyle={{ color: "white" }}
           />
           <DrawerItem
             label="Sign Out"
             onPress={() => {
               firebase.auth().signOut();
             }}
-            icon={({ color, size }) => <Ionicons name="log-out" size={size} color={color} />}
+            icon={({ color, size }) => <Ionicons name="log-out" size={size} color="white" />}
+            labelStyle={{ color: "white" }}
           />
         </View>
       </View>
     );
   }
+  
+  const styles = StyleSheet.create({
+    bottomDrawerSection: {
+      marginBottom: 15,
+      borderTopColor: "yellow",
+      borderTopWidth: 1,
+      paddingTop: 15,
+      paddingHorizontal: 20,
+    },
+  });
 
   function DrawerNavigator() {
     const Drawer = createDrawerNavigator();

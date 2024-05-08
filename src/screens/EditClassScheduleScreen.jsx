@@ -145,14 +145,14 @@ const EditClassScheduleScreen = ({ navigation, route }) => {
     )
   } else return (
     <MenuProvider>
-      <View style={styles.container}>
+      <View style={[styles.container, { paddingTop: 25, backgroundColor: '#f0f0f0' }]}>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Icon name="arrow-left" size={24} color="#000" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Edit Class Schedule</Text>
           <TouchableOpacity onPress={handleSaveClassSchedule}>
-            <Icon name="content-save" size={24} color="#000" />
+            <Text style={styles.saveButton}>Save changes</Text>
           </TouchableOpacity>
         </View>
 
@@ -277,17 +277,40 @@ export default EditClassScheduleScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 20,
+    backgroundColor: "#f2f2f2",
+    padding: 20,
+    paddingTop: 25,
+    marginTop: 50,
   },
-  header: {
+  headerContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 20,
   },
-  headerTitle: {
-    fontSize: 20,
+  header: {
+    fontSize: 24,
     fontWeight: "bold",
+  },
+  formContainer: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 20,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10,
   },
   sectionContainer: {
     marginBottom: 20,
@@ -297,22 +320,16 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 5,
   },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    padding: 10,
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 5,
   },
   timeContainer: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 10,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 5,
   },
   timeButton: {
     flexDirection: "row",
@@ -336,11 +353,21 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   dayOptionContainer: {
-    flexDirection: 'row', // Arrange items horizontally
-    alignItems: 'center', // Align items vertically in the center
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   dayOptionText: {
-    marginLeft: 8, // Add some space between the checkbox and text
+    marginLeft: 8,
   },
-
+  saveButton: {
+    backgroundColor: "#2196F3",
+    borderRadius: 5,
+    paddingVertical: 12,
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
 });

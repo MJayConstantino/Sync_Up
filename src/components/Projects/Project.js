@@ -1,8 +1,20 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { firebase } from "../../../firebase-config";// Import your Firebase configuration file
 
 const Project = ({ projectName, deadline, collaborators, progress }) => {
+  const [collaboratorImages, setCollaboratorImages] = useState([]);
+
+  useEffect(() => {
+    const unsubscribe = firebase.firestore().collection("collaborators").onSnapshot(snapshot => {
+      const images = snapshot.docs.map(doc => doc.data().imageUrl);
+      setCollaboratorImages(images);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   // Calculate progress status color based on completion percentage
   let progressColor;
   if (progress >= 100) {
@@ -32,7 +44,14 @@ const Project = ({ projectName, deadline, collaborators, progress }) => {
         </View>
       </View>
       <View style={styles.collaboratorContainer}>
-        {/* Display collaborators if needed */}
+        {/* Display avatars of collaborators */}
+        {collaboratorImages.map((imageUrl, index) => (
+          <Image
+            key={index}
+            source={{ uri: imageUrl }}
+            style={styles.collaboratorAvatar}
+          />
+        ))}
       </View>
     </View>
   );
@@ -83,6 +102,12 @@ const styles = StyleSheet.create({
   collaboratorContainer: {
     flexDirection: "row",
     alignItems: "center",
+  },
+  collaboratorAvatar: {
+    width: 30,
+    height: 30,
+    borderRadius: 15, // Make it circular
+    marginRight: 5,
   },
   statusIndicator: {
     backgroundColor: "#00FF00", // Default color is green

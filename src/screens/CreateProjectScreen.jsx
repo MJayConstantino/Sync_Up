@@ -127,12 +127,12 @@ const CreateProjectScreen = ({ navigation }) => {
   } else return (
     <MenuProvider>
       <View style={styles.container}>
-        <View style={styles.headerContainer}>
-          <Text style={styles.header}>Create Project</Text>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <MaterialIcons name="close" size={24} color="black" />
-          </TouchableOpacity>
-        </View>
+      <View style={styles.headerContainer}>
+        <Text style={styles.header}>Edit Class Schedule</Text>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <MaterialIcons name="close" size={24} color="black" />
+        </TouchableOpacity>
+      </View>
 
         <View style={styles.formContainer}>
           <TextInput
@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f2f2f2",
     padding: 20,
     paddingTop: 25,
-    marginTop: 50
+    marginTop: 50,
   },
   headerContainer: {
     flexDirection: 'row',

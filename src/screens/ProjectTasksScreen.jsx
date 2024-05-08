@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    marginTop: 50
+    paddingTop: 25
   },
   headerContainer: {
     flexDirection: 'row',
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   header: {
-    fontSize: 20,
+    fontSize: 25,
     fontWeight: "bold",
   },
   addButton: {

@@ -9,7 +9,7 @@ const Task = ({ text, description, category, time, date, toggleCompleted, taskId
       <View style={styles.topContainer}>
         <Text style={styles.categoryText}>{category}</Text>
         <View style={styles.timeContainer}>
-          <MaterialCommunityIcons name="clock-outline" size={15} color="#000" />
+          <MaterialCommunityIcons name="clock-outline" size={18} color="#000" />
           <Text style={styles.deadlineText}>{time} {date}</Text>
         </View>
       </View>
@@ -29,7 +29,7 @@ const Task = ({ text, description, category, time, date, toggleCompleted, taskId
 const styles = StyleSheet.create({
   item: {
     backgroundColor: "#FFFFFF",
-    padding: 12,
+    padding: 16,
     borderRadius: 10,
     borderWidth: 1,
     borderColor: "#D6D6D6",
@@ -42,16 +42,17 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "#00adf5", // Light blue background
-    paddingHorizontal: 10, // Add padding for better spacing
-    paddingVertical: 5, // Add padding for better spacing
-    borderTopLeftRadius: 10, // Match corner radius of the main item
-    borderTopRightRadius: 10, // Match corner radius of the main item
+    backgroundColor: "#00adf5",
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
   },
   contentContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    marginTop: 12,
   },
   itemLeft: {
     flexDirection: "row",
@@ -59,34 +60,35 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
   },
   textContainer: {
-    marginLeft: 5,
+    marginLeft: 10,
+    fontSize: 18,
+    fontWeight: "bold",
   },
   checkBoxMargin: {
     marginLeft: 5,
   },
   deadlineText: {
-    fontSize: 12,
-    color: "#666",
+    fontSize: 16,
+    color: "#FFFFFF",
     marginLeft: 5,
   },
   categoryText: {
-    fontSize: 12,
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#FFFFFF",
   },
   timeContainer: {
     flexDirection: "row",
     alignItems: "center",
   },
-  clockIcon: {
-    width: 15,
-    height: 15,
-    marginRight: 5,
-  },
   bottomRow: {
     flexDirection: "row",
     flexWrap: "wrap",
+    marginTop: 8,
+    maxHeight: 30
   },
   descriptionText: {
-    fontSize: 12,
+    fontSize: 16,
   },
 });
 
