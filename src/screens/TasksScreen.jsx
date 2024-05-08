@@ -41,25 +41,6 @@ export default function TasksScreen({ navigation }) {
     return () => unsubscribe();
   }, [currentUser.uid]);
 
-  // Function to convert time string to 24-hour format
-  const convertTo24HourFormat = (timeStr) => {
-    const [time, period] = timeStr.split(" ");
-    let [hours, minutes] = time.split(":").map(Number);
-    if (period === "PM" && hours < 12) {
-      hours += 12;
-    } else if (period === "AM" && hours === 12) {
-      hours = 0;
-    }
-    return hours * 60 + minutes;
-  };
-
-  // Sorting function to compare time strings
-  const sortByTime = (a, b) => {
-    const aTime = convertTo24HourFormat(a.time);
-    const bTime = convertTo24HourFormat(b.time);
-    return aTime - bTime;
-  };
-
   const handleTaskPress = (taskId) => {
     navigation.navigate('EditTaskScreen', { taskId: taskId });
   };
@@ -127,7 +108,7 @@ export default function TasksScreen({ navigation }) {
     if (selectedCategory === "All") {
       return items;
     } else {
-      return items.filter((item) => item.category === selectedCategory).sort(sortByTime);
+      return items.filter((item) => item.category === selectedCategory);
     }
   };
 

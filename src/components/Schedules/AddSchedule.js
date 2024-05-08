@@ -3,7 +3,6 @@ import { Modal, StyleSheet, Text, TouchableOpacity, View, TextInput, Keyboard, P
 import { MaterialCommunityIcons as Icon } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { format } from 'date-fns';
-import * as Notifications from 'expo-notifications'; // Import Notifications from Expo
 
 const AddScheduleModal = ({
   isVisible,
@@ -11,32 +10,33 @@ const AddScheduleModal = ({
   onSave,
 }) => {
   const [scheduleName, setScheduleName] = useState('');
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [selectedStartTime, setSelectedStartTime] = useState(new Date());
-  const [selectedEndTime, setSelectedEndTime] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedStartTime, setSelectedStartTime] = useState("");
+  const [selectedEndTime, setSelectedEndTime] = useState("");
   const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
   const [isStartTimePickerVisible, setIsStartTimePickerVisible] = useState(false);
   const [isEndTimePickerVisible, setIsEndTimePickerVisible] = useState(false);
+
 
   const openDatePicker = () => {
     setIsDatePickerVisible(true);
     setIsStartTimePickerVisible(false);
     setIsEndTimePickerVisible(false);
-    Keyboard.dismiss();
+    Keyboard.dismiss(); // Close soft keyboard if open
   };
 
   const openStartTimePicker = () => {
     setIsStartTimePickerVisible(true);
     setIsDatePickerVisible(false);
     setIsEndTimePickerVisible(false);
-    Keyboard.dismiss();
+    Keyboard.dismiss(); // Close soft keyboard if open
   };
 
   const openEndTimePicker = () => {
     setIsEndTimePickerVisible(true);
     setIsDatePickerVisible(false);
     setIsStartTimePickerVisible(false);
-    Keyboard.dismiss();
+    Keyboard.dismiss(); // Close soft keyboard if open
   };
 
   const closeDateTimePicker = () => {
@@ -66,17 +66,15 @@ const AddScheduleModal = ({
     }
   };
 
-  const setAlarm = (dateTime, message) => {
-    Notifications.scheduleNotificationAsync({
-      content: {
-        title: "Schedule Reminder",
-        body: message,
-      },
-      trigger: {
-        date: dateTime,
-      },
-    });
-  };
+  function getTimeValue(taskTime) {
+    const [time, period] = taskTime.split(' ');
+    const [hours, minutes] = time.split(':');
+    let timeValue = parseInt(hours) * 100 + parseInt(minutes);
+    if (period === 'PM' && hours !== '12') {
+      timeValue += 1200;
+    }
+    return timeValue;
+  }
 
   const handleSaveSchedule = () => {
     const newSchedule = {
@@ -84,35 +82,26 @@ const AddScheduleModal = ({
       timeStart: format(selectedStartTime, "hh:mm aa"),
       timeEnd: format(selectedEndTime, "hh:mm aa"),
       date: format(selectedDate, "yyyy-MM-dd"),
-      description: 'Sample Description',
+      description: '', 
+      createdAt: new Date(),
+      timeValue: getTimeValue(format(selectedStartTime, "hh:mm aa"))
     };
 
     onSave(newSchedule);
     onDismiss();
 
-    // Set up alarm for the start time
-    const startDateTime = new Date(selectedDate);
-    startDateTime.setHours(selectedStartTime.getHours(), selectedStartTime.getMinutes(), 0, 0);
-    setAlarm(startDateTime, scheduleName);
-
-    // Set up alarm for the end time
-    const endDateTime = new Date(selectedDate);
-    endDateTime.setHours(selectedEndTime.getHours(), selectedEndTime.getMinutes(), 0, 0);
-    setAlarm(endDateTime, `End of ${scheduleName}`);
-
-    // Clear input fields
     setScheduleName("");
-    setSelectedDate(new Date());
-    setSelectedStartTime(new Date());
-    setSelectedEndTime(new Date());
+    setSelectedDate("");
+    setSelectedStartTime("");
+    setSelectedEndTime("");
   };
 
   const handleCancel = () => {
     // Clear input fields
     setScheduleName("");
-    setSelectedDate(new Date());
-    setSelectedStartTime(new Date());
-    setSelectedEndTime(new Date());
+    setSelectedDate("");
+    setSelectedStartTime("");
+    setSelectedEndTime("");
 
     // Call the onDismiss function to close the modal
     onDismiss();
@@ -120,17 +109,17 @@ const AddScheduleModal = ({
 
   return (
     <Modal animationType="fade" transparent={true} visible={isVisible} onRequestClose={onDismiss}>
-      <View style={styles.modalContainer}>
-        <View style={styles.shadowContainer}>
-          <View style={styles.container}>
-            <View style={styles.centeredView}>
-              <View style={styles.modalView}>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Schedule Name"
-                  value={scheduleName}
-                  onChangeText={setScheduleName}
-                />
+    <View style={styles.modalContainer}>
+      <View style={styles.shadowContainer}>
+        <View style={styles.container}>
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <TextInput
+                style={styles.input}
+                placeholder="Schedule Name"
+                value={scheduleName}
+                onChangeText={setScheduleName}
+              />
 
                 <TouchableOpacity style={styles.dateButton} onPress={openDatePicker}>
                   <Icon name="calendar" size={20} color="#ccc" />
@@ -155,7 +144,7 @@ const AddScheduleModal = ({
 
                 {isDatePickerVisible && (
                   <DateTimePicker
-                    value={selectedDate}
+                    value={selectedDate ? new Date(selectedDate) : new Date()}
                     mode="date"
                     display={Platform.OS === "android" ? "calendar" : "spinner"}
                     onChange={(event, selectedDate) => handleDateChange(event, selectedDate)}
@@ -165,7 +154,7 @@ const AddScheduleModal = ({
 
                 {isStartTimePickerVisible && (
                   <DateTimePicker
-                    value={selectedStartTime}
+                    value={selectedStartTime ? new Date(selectedStartTime) : new Date()}
                     mode="time"
                     display={Platform.OS === "android" ? "clock" : "spinner"}
                     onChange={(event, selectedTime) => handleStartTimeChange(event, selectedTime)}
@@ -175,7 +164,7 @@ const AddScheduleModal = ({
 
                 {isEndTimePickerVisible && (
                   <DateTimePicker
-                    value={selectedEndTime}
+                    value={selectedEndTime ? new Date(selectedEndTime) : new Date()}
                     mode="time"
                     display={Platform.OS === "android" ? "clock" : "spinner"}
                     onChange={(event, selectedTime) => handleEndTimeChange(event, selectedTime)}
@@ -198,7 +187,7 @@ const AddScheduleModal = ({
       </View>
     </Modal>
   );
-};
+}
 
 export default AddScheduleModal;
 
@@ -207,8 +196,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    shadowColor: "#000",
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent background color
+    shadowColor: "#000", // Shadow color
     maxWidth: '100%',
     elevation: 10,
   },
@@ -224,7 +213,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     padding: 20,
     borderRadius: 10,
-    width: "100%",
+    width: "100%", // Make the modal view width fill the screen
   },
   input: {
     borderWidth: 1,
@@ -232,7 +221,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 10,
     marginBottom: 10,
-    width: "100%",
+    width: "100%", // Make the input fill the width of the screen
   },
   dateButton: {
     flexDirection: "row",
