@@ -28,6 +28,8 @@ const ProjectTasksScreen = ({ route }) => {
 
   useEffect(() => {
     const unsubscribe = firestore.collection(`projects/${projectId}/tasks`)
+      .orderBy("isCompleted", "asc")
+      .orderBy("createdAt", "desc")
       .onSnapshot(snapshot => {
         const tasksData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         setTasks(tasksData);
@@ -165,9 +167,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 20,
     right: 20,
-    backgroundColor: 'blue',
-    width: 50,
-    height: 50,
+    backgroundColor: '#00adf5',
+    width: 75,
+    height: 75,
     borderRadius: 25,
     justifyContent: 'center',
     alignItems: 'center',

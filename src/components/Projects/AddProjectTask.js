@@ -183,7 +183,7 @@ const AddProjectTaskModal = ({
                   {/* Display selected collaborators */}
                   <View style={styles.selectedCollaboratorsContainer}>{selectedCollaboratorsUI}</View>
                 </View>
-
+                <View style={styles.buttonRow}> 
                   {/* Date Button */}
                   <TouchableOpacity style={styles.dateButton} onPress={openDatePicker}>
                     <Icon name="calendar" size={20} color="#ccc" />
@@ -199,6 +199,10 @@ const AddProjectTaskModal = ({
                       {selectedTime ? format(selectedTime, "hh:mm aa") : 'Set Time'}
                     </Text>
                   </TouchableOpacity>
+
+                </View>
+
+
 
                   {isDatePickerVisible && (
                     <DateTimePicker
@@ -225,7 +229,7 @@ const AddProjectTaskModal = ({
                       <Icon name="close-circle-outline" size={28} color="#FF0000" />
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.saveButton} onPress={handleSaveTask}>
-                      <Icon name="content-save" size={24} color="#FFF" />
+                      <Text style={styles.buttonText}>SAVE</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -258,6 +262,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "100%", // Set width to 100%
   },
+
   modalView: {
     backgroundColor: "white",
     padding: 20,
@@ -273,12 +278,50 @@ const styles = StyleSheet.create({
   },
   menu: {
     marginBottom: 10,
+    backgroundColor: '#ccc',
+    marginBottom: 10,
   },
   menuText: {
-    fontSize: 16,
+    fontSize: 14,
     padding: 10,
   },
+  assignToLabel: {
+    padding: 5,
+    marginBottom: 10,
+    paddingBottom: 1,
+    fontWeight: 'bold',
+  },
+  assignToContainer: {
+    marginBottom: 10,
+    backgroundColor: 'white',
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  // selectedCollaboratorsContainer: {
+  //   fontWeight: 'bold',
+  //   backgroundColor: 'ccc',
+  // },
+  collaboratorBox: {
+    padding: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+    // borderWidth: 1,
+    // borderColor: "#ccc",
+    // borderRadius: 5,
+  },
+
+  buttonRow: {
+    flexDirection: "row", // Align buttons horizontally
+    alignItems: "center", // Align items vertically
+    marginBottom: 10, // Reduce vertical space between category container and other inputs
+  },
+
   dateButton: {
+    marginRight: 15, // Add some space between date/time buttons
+    marginLeft: 1,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -289,6 +332,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   timeButton: {
+    marginRight: 1,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -308,6 +352,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     marginTop: 10,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: "#FFF",
+    fontSize: 14,
+    fontWeight: "bold",
   },
   cancelButton: {
     borderRadius: 20,
@@ -318,4 +368,30 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 10,
   },
+
+
+  // cancelButton: {
+  //   borderRadius: 20,
+  //   padding: 10,
+  //   marginRight: 10,
+  // },
+  // saveButton: {
+  //   backgroundColor: "#03a1fc", // Blue background for save button
+  //   borderRadius: 20,
+  //   padding: 10,
+  // },
+  // buttonText: {
+  //     color: "#FFF",
+  //     fontSize: 14,
+  //     fontWeight: "bold",
+  //   },
+
+  // saveButton: {
+  //   backgroundColor: "#03a1fc",
+  //   borderRadius: 20,
+  //   paddingVertical: 10,
+  //   paddingHorizontal: 20,
+  // },
+
+
 });

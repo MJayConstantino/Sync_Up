@@ -5,7 +5,6 @@ import * as ImagePicker from 'expo-image-picker';
 import { firebase } from '../../firebase-config';
 import { MaterialCommunityIcons } from '@expo/vector-icons'; // Importing icon library
 import { ScrollView } from 'react-native-gesture-handler';
-import { classScheduleNotification, } from "../components/Alarms/Alarm";
 
 const firestore = firebase.firestore();
 

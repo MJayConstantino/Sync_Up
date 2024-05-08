@@ -1,41 +1,43 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import CheckBox from "./CheckBox";
 
 const ProjectTask = ({ assignedTo, taskName, description, time, date, deleteTask, toggleCompleted, taskId, isCompleted }) => {
-  // Function to determine the color of the deadline date based on completion status
+  // Function to determine the color of the deadline date text based on completion status
   const getDeadlineColor = () => {
-    if (isCompleted) {
-      return "#00FF00"; // Green if completed before deadline
-    } else if (!isCompleted) {
-      return "#FF0000"; // Red if not completed and past the deadline
-    }
+    return isCompleted ? "#00FF00" : "#FF0000"; // Green if completed, red if not completed
   };
 
   return (
     <View style={styles.item}>
-      {/* Display the time and deadline */}
-      <View style={styles.deadlineContainer}>
-        <View style={[styles.oval, { backgroundColor: getDeadlineColor() }]}>
-          <MaterialCommunityIcons name="calendar" size={15} color="#FFFFFF" />
-        </View>
+      {/* Deadline container with background color */}
+      <View style={[styles.deadlineContainer, { backgroundColor: getDeadlineColor() }]}>
+        {/* Deadline icon */}
+        <MaterialCommunityIcons name="calendar" size={20} color="#FFFFFF" />
+        {/* Deadline text */}
         <Text style={styles.deadlineText}>{date}</Text>
-        <View style={styles.timeOval}>
-          <Text style={styles.time}>{time}</Text>
-        </View>
       </View>
 
-      <View style={styles.contentContainer}>
-        <View style={styles.itemLeft}>
-          <CheckBox taskId={taskId} isCompleted={isCompleted} toggleCompleted={toggleCompleted} style={styles.checkBoxMargin} />
-          {/* Display the task name */}
-          <Text style={styles.taskName}>{taskName}</Text>
-        </View>
+      {/* Time container */}
+      <View style={styles.timeContainer}>
+        {/* Clock icon */}
+        <MaterialCommunityIcons name="clock-outline" size={24} color="#000000" />
+        {/* Time text */}
+        <Text style={styles.time}>{time}</Text>
       </View>
-      <View style={styles.bottomRow}>
-        {/* Display the description */}
-        <Text style={styles.descriptionText}>{description}</Text>
+
+      {/* Main content container */}
+      <View style={styles.contentContainer}>
+        {/* Description */}
+        
+
+        {/* Checkbox and Task Name in one row */}
+        <View style={styles.checkboxAndTaskNameContainer}>
+          <CheckBox taskId={taskId} isCompleted={isCompleted} toggleCompleted={toggleCompleted} />
+          <Text style={styles.taskName}>{taskName}</Text>
+          <Text style={styles.descriptionText}>{description}</Text>
+        </View>
       </View>
     </View>
   );
@@ -43,69 +45,55 @@ const ProjectTask = ({ assignedTo, taskName, description, time, date, deleteTask
 
 const styles = StyleSheet.create({
   item: {
-    backgroundColor: "#FFFFFF",
     padding: 12,
     borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#D6D6D6",
     flexDirection: "column",
     justifyContent: "space-between",
     marginTop: 10,
     marginBottom: 0.5,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    backgroundColor: 'white'
   },
   deadlineContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 5, // Add margin bottom for spacing
-  },
-  oval: {
-    width: 30,
-    height: 20,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 10,
-    marginRight: 5, // Add margin right for spacing
-  },
-  timeOval: {
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#D6D6D6",
-    marginLeft: "auto", // Align to the right
-    paddingLeft: 5, // Add padding left for better spacing
-    paddingRight: 5, // Add padding right for better spacing
+    paddingVertical: 5,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    paddingHorizontal: 10,
   },
   deadlineText: {
-    fontSize: 14,
+    fontSize: 22,
+    fontWeight: "bold",
+  },
+  timeContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 10,
+    marginTop: 10
   },
   time: {
-    fontSize: 12,
+    fontSize: 20,
+    marginLeft: 5, // Reduced margin
   },
   contentContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 10,
+    paddingHorizontal: 0
   },
-  itemLeft: {
+  checkboxAndTaskNameContainer: {
     flexDirection: "row",
     alignItems: "center",
-    flexWrap: "wrap",
   },
   taskName: {
-    fontSize: 16, // Increase font size slightly
-    marginLeft: 5, // Add margin left for spacing
+    fontSize: 22,
+    fontWeight: "bold",
+    marginLeft: 5, // Reduced margin
   },
   checkBoxMargin: {
-    marginLeft: 5,
-  },
-  bottomRow: {
-    paddingHorizontal: 10,
-    paddingTop: 5,
+    marginRight: 5, // Adjusted margin for checkbox
   },
   descriptionText: {
-    fontSize: 12,
+    fontSize: 18,
   },
 });
 

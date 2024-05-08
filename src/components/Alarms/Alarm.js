@@ -56,28 +56,6 @@ async function scheduleNotification(hour, minute, ampm, scheduleName) {
   return identifier;
 }
 
-async function classScheduleNotification(hour, minute, ampm, classScheduleName) {
-  let newHour = parseInt(hour);
-  if (ampm === "PM") {
-    newHour = (newHour % 12) + 12; // Convert to 24-hour format if PM
-  } else {
-    newHour %= 12; // Convert to 24-hour format if AM
-  }
-  const identifier = await Notifications.scheduleNotificationAsync({
-    content: {
-      title: "Class Reminder",
-      body: classScheduleName,
-      sound: "default",
-    },
-    trigger: {
-      hour: newHour,
-      minute: parseInt(minute),
-      repeats: true,
-    },
-  });
-  return identifier;
-}
-
 async function playAlarmSound() {
   try {
     const { sound } = await Audio.Sound.createAsync(require('../../assets/sounds/alarm.mp3'));
@@ -217,7 +195,7 @@ const Alarm = () => {
   );
 }
 
-export { taskNotification, scheduleNotification, classScheduleNotification, removeAlarm, storeAlarms, getData };
+export { taskNotification, scheduleNotification, removeAlarm, storeAlarms, getData };
 
 const styles = StyleSheet.create({
   container: {
