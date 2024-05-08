@@ -197,23 +197,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent background color
-    shadowColor: "#000", // Shadow color
-    maxWidth: '100%',
-    elevation: 10,
-  },
-  container: {
-    flex: 1,
-    justifyContent: "flex-end",
-  },
-  centeredView: {
-    justifyContent: "center",
-    alignItems: "center",
   },
   modalView: {
     backgroundColor: "white",
     padding: 20,
     borderRadius: 10,
-    width: "100%", // Make the modal view width fill the screen
+    width: "80%", // Adjust the width as needed
   },
   input: {
     borderWidth: 1,
@@ -221,7 +210,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 10,
     marginBottom: 10,
-    width: "100%", // Make the input fill the width of the screen
   },
   dateButton: {
     flexDirection: "row",
@@ -250,14 +238,22 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     marginTop: 10,
+    alignItems: 'center',
   },
   cancelButton: {
     borderRadius: 20,
     padding: 10,
+    marginRight: 10,
   },
   saveButton: {
     backgroundColor: "#03a1fc",
     borderRadius: 20,
-    padding: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+  },
+  saveButtonText: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "bold",
   },
 });

@@ -4,15 +4,15 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const TaskSchedule = ({ taskName, time, description, category }) => {
   return (
-    <View style={[styles.item, { backgroundColor: "transparent" }]}>
-      <View style={[styles.categoryContainer, { backgroundColor: "#00adf5" }]}>
-        <Text style={styles.categoryText}>{category}</Text>
+    <View style={[styles.item, { backgroundColor: "white" }]}>
+      <View style={[styles.topContainer, { backgroundColor: "#00adf5" }]}>
+        <Text style={[styles.scheduleType, { color: "white" }]}>Task - {category}</Text>
       </View>
       <View style={styles.timeContainer}>
-        <MaterialCommunityIcons name="clock-outline" size={15} color="#000" />
+        <MaterialCommunityIcons name="clock-outline" size={18} color="#000" />
         <Text style={styles.timeText}>{time}</Text>
       </View>
-      <View style={styles.topContainer}>
+      <View style={styles.nameContainer}>
         <Text style={styles.scheduleName}>{taskName}</Text>
       </View>
       <View style={styles.bottomRow}>
@@ -32,19 +32,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginTop: 10,
     marginBottom: 0.5,
-    // Increase height
     minHeight: 120,
-  },
-  categoryContainer: {
-    borderRadius: 20,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    alignSelf: "flex-start",
-    marginBottom: 5,
-  },
-  categoryText: {
-    fontSize: 12,
-    color: "#fff",
   },
   topContainer: {
     flexDirection: "row",
@@ -55,16 +43,29 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
   },
-  scheduleName: {
-    fontSize: 20,
+  scheduleType: {
+    fontSize: 16,
     fontWeight: "bold",
+    backgroundColor: "#00adf5",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 20,
+  },
+  scheduleName: {
+    fontSize: 25,
+    fontWeight: "bold",
+  },
+  nameContainer: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
   },
   timeContainer: {
     flexDirection: "row",
     alignItems: "center",
+    marginTop: 10,
   },
   timeText: {
-    fontSize: 16,
+    fontSize: 18,
     marginLeft: 5,
   },
   bottomRow: {
@@ -73,7 +74,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   descriptionText: {
-    fontSize: 12,
+    fontSize: 18,
   },
 });
 

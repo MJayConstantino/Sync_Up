@@ -4,12 +4,15 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const ProjectSchedule = ({ projectName, deadline }) => {
   return (
-    <View style={[styles.item, { backgroundColor: "transparent" }]}>
+    <View style={[styles.item, { backgroundColor: "white" }]}>
+      <View style={[styles.topContainer, { backgroundColor: "red" }]}>
+        <Text style={[styles.scheduleType, { color: "white" }]}>Project</Text>
+      </View>
       <View style={styles.timeContainer}>
-        <MaterialCommunityIcons name="clock-outline" size={15} color="#000" />
+        <MaterialCommunityIcons name="clock-outline" size={18} color="#000" />
         <Text style={styles.timeText}>{deadline}</Text>
       </View>
-      <View style={styles.topContainer}>
+      <View style={styles.nameContainer}>
         <Text style={styles.scheduleName}>{projectName}</Text>
       </View>
     </View>
@@ -37,25 +40,30 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
   },
-  scheduleName: {
-    fontSize: 20,
+  scheduleType: {
+    fontSize: 16,
     fontWeight: "bold",
+    backgroundColor: "red",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 20,
+  },
+  scheduleName: {
+    fontSize: 25,
+    fontWeight: "bold",
+  },
+  nameContainer: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
   },
   timeContainer: {
     flexDirection: "row",
     alignItems: "center",
-  },
-  timeText: {
-    fontSize: 16,
-    marginLeft: 5,
-  },
-  bottomRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
     marginTop: 10,
   },
-  descriptionText: {
-    fontSize: 12,
+  timeText: {
+    fontSize: 18,
+    marginLeft: 5,
   },
 });
 
