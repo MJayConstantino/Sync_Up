@@ -36,8 +36,8 @@ const ProjectTask = ({ assignedTo, taskName, description, time, date, deleteTask
         <View style={styles.checkboxAndTaskNameContainer}>
           <CheckBox taskId={taskId} isCompleted={isCompleted} toggleCompleted={toggleCompleted} />
           <Text style={styles.taskName}>{taskName}</Text>
-          <Text style={styles.descriptionText}>{description}</Text>
         </View>
+        <Text style={styles.descriptionText}>{description}</Text>
       </View>
     </View>
   );
