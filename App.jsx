@@ -7,6 +7,7 @@ import { View, Text, Image, StyleSheet } from 'react-native';
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import React, { useState, useEffect } from 'react';
 import { firebase } from './firebase-config';
+import { LinearGradient } from 'expo-linear-gradient';
 import Login from "./src/screens/Login";
 import Registration from "./src/screens/Registration";
 import DashboardScreen from "./src/screens/DashboardScreen";
@@ -58,7 +59,12 @@ export default function App() {
 
   function CustomDrawerContent(props) {
     return (
-      <View style={{ flex: 1, backgroundColor: "#0859C6", }}>
+      <LinearGradient
+        colors={['#0859C6', '#0A3D62']} // Your preferred gradient colors
+        start={[0, 0]}
+        end={[1, 1]}
+        style={{ flex: 1 }}
+      >
         <DrawerContentScrollView {...props}>
           {/* Custom top section with logo placeholder */}
           <View style={{ alignItems: 'center', marginTop: 20, marginBottom: 20, }}>
@@ -74,18 +80,21 @@ export default function App() {
             onPress={() => props.navigation.navigate('Profile')}
             icon={({ color, size }) => <Ionicons name="person" size={size} color="white" />}
             labelStyle={{ color: "white" }}
+            style={{ borderRadius: 10 }} // Add this line
           />
           <DrawerItem
             label="Dashboard"
             onPress={() => props.navigation.navigate('Dashboard')}
             icon={({ color, size }) => <Ionicons name="home" size={size} color="white" />}
             labelStyle={{ color: "white" }}
+            style={{ borderRadius: 10 }} // Add this line
           />
           <DrawerItem
             label="Scan RF"
             onPress={() => props.navigation.navigate('Scan RF')}
             icon={({ color, size }) => <Ionicons name="barcode" size={size} color="white" />}
             labelStyle={{ color: "white" }}
+            style={{ borderRadius: 10 }} // Add this line
           />
           <DrawerItem
             label="Class Schedules"
@@ -94,12 +103,14 @@ export default function App() {
               <Ionicons name="book" size={size} color="white" />
             )}
             labelStyle={{ color: "white" }}
+            style={{ borderRadius: 10 }} // Add this line
           />
           <DrawerItem
             label="Settings"
             onPress={() => props.navigation.navigate('Settings')}
             icon={({ color, size }) => <Ionicons name="settings" size={size} color="white" />}
             labelStyle={{ color: "white" }}
+            style={{ borderRadius: 10 }} // Add this line
           />
         </DrawerContentScrollView>
         {/* Bottom section for Sign Out */}
@@ -116,6 +127,7 @@ export default function App() {
             }}
             icon={({ color, size }) => <Ionicons name="key" size={size} color="white" />}
             labelStyle={{ color: "white" }}
+            style={{ borderRadius: 10 }} // Add this line
           />
           <DrawerItem
             label="Sign Out"
@@ -124,9 +136,10 @@ export default function App() {
             }}
             icon={({ color, size }) => <Ionicons name="log-out" size={size} color="white" />}
             labelStyle={{ color: "white" }}
+            style={{ borderRadius: 10 }} // Add this line
           />
         </View>
-      </View>
+      </LinearGradient>
     );
   }
   
