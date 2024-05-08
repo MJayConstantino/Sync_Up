@@ -116,9 +116,7 @@ const DashboardScreen = () => {
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionHeaderText}>Projects</Text>
         </View>
-          <TouchableOpacity onPress={() => navigation.navigate('Projects')}>
-            <ProjectCard title="Current Projects"/>
-          </TouchableOpacity>
+            <ProjectCard title="Current Projects" onPress={() => navigation.navigate('Projects')}/>
       </ScrollView>
     </View>
   );

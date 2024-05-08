@@ -72,87 +72,117 @@ const ScheduleScreen = ({ navigation, route }) => {
   useEffect(() => {
     const fetchSchedulesAndTasks = async () => {
       try {
-        const schedulesSnapshot = await firestore
+        const unsubscribeFromSchedules = firestore
           .collection(`users/${currentUser.uid}/schedules`)
           .orderBy("timeValue", "asc")
-          .get();
-        const tasksSnapshot = await firestore
-          .collection(`users/${currentUser.uid}/tasks`)
-          .orderBy("timeValue", "asc")
-          .get();
-        const classSchedulesSnapshot = await firestore
-          .collection(`users/${currentUser.uid}/classSchedules`)
-          .orderBy("timeValue", "asc")
-          .get();
+          .onSnapshot(snapshot => {
+            const schedules = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), type: 'schedule' }));
+            // Update state or handle schedules
 
-        const schedules = schedulesSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data(), type: 'schedule' }));
-        const tasks = tasksSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data(), type: 'task' }));
-        const classSchedules = classSchedulesSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data(), type: 'classSchedule' }));
+            const unsubscribeFromTasks = firestore
+              .collection(`users/${currentUser.uid}/tasks`)
+              .orderBy("timeValue", "asc")
+              .onSnapshot(snapshot => {
+                const tasks = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), type: 'task' }));
+                // Update state or handle tasks
 
-        const combinedItems = {};
+                const unsubscribeFromClassSchedules = firestore
+                  .collection(`users/${currentUser.uid}/classSchedules`)
+                  .orderBy("timeValue", "asc")
+                  .onSnapshot(snapshot => {
+                    const classSchedules = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), type: 'classSchedule' }));
+                    // Update state or handle class schedules
 
-        schedules.forEach(schedule => {
-          const date = schedule.date;
-          if (!combinedItems[date]) {
-            combinedItems[date] = [];
-          }
-          combinedItems[date].push(schedule);
-        });
+                    const unsubscribeFromProjects = firestore
+                      .collection('projects')
+                      .where('collaborators', 'array-contains', currentUser.uid)
+                      .onSnapshot(snapshot => {
+                        const projects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), type: 'project' }));
+                        // Update state or handle projects
 
-        tasks.forEach(task => {
-          const date = task.date;
-          if (!combinedItems[date]) {
-            combinedItems[date] = [];
-          }
-          combinedItems[date].push(task);
-        });
+                        // For each project, set up a listener for tasks where the current user is assigned
+                        projects.forEach(project => {
+                          const unsubscribeFromProjectTasks = firestore
+                            .collection(`projects/${project.id}/tasks`)
+                            .where('assignedTo', 'array-contains', currentUser.uid)
+                            .onSnapshot(taskSnapshot => {
+                              const projectTasks = taskSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), type: 'projectTask' }));
+                              // Update state or handle project tasks
 
-        classSchedules.forEach(classSchedule => {
-          const days = Array.isArray(classSchedule.day) ? classSchedule.day : [classSchedule.day];
-          days.forEach(day => {
-            const occurrences = getOccurrencesOfMonth(day);
-            occurrences.forEach(date => {
-              if (!combinedItems[date]) {
-                combinedItems[date] = [];
-              }
-              combinedItems[date].push(classSchedule);
-            });
+                              // Combine all items (schedules, tasks, class schedules, projects, and project tasks)
+                              const combinedItems = {};
+
+                              schedules.forEach(schedule => {
+                                const date = schedule.date;
+                                if (!combinedItems[date]) {
+                                  combinedItems[date] = [];
+                                }
+                                combinedItems[date].push(schedule);
+                              });
+
+                              tasks.forEach(task => {
+                                const date = task.date;
+                                if (!combinedItems[date]) {
+                                  combinedItems[date] = [];
+                                }
+                                combinedItems[date].push(task);
+                              });
+
+                              classSchedules.forEach(classSchedule => {
+                                const days = Array.isArray(classSchedule.day) ? classSchedule.day : [classSchedule.day];
+                                days.forEach(day => {
+                                  const occurrences = getOccurrencesOfMonth(day); // Assuming getOccurrencesOfMonth is defined elsewhere
+                                  occurrences.forEach(date => {
+                                    if (!combinedItems[date]) {
+                                      combinedItems[date] = [];
+                                    }
+                                    combinedItems[date].push(classSchedule);
+                                  });
+                                });
+                              });
+
+                              projects.forEach(project => {
+                                const projectTasks = project.tasks || []; // Add a check for project.tasks
+                                combinedItems[project.deadline] = combinedItems[project.deadline] || [];
+                                combinedItems[project.deadline].push(project);
+
+                                projectTasks.forEach(projectTask => {
+                                  const date = projectTask.date;
+                                  if (!combinedItems[date]) {
+                                    combinedItems[date] = [];
+                                  }
+                                  combinedItems[date].push(projectTask);
+                                });
+                              });
+
+                              setItems(combinedItems);
+                            });
+
+                          // Return a function to unsubscribe from the project tasks collection
+                          return unsubscribeFromProjectTasks;
+                        });
+                      });
+
+                    // Return a function to unsubscribe from the projects collection
+                    return unsubscribeFromProjects;
+                  });
+
+                // Return a function to unsubscribe from the class schedules collection
+                return unsubscribeFromClassSchedules;
+              });
+
+            // Return a function to unsubscribe from the tasks collection
+            return unsubscribeFromTasks;
           });
-        });
 
-        // Fetch projects where the user is a collaborator
-        const projectsSnapshot = await firestore.collection('projects').where('collaborators', 'array-contains', currentUser.uid).get();
-        const projects = projectsSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data(), type: 'project' }));
-
-        projects.forEach(async project => {
-          combinedItems[project.deadline] = combinedItems[project.deadline] || [];
-          combinedItems[project.deadline].push(project);
-        
-          try {
-            // Fetch project tasks assigned to the user
-            const projectTasksSnapshot = await firestore.collection(`projects/${project.id}/tasks`).where('assignedTo', 'array-contains', currentUser.uid).get();
-            const projectTasks = projectTasksSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data(), type: 'projectTask' }));
-        
-            projectTasks.forEach(projectTask => {
-              const date = projectTask.date;
-              if (!combinedItems[date]) {
-                combinedItems[date] = [];
-              }
-              combinedItems[date].push(projectTask);
-            });
-          } catch (error) {
-            console.error(`Error fetching project tasks for project ${project.id}:`, error);
-          }
-        });
-
-        setItems(combinedItems);
+        // Return a function to unsubscribe from the schedules collection
+        return unsubscribeFromSchedules;
       } catch (error) {
         console.error("Error fetching schedules and tasks:", error);
       } finally {
         setLoading(false);
       }
     };
-
     fetchSchedulesAndTasks();
   }, [currentUser.uid, addedSchedule, filter]);
 
