@@ -30,14 +30,14 @@ export default function TasksScreen({ navigation }) {
   useEffect(() => {
     const unsubscribe = firestore
       .collection(`users/${currentUser.uid}/tasks`)
-      .orderBy("isCompleted", "asc")
-      .orderBy("createdAt", "desc")
+      .orderBy("isCompleted", "asc") // Order by isCompleted in ascending order
+      .orderBy("createdAt", "desc") // Order by createdAt in descending order
       .onSnapshot((snapshot) => {
         const tasks = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-        setTaskItems(tasks.sort(sortByTime));
+        setTaskItems(tasks);
         setLoading(false);
       });
-
+  
     return () => unsubscribe();
   }, [currentUser.uid]);
 
