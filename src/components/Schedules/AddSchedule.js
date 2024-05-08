@@ -110,9 +110,6 @@ const AddScheduleModal = ({
   return (
     <Modal animationType="fade" transparent={true} visible={isVisible} onRequestClose={onDismiss}>
     <View style={styles.modalContainer}>
-      <View style={styles.shadowContainer}>
-        <View style={styles.container}>
-          <View style={styles.centeredView}>
             <View style={styles.modalView}>
               <TextInput
                 style={styles.input}
@@ -127,14 +124,14 @@ const AddScheduleModal = ({
                     {selectedDate ? format(selectedDate, "yyyy-MM-dd") : 'Set Date'}
                   </Text>
                 </TouchableOpacity>
-
+                <Text style={styles.timeTextoutsidetheBox}> Time Start </Text>
                 <TouchableOpacity style={styles.timeButton} onPress={openStartTimePicker}>
                   <Icon name="clock" size={20} color="#ccc" />
                   <Text style={styles.timeButtonText}>
                     {selectedStartTime ? format(new Date(selectedStartTime), "hh:mm aa") : 'Set Start Time'}
                   </Text>
                 </TouchableOpacity>
-
+                <Text style={styles.timeTextoutsidetheBox}> Time Ends </Text>
                 <TouchableOpacity style={styles.timeButton} onPress={openEndTimePicker}>
                   <Icon name="clock" size={20} color="#ccc" />
                   <Text style={styles.timeButtonText}>
@@ -177,13 +174,11 @@ const AddScheduleModal = ({
                     <Icon name="close-circle-outline" size={28} color="#FF0000" />
                   </TouchableOpacity>
                   <TouchableOpacity style={styles.saveButton} onPress={handleSaveSchedule}>
-                    <Icon name="content-save" size={24} color="#FFF" />
+                    {/* <Icon name="content-save" size={24} color="#FFF" /> */}
+                    <Text style={styles.saveButtonText}>SAVE</Text>
                   </TouchableOpacity>
                 </View>
               </View>
-            </View>
-          </View>
-        </View>
       </View>
     </Modal>
   );
@@ -256,4 +251,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "bold",
   },
+  timeTextoutsidetheBox: {
+    paddingBottom: 5,
+    marginBottom: 5,
+    fontWeight: "bold",
+  }
 });

@@ -70,8 +70,7 @@ const styles = StyleSheet.create({
   },
   bottomRow: {
     flexDirection: "row",
-    flexWrap: "wrap",
-    marginTop: 10,
+    height: 30
   },
   descriptionText: {
     fontSize: 18,
