@@ -9,30 +9,56 @@ const ProjectList = () => {
   const currentUser = firebase.auth().currentUser;
 
   useEffect(() => {
-    const unsubscribe = firebase.firestore()
+    const unsubscribe = firebase
+      .firestore()
       .collection('projects')
       .where('collaborators', 'array-contains', currentUser.uid)
-      .onSnapshot(async (snapshot) => {
-        const fetchedProjects = await Promise.all(
-          snapshot.docs.map(async (doc) => {
-            const projectData = doc.data();
-            const tasksSnapshot = await firebase.firestore().collection(`projects/${doc.id}/tasks`).get();
-            const tasks = tasksSnapshot.docs.map((taskDoc) => taskDoc.data());
-            const completedTasks = tasks.filter((task) => task.isCompleted).length;
-            const totalTasks = tasks.length;
-            const progress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
-
-            return {
-              id: doc.id,
-              ...projectData,
-              tasks,
-              progress: progress.toFixed(2),
-            };
-          })
-        );
+      .onSnapshot((snapshot) => {
+        const fetchedProjects = snapshot.docs.map((doc) => {
+          const projectData = doc.data();
+          return {
+            id: doc.id,
+            ...projectData,
+            tasks: [], // Initialize tasks as an empty array
+            progress: 0, // Initialize progress as 0
+          };
+        });
         setProjects(fetchedProjects);
       });
-    return () => unsubscribe();
+
+    const fetchTasksAndUpdateProgress = async () => {
+      const updatedProjects = await Promise.all(
+        projects.map(async (project) => {
+          const tasksSnapshot = await firebase
+            .firestore()
+            .collection(`projects/${project.id}/tasks`)
+            .get();
+          const tasks = tasksSnapshot.docs.map((taskDoc) => taskDoc.data());
+          const completedTasks = tasks.filter((task) => task.isCompleted).length;
+          const totalTasks = tasks.length;
+          const progress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+          return { ...project, tasks, progress: progress.toFixed(2) };
+        })
+      );
+      setProjects(updatedProjects);
+    };
+
+    fetchTasksAndUpdateProgress();
+
+    // Subscribe to changes in the tasks collection of each project
+    const tasksUnsubscribes = projects.map((project) =>
+      firebase
+        .firestore()
+        .collection(`projects/${project.id}/tasks`)
+        .onSnapshot(() => {
+          fetchTasksAndUpdateProgress();
+        })
+    );
+
+    return () => {
+      unsubscribe();
+      tasksUnsubscribes.forEach((unsubscribe) => unsubscribe());
+    };
   }, [currentUser.uid]);
 
   const getPendingTasksCount = (project) => {
