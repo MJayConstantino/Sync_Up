@@ -17,8 +17,7 @@ import { firebase } from "../../firebase-config";
 import { useCallback } from "react";
 
 const firestore = firebase.firestore();
-const DEFAULT_PROFILE_PIC =
-  "https://firebasestorage.googleapis.com/v0/b/syncup-4b36a.appspot.com/o/profilepic.png?alt=media&token=4f9acff6-166b-4e21-9ac8-42bc5f441e63";
+const DEFAULT_PROFILE_PIC = "https://firebasestorage.googleapis.com/v0/b/syncup-4b36a.appspot.com/o/profilepic.png?alt=media&token=4f9acff6-166b-4e21-9ac8-42bc5f441e63";
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
@@ -35,9 +34,8 @@ const ProfileScreen = () => {
       }
     } catch (error) {
       console.error("Error fetching user data:", error);
-    } finally {
-    setLoading(false);
     }
+    setLoading(false);
   };
   // Re-fetch user data when the screen gains focus
   useFocusEffect(
@@ -159,11 +157,10 @@ const styles = StyleSheet.create({
     margin: 20,
   },
   backButton: {
-    marginRight: 10,
     borderColor: '#000',
     borderWidth: 1,
     borderRadius: 50,
-    marginRight: 80,
+    marginRight: 85,
   },
   headerText: {
     fontSize: 24,

@@ -1,6 +1,7 @@
 import firebase from 'firebase/compat/app';
-import { auth } from 'firebase/compat/auth';
-import { getFirestore } from 'firebase/compat/firestore';
+import 'firebase/compat/auth';
+import 'firebase/compat/firestore';
+import 'firebase/compat/storage';
 
 //web app's firebase configuration
 const firebaseConfig = {
@@ -19,4 +20,3 @@ if (!firebase.apps.length){
 }
 
 export { firebase };
-

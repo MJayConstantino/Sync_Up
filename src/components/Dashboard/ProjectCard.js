@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   itemCountContainer: {
-    backgroundColor: '#4B98FF',
+    backgroundColor: 'red',
     borderRadius: 20,
     paddingHorizontal: 12,
     paddingVertical: 8,

@@ -85,7 +85,7 @@ const DashboardScreen = () => {
         </ScrollView>
 
         {/* This Week's and Next Week's Events */}
-        <View style={styles.rowContainer}>
+        {/* <View style={styles.rowContainer}>
           <TouchableOpacity style={styles.smallCardContainer} onPress={() => navigation.navigate('Schedule')}>
             <ThisWeekEventsCard />
           </TouchableOpacity>
@@ -95,14 +95,14 @@ const DashboardScreen = () => {
         </View>
 
         {/* This Month's and Next Month's Events */}
-        <View style={styles.rowContainer}>
+        {/* <View style={styles.rowContainer}>
           <TouchableOpacity style={styles.smallCardContainer} onPress={() => navigation.navigate('Schedule')}>
             <ThisMonthEventsCard />
           </TouchableOpacity>
           <TouchableOpacity style={styles.smallCardContainer} onPress={() => navigation.navigate('Schedule')}>
             <NextMonthEventsCard />
           </TouchableOpacity>
-        </View>
+        </View> */}
 
         {/* Tasks Section */}
         <View style={styles.sectionHeader}>

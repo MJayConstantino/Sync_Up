@@ -2,7 +2,7 @@ import { View, Text, TouchableOpacity, TextInput, StyleSheet, Alert, Image } fro
 import React, { useState } from 'react';
 import { firebase } from '../../firebase-config';
 import { ScrollView } from 'react-native-gesture-handler';
-import Icon from 'react-native-vector-icons/Ionicons';
+import { Ionicons as Icon } from 'react-native-vector-icons';
 
 const Registration = () => {
     const [email, setEmail] = useState('');
@@ -10,6 +10,12 @@ const Registration = () => {
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [showPassword, setShowPassword] = useState(false); // State to control password visibility
+    const imageUrl = "https://firebasestorage.googleapis.com/v0/b/syncup-4b36a.appspot.com/o/profilepic.png?alt=media&token=4f9acff6-166b-4e21-9ac8-42bc5f441e63";
+    const [bio] = useState('');
+    const [birthDate] = useState('');
+    const [country] = useState('');
+    const [occupation] = useState('');
+
 
     const registerUser = async (email, password, firstName, lastName) => {
       // Basic validation to ensure all fields are filled
@@ -37,6 +43,12 @@ const Registration = () => {
                   firstName,
                   lastName,
                   email,
+                  bio,
+                  birthDate,
+                  imageUrl,
+                  country,
+                  occupation,
+                  password,
               });
   
       } catch (error) {

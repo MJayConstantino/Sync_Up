@@ -1,11 +1,29 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, Image, ActivityIndicator } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  FlatList,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  ActivityIndicator,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { collection, query, onSnapshot, orderBy, limit, doc, updateDoc } from 'firebase/firestore';
+import {
+  collection,
+  query,
+  onSnapshot,
+  orderBy,
+  limit,
+  doc,
+  updateDoc,
+} from 'firebase/firestore';
 import { firebase } from '../../firebase-config';
 import moment from 'moment';
 
-const DEFAULT_PROFILE_PIC = "https://firebasestorage.googleapis.com/v0/b/syncup-4b36a.appspot.com/o/profilepic.png?alt=media&token=4f9acff6-166b-4e21-9ac8-42bc5f441e63";
+const DEFAULT_PROFILE_PIC =
+  'https://firebasestorage.googleapis.com/v0/b/syncup-4b36a.appspot.com/o/profilepic.png?alt=media&token=4f9acff6-166b-4e21-9ac8-42bc5f441e63';
 
 const database = firebase.firestore();
 const auth = firebase.auth();
@@ -14,13 +32,12 @@ const ChatListScreen = () => {
   const [allUsers, setAllUsers] = useState([]);
   const [recentMessages, setRecentMessages] = useState({});
   const [searchTerm, setSearchTerm] = useState('');
-  const [profilePictures, setProfilePictures] = useState({});
   const navigation = useNavigation();
   const [loading, setLoading] = useState(true);
 
-  const fetchAllUsers = useCallback(async () => {
-    const collectionRef = collection(database, 'users');
-    const q = query(collectionRef);
+  const fetchAllUsers = useCallback(() => {
+    const usersCollection = collection(database, 'users');
+    const q = query(usersCollection);
 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const userList = querySnapshot.docs.map((doc) => {
@@ -42,36 +59,23 @@ const ChatListScreen = () => {
     return () => unsubscribe();
   }, []);
 
-  const fetchProfilePictures = useCallback(async () => {
-    const collectionRef = collection(database, 'users');
-    const q = query(collectionRef);
-
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const newProfilePictures = {};
-
-      querySnapshot.docs.forEach((doc) => {
-        newProfilePictures[doc.id] = doc.data().imageUrl || DEFAULT_PROFILE_PIC;
-      });
-
-      setProfilePictures(newProfilePictures);
-    });
-
-    return () => unsubscribe();
-  }, []);
-
   useEffect(() => {
     fetchAllUsers();
-    fetchProfilePictures();
-  }, [fetchAllUsers, fetchProfilePictures]);
+  }, [fetchAllUsers]);
 
   useEffect(() => {
+    const currentUserEmail = auth.currentUser?.email;
+
     const unsubscribes = allUsers.map((user) => {
-      const currentUserEmail = auth.currentUser?.email;
       const userEmails = [currentUserEmail, user.email].sort();
       const chatRoomId = userEmails.join('_');
 
       const chatRef = collection(database, 'chats', chatRoomId, 'messages');
-      const recentMessageQuery = query(chatRef, orderBy('createdAt', 'desc'), limit(1));
+      const recentMessageQuery = query(
+        chatRef,
+        orderBy('createdAt', 'desc'),
+        limit(1)
+      );
 
       const unsubscribe = onSnapshot(recentMessageQuery, (snapshot) => {
         if (snapshot.docs.length > 0) {
@@ -101,9 +105,10 @@ const ChatListScreen = () => {
     const chatRoomId = userEmails.join('_');
 
     const chatRef = collection(database, 'chats', chatRoomId, 'messages');
-    const messageToUpdate = recentMessages[chatRoomId]?.id;
-    if (messageToUpdate) {
-      const messageDoc = doc(chatRef, messageToUpdate);
+    const recentMessage = recentMessages[chatRoomId];
+
+    if (recentMessage && !recentMessage.read) {
+      const messageDoc = doc(chatRef, recentMessage.id);
       updateDoc(messageDoc, { read: true });
     }
 
@@ -132,7 +137,7 @@ const ChatListScreen = () => {
       const bMessage = recentMessages[bChatRoomId];
 
       if (aMessage?.createdAt && bMessage?.createdAt) {
-        return bMessage.createdAt - aMessage.createdAt; // Latest message at the top
+        return bMessage.createdAt - aMessage.createdAt; // Sort by most recent message time
       }
 
       return 0;
@@ -142,78 +147,78 @@ const ChatListScreen = () => {
     return user.name.toLowerCase().includes(searchTerm.toLowerCase());
   });
 
-  if (loading) {
-    return (
-      <ActivityIndicator style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }} color="00adf5" size="large" />
-    );
-  } else {
-    return (
-      <View style={styles.container}>
-        <TextInput
-          style={styles.searchBar}
-          placeholder="Search users..."
-          value={searchTerm}
-          onChangeText={(text) => setSearchTerm(text)}
-        />
-        <FlatList
-          data={searchTerm ? filteredSearchResults : usersWithRecentMessages}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => {
-            const currentUserEmail = auth.currentUser?.email;
-            const userEmails = [currentUserEmail, item.email].sort();
-            const chatRoomId = userEmails.join('_');
+  const listData = searchTerm ? filteredSearchResults : usersWithRecentMessages;
 
-            const recentMessage = recentMessages[chatRoomId];
-            const recentText = recentMessage ? recentMessage.text : '';
-            const isUnread = recentMessage && !recentMessage.read;
+  return loading ? (
+    <ActivityIndicator
+      style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+      color="00adf5"
+      size="large"
+    />
+  ) : (
+    <View style={styles.container}>
+      <TextInput
+        style={styles.searchBar}
+        placeholder="Search users..."
+        value={searchTerm}
+        onChangeText={(text) => setSearchTerm(text)}
+      />
+      <FlatList
+        data={listData}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => {
+          const currentUserEmail = auth.currentUser?.email;
+          const userEmails = [currentUserEmail, item.email].sort();
+          const chatRoomId = userEmails.join('_');
 
-            const profilePic = profilePictures[item.id] || DEFAULT_PROFILE_PIC;
-            const messageTime = recentMessage?.createdAt
-              ? moment(recentMessage.createdAt).format('HH:mm')
-              : '';
+          const recentMessage = recentMessages[chatRoomId];
+          const recentText = recentMessage ? recentMessage.text : '';
+          const isUnread = recentMessage && !recentMessage.read;
 
-            return (
-              <TouchableOpacity
-                onPress={() => handleUserPress(item)}
-                style={styles.userContainer}
-              >
-                <View style={styles.mainContent}>
-                  <Image
-                    source={{ uri: profilePic }}
-                    style={styles.profileImage}
-                  />
-                  <View style={styles.textContainer}>
-                    <Text
-                      style={[
-                        styles.userName,
-                        isUnread ? { fontWeight: 'bold' } : {},
-                      ]}
-                    >
-                      {item.name}
-                    </Text>
-                    <Text
-                      style={[
-                        styles.recentMessage,
-                        isUnread ? { fontWeight: 'bold', color: 'black' } : {},
-                      ]}
-                    >
-                      {recentText}
-                    </Text>
-                  </View>
+          const messageTime = recentMessage?.createdAt
+            ? moment(recentMessage.createdAt).format('HH:mm')
+            : '';
+
+          return (
+            <TouchableOpacity
+              onPress={() => handleUserPress(item)}
+              style={styles.userContainer}
+            >
+              <View style={styles.mainContent}>
+                <Image
+                  source={{ uri: item.profilePicture }}
+                  style={styles.profileImage}
+                />
+                <View style={styles.textContainer}>
+                  <Text
+                    style={[
+                      styles.userName,
+                      isUnread ? { fontWeight: 'bold' } : {},
+                    ]}
+                  >
+                    {item.name}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.recentMessage,
+                      isUnread ? { fontWeight: 'bold', color: 'black' } : {},
+                    ]}
+                  >
+                    {recentText}
+                  </Text>
                 </View>
-
-                {messageTime && (  // This is the separate time container
-                  <View style={styles.timeContainer}>
-                    <Text style={styles.messageTime}>{messageTime}</Text>
-                  </View>
-                )}
-              </TouchableOpacity>
-            );
-          }}
-        />
-      </View>
-    );
-  }
+              </View>
+              {messageTime && (
+                <View style={styles.timeContainer}>
+                  <Text style={styles.messageTime}>{messageTime}</Text>
+                </View>
+              )}
+            </TouchableOpacity>
+          );
+        }}
+      />
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
@@ -265,7 +270,6 @@ const styles = StyleSheet.create({
   messageTime: {
     fontSize: 14,
     color: 'gray',
-    textAlign: 'right',
   },
 });
 
