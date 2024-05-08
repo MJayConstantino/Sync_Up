@@ -124,6 +124,8 @@ export default function App() {
   }
 
   function DrawerNavigator() {
+    const Drawer = createDrawerNavigator();
+  
     return (
       <Drawer.Navigator
         drawerContent={(props) => <CustomDrawerContent {...props} />} // Use CustomDrawerContent for drawer content
@@ -132,8 +134,8 @@ export default function App() {
           headerStyle: { backgroundColor: 'blue' }, // Header background color
           headerTintColor: 'white', // Header text color
           headerTitleStyle: { fontWeight: 'bold' }, // Header title style
-          drawerActiveBackgroundColor: 'lightblue', // Active screen background color
-          drawerActiveTintColor: 'blue', // Active screen text color
+          drawerActiveBackgroundColor: '00adf5', // Active screen background color (changed to yellow)
+          drawerActiveTintColor: 'white', // Active screen text color
           drawerInactiveTintColor: 'black', // Inactive screen text color
         }}
       >
@@ -145,7 +147,7 @@ export default function App() {
       </Drawer.Navigator>
     );
   }
-
+  
   function ClassScheduleManager(){
     return(
       <Stack.Navigator

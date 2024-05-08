@@ -11,6 +11,7 @@ import ThisWeekEventsCard from '../components/Dashboard/ThisWeekEventsCard';
 import NextWeekEventsCard from '../components/Dashboard/NextWeekEventsCard';
 import ThisMonthEventsCard from '../components/Dashboard/ThisMonthEventsCard';
 import NextMonthEventsCard from '../components/Dashboard/NextMonthEventsCard';
+import ProjectList from '../components/Dashboard/ProjectLists';
 
 const DashboardScreen = () => {
   const [name, setName] = useState('');
@@ -116,7 +117,13 @@ const DashboardScreen = () => {
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionHeaderText}>Projects</Text>
         </View>
-            <ProjectCard title="Current Projects" onPress={() => navigation.navigate('Projects')}/>
+        <View style={styles.projectsContainer}>
+          <ProjectCard title="Current Projects" onPress={() => navigation.navigate('Projects')} />
+          <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={styles.projectListContainer}>
+            {/* Render ProjectList component here */}
+            <ProjectList />
+          </ScrollView>
+        </View>
       </ScrollView>
     </View>
   );
@@ -188,6 +195,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
     borderWidth: 0.3,
+  },
+  projectsContainer: {
+    flexDirection: 'row',
+    marginBottom: 20,
+    maxHeight: 200, // Set a maximum height to enable scrolling
   },
 });
 

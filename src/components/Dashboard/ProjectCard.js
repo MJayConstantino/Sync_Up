@@ -8,13 +8,11 @@ const ProjectCard = ({ title, onPress }) => {
   useEffect(() => {
     const currentUser = firebase.auth().currentUser;
     const projectsCollection = firebase.firestore().collection('projects');
-
     const unsubscribe = projectsCollection
       .where('collaborators', 'array-contains', currentUser.uid)
       .onSnapshot((snapshot) => {
         setProjectCount(snapshot.size);
       });
-
     return () => unsubscribe();
   }, []);
 
@@ -38,7 +36,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: 200,
     backgroundColor: '#FFFFFF',
-    borderWidth: 0.3
+    borderWidth: 0.3,
   },
   title: {
     fontSize: 18,
@@ -56,6 +54,34 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#FFFFFF',
   },
+  projectListContainer: {
+    height: 200,
+  },
+  projectCard: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 0.3,
+    borderRadius: 10,
+    padding: 10,
+    marginRight: 10,
+    width: 250,
+  },
+  projectName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
+  projectProgress: {
+    fontSize: 14,
+    marginBottom: 5,
+  },
+  projectTasks: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
+  taskDescription: {
+    fontSize: 12,
+    marginLeft: 10,
+  },
 });
-
 export default ProjectCard;
