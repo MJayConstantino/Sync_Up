@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { StyleSheet, Text, TouchableOpacity, View, TextInput, Platform, ScrollView, ActivityIndicator } from "react-native";
 import { MaterialCommunityIcons as Icon } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { EvilIcons } from '@expo/vector-icons';
 import { format, setDate } from 'date-fns';
 import { firebase } from '../../firebase-config';
 import { Menu, MenuOption, MenuOptions, MenuTrigger, MenuProvider } from 'react-native-popup-menu';
@@ -101,6 +102,15 @@ const EditTaskScreen = ({ navigation, route }) => {
     return timeValue;
   }
 
+  const deleteTask = async () => {
+    try {
+      await firestore.collection(`users/${currentUser.uid}/tasks`).doc(taskId).delete();
+      navigation.goBack();
+    } catch (error) {
+      console.error("Error deleting task:", error);
+    }
+  };
+
   const handleSaveTask = async () => {
     if (!taskName) {
       alert("Please enter a task name.");
@@ -157,24 +167,19 @@ const EditTaskScreen = ({ navigation, route }) => {
             <Icon name="arrow-left" size={24} color="#000" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Edit Task</Text>
-          <TouchableOpacity onPress={handleSaveTask}>
-            <Icon name="content-save" size={24} color="#000" />
+          
+          <TouchableOpacity onPress={deleteTask}>
+            <EvilIcons name="trash" size={24} style={{ padding: 10 }} color="red" />
           </TouchableOpacity>
+         
         </View>
-
-        <TextInput
-          style={styles.input}
-          placeholder="Enter task name"
-          value={taskName}
-          onChangeText={setTaskName}
-        />
 
         <Menu>
           <MenuTrigger style={styles.categoryButton}>
             <Text style={styles.categoryButtonText}>
               {selectedCategory !== null && selectedCategory !== "All" ? `Category: ${selectedCategory}` : "Category: None"}
             </Text>
-            <Icon name="chevron-down" size={20} color="#ccc" />
+            <Icon name="chevron-down" size={16} color="white" />
           </MenuTrigger>
           <MenuOptions>
             <MenuOption key="none" onSelect={() => setSelectedCategory(null)}>
@@ -195,19 +200,14 @@ const EditTaskScreen = ({ navigation, route }) => {
           </MenuOptions>
         </Menu>
 
-        <TouchableOpacity style={styles.dateButton} onPress={openDatePicker}>
-          <Icon name="calendar" size={20} color="#ccc" />
-          <Text style={styles.timeButtonText}>
-            {selectedDate ? format(new Date(selectedDate), "yyyy-MM-dd") : taskDate ? taskDate : 'Set Date'}
-          </Text>
-        </TouchableOpacity>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter task name"
+          value={taskName}
+          onChangeText={setTaskName}
+        />
 
-        <TouchableOpacity style={styles.timeButton} onPress={openTimePicker}>
-          <Icon name="clock" size={20} color="#ccc" />
-          <Text style={styles.timeButtonText}>
-            {selectedTime ? format(new Date(selectedTime), "hh:mm aa") : taskTime ? taskTime : 'Set Time'}
-          </Text>
-        </TouchableOpacity>
+
 
         <TextInput
           style={styles.inputDescription}
@@ -217,6 +217,43 @@ const EditTaskScreen = ({ navigation, route }) => {
           value={taskDescription}
           onChangeText={setTaskDescription}
         />
+
+        <TouchableOpacity style={styles.dateButton} onPress={openDatePicker}>
+          <View style={styles.dateIconandDue}> 
+            <Icon name="calendar" size={20} color="#ccc" />
+            <Text styles={styles.textDueDate}> Due Date</Text>
+          </View>
+            <View style={styles.dateButtonShape}> 
+              <Text style={styles.dateButtonText}>
+                {selectedDate ? format(new Date(selectedDate), "yyyy-MM-dd") : taskDate ? taskDate : 'Set Date'}
+              </Text>            
+            </View>
+
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.timeButton} onPress={openTimePicker}>
+          <View style={styles.timeIconandDue}> 
+            <Icon name="clock" size={20} color="#ccc" />
+            <Text styles={styles.textTime}> Time and Reminder </Text>
+          </View>
+          <View style={styles.timeButtonShape}> 
+            <Text style={styles.timeButtonText}>
+              {selectedTime ? format(new Date(selectedTime), "hh:mm aa") : taskTime ? taskTime : 'Set Time'}
+            </Text>
+          </View>
+
+        </TouchableOpacity>
+
+        <View style={styles.savebutonContainer}> 
+          <TouchableOpacity onPress={handleSaveTask}> 
+            <View style={styles.savebuton}> 
+              <Text style={styles.savebuttonText} > SAVE </Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+
+
+
 
         {isDatePickerVisible && (
           <DateTimePicker
@@ -260,63 +297,129 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
   },
+  // Title of Task 
   input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
+    borderBottomWidth: 2,
+    borderBottomColor: 'black',
     padding: 10,
     marginBottom: 10,
+    textAlignVertical: "bottom",
+    fontWeight: 'bold',
+    fontSize: 30,
   },
+  // Desciption
   inputDescription: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
+    // borderWidth: 1,
+    // borderColor: "#ccc",
+    // borderRadius: 5,
     padding: 10,
     marginBottom: 10,
     flex: 1, // Fill remaining space
     textAlignVertical: "top", // Align text to the top
   },
+  //  Categorry
   categoryButton: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
+    backgroundColor: "#D3D3D3",
+    borderRadius: 30,
     padding: 10,
     marginBottom: 10,
-    width: "100%",
+    width: "40%",
+    height: 'auto',
   },
   categoryButtonText: {
-    fontSize: 16,
+    fontSize: 12,
+    color: 'white'
   },
+  //
   dateButton: {
     flexDirection: "row",
+    justifyContent: 'space-between',
     alignItems: "center",
-    borderWidth: 1,
+    borderTopWidth: 1,
     borderColor: "#ccc",
-    borderRadius: 5,
     padding: 10,
     marginBottom: 10,
+  },
+  dateButtonShape: {
+    alignItems: 'center',
+    backgroundColor: '#ccc',
+    borderRadius: 20,
+    padding: 1,
   },
   dateButtonText: {
-    fontSize: 16,
+    fontSize: 14,
+    padding: 5,
+    width: 'auto',
+  },
+  dateIconandDue: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  textDueDate: {
+    color: '#ccc',
+    fontSize: 20,
     marginLeft: 5,
   },
+  //
   timeButton: {
     flexDirection: "row",
+    justifyContent: 'space-between',
     alignItems: "center",
-    borderWidth: 1,
+    borderTopWidth: 1,
+    // borderBottomWidth: 1,
     borderColor: "#ccc",
-    borderRadius: 5,
     padding: 10,
     marginBottom: 10,
   },
+  timeButtonShape: {
+    alignItems: 'center',
+    backgroundColor: '#ccc',
+    borderRadius: 20,
+    padding: 1,
+    width: "auto",
+  },
   timeButtonText: {
-    fontSize: 16,
+    fontSize: 14,
+    padding: 5,
+    width: 'auto',
+  },
+  timeIconandDue: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  textTime: {
+    color: 'white',
+    fontSize: 14,
     marginLeft: 5,
   },
   datePicker: {
     width: "100%",
   },
+  savebutonContainer: {
+    borderTopWidth: 1,
+    borderColor: '#ccc',
+    alignItems: "center",
+    padding: 10,
+    marginBottom: 10,
+  },
+  savebuton: {
+    borderWidth: 1,
+    borderRadius: 20,
+    borderColor: '#ccc',
+    padding: 5,
+    backgroundColor: "#03a1fc",
+    borderRadius: 40,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+  },
+  savebuttonText: {
+    alignItems: 'center',
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+
 });
