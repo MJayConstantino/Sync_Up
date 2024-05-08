@@ -3,21 +3,20 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { firebase } from '../../../firebase-config';
 
 const ScheduleTaskCard = ({ title, date, onPress }) => {
-    const [taskCount, setTaskCount] = useState(0);
-  
-    useEffect(() => {
-      const fetchTaskCount = async () => {
-        try {
-          const currentUser = firebase.auth().currentUser;
-          const snapshot = await firebase.firestore().collection(`users/${currentUser.uid}/tasks`).where('date', '==', date).get();
-          setTaskCount(snapshot.size);
-        } catch (error) {
-          console.error('Error fetching task count:', error);
-        }
-      };
-  
-      fetchTaskCount();
-    }, [date]);
+  const [taskCount, setTaskCount] = useState(0);
+
+  useEffect(() => {
+    const currentUser = firebase.auth().currentUser;
+    const tasksCollection = firebase.firestore().collection(`users/${currentUser.uid}/tasks`);
+
+    const unsubscribe = tasksCollection
+      .where('date', '==', date)
+      .onSnapshot((snapshot) => {
+        setTaskCount(snapshot.size);
+      });
+
+    return () => unsubscribe();
+  }, [date]);
     
     return (
       <TouchableOpacity onPress={onPress} style={styles.card}>

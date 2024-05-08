@@ -6,25 +6,16 @@ const ProjectCard = ({ title, onPress }) => {
   const [projectCount, setProjectCount] = useState(0);
 
   useEffect(() => {
-    const fetchProjectsCount = async () => {
-      try {
-        const currentUser = firebase.auth().currentUser;
-        const projectsCollection = firebase.firestore().collection('projects');
+    const currentUser = firebase.auth().currentUser;
+    const projectsCollection = firebase.firestore().collection('projects');
 
-        // Query projects where the user is a collaborator
-        const snapshot = await projectsCollection.where('collaborators', 'array-contains', currentUser.uid).get();
-        
-        // Get the count of documents in the snapshot
-        const count = snapshot.size;
+    const unsubscribe = projectsCollection
+      .where('collaborators', 'array-contains', currentUser.uid)
+      .onSnapshot((snapshot) => {
+        setProjectCount(snapshot.size);
+      });
 
-        // Update the project count state
-        setProjectCount(count);
-      } catch (error) {
-        console.error('Error fetching project count:', error);
-      }
-    };
-
-    fetchProjectsCount();
+    return () => unsubscribe();
   }, []);
 
   return (

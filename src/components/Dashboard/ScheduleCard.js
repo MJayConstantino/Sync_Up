@@ -6,17 +6,16 @@ const ScheduleCard = ({ title, date, onPress }) => {
   const [itemCount, setItemCount] = useState(0);
 
   useEffect(() => {
-    const fetchItemCount = async () => {
-      try {
-        const currentUser = firebase.auth().currentUser;
-        const snapshot = await firebase.firestore().collection(`users/${currentUser.uid}/schedules`).where('date', '==', date).get();
-        setItemCount(snapshot.size);
-      } catch (error) {
-        console.error('Error fetching item count:', error);
-      }
-    };
+    const currentUser = firebase.auth().currentUser;
+    const schedulesCollection = firebase.firestore().collection(`users/${currentUser.uid}/schedules`);
 
-    fetchItemCount();
+    const unsubscribe = schedulesCollection
+      .where('date', '==', date)
+      .onSnapshot((snapshot) => {
+        setItemCount(snapshot.size);
+      });
+
+    return () => unsubscribe();
   }, [date]);
 
   return (
