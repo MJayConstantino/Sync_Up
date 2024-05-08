@@ -6,32 +6,19 @@ const TaskCard = ({ title, isCompleted, onPress }) => {
   const [taskCount, setTaskCount] = useState(0);
 
   useEffect(() => {
-    const fetchTaskCount = async () => {
-      try {
-        const currentUser = firebase.auth().currentUser;
-        let snapshot;
-        if (isCompleted) {
-          // Fetch count of completed tasks
-          snapshot = await firebase.firestore()
-            .collection(`users/${currentUser.uid}/tasks`)
-            .where('isCompleted', '==', true)
-            .get();
-        } else {
-          // Fetch count of pending tasks
-          snapshot = await firebase.firestore()
-            .collection(`users/${currentUser.uid}/tasks`)
-            .where('isCompleted', '==', false)
-            .get();
-        }
+    const currentUser = firebase.auth().currentUser;
+
+    const unsubscribe = firebase.firestore()
+      .collection(`users/${currentUser.uid}/tasks`)
+      .where('isCompleted', '==', isCompleted)
+      .onSnapshot(snapshot => {
         setTaskCount(snapshot.size);
-      } catch (error) {
+      }, error => {
         console.error('Error fetching task count:', error);
-      }
-    };
-  
-    fetchTaskCount();
+      });
+
+    return () => unsubscribe();
   }, [isCompleted]);
-  
 
   // Define the card color based on the status
   const cardColor = isCompleted ? '#CCFFCC' : '#FFCCCC';
