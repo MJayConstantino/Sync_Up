@@ -4,6 +4,7 @@ import { MaterialCommunityIcons as Icon } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { format } from 'date-fns';
 import { firebase } from '../../firebase-config';
+import { scheduleNotification, removeAlarm } from '../components/Alarms/Alarm';
 
 const firestore = firebase.firestore();
 
@@ -118,7 +119,7 @@ const EditScheduleScreen = ({ navigation, route }) => {
       alert("Please enter a schedule name.");
       return;
     }
-
+    
     const editedSchedule = {
       scheduleName,
       timeStart,
@@ -127,16 +128,28 @@ const EditScheduleScreen = ({ navigation, route }) => {
       description,
       timeValue: getTimeValue(timeStart)
     };
-
+    
     try {
       // Update schedule in your data store
       await updateScheduleInFirebase(scheduleId, editedSchedule); // Pass schedule ID and edited schedule details
+      
+      // Extract hour, minute, and period from timeStart
+      const [time, ampm] = timeStart.split(' ');
+      const [hour, minute] = time.split(':');
+      const period = ampm.toUpperCase(); // Convert period to uppercase (AM/PM)
+      
+      // Schedule notification for the updated schedule
+      const notificationId = await scheduleNotification(hour, minute, period, scheduleName);
+  
+      // Update the schedule in Firebase with the new notification ID
+      await firestore.collection(`users/${currentUser.uid}/schedules`).doc(scheduleId).update({ notificationId });
+  
       navigation.goBack();
     } catch (error) {
       console.error("Error updating schedule:", error);
     }
   };
-
+  
   const updateScheduleInFirebase = async (taskId, editedSchedule) => {
     try {
       // Update the schedule in Firebase using the taskId

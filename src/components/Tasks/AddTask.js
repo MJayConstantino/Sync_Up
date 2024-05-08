@@ -67,7 +67,7 @@ const AddTaskModal = ({
   const handleTimeChange = (event, selectedTime) => {
     if (selectedTime) {
       setSelectedTime(selectedTime);
-      const formattedTime = format(selectedTime, "HH:mm aa");
+      const formattedTime = format(selectedTime, "hh:mm aa");
 
       if (isTimePickerVisible) {
         setTaskTime(formattedTime); // If time picker was visible, update taskTime
@@ -82,7 +82,7 @@ const AddTaskModal = ({
       alert("Please enter a task name.");
       return;
     }
-
+  
     // Set task information with selected category
     const newTask = {
       taskName,
@@ -92,13 +92,13 @@ const AddTaskModal = ({
       description: taskDescription,
       isCompleted: false
     };
-
+  
     // Invoke onSave function with the newTask object
     onSave(newTask);
-
+  
     // Close the modal
     onDismiss();
-
+  
     // Clear input fields
     setTaskName("");
     setTaskTime("");

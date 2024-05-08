@@ -5,6 +5,7 @@ import AddTaskModal from "../components/Tasks/AddTask";
 import EditTaskScreen from "./EditTasksScreen";
 import { firebase } from "../../firebase-config";
 import { Swipeable } from 'react-native-gesture-handler';
+import { taskNotification, removeAlarm } from '../components/Alarms/Alarm';
 
 const firestore = firebase.firestore();
 
@@ -59,6 +60,14 @@ export default function TasksScreen({ navigation }) {
 
   const addNewTask = async () => {
     try {
+      let notificationId;
+      if (taskTime) {
+        const [time, ampm] = taskTime.split(' ');
+        const [hour, minute] = time.split(':');
+        const period = ampm.toUpperCase(); // Extract AM/PM from the time string
+        notificationId = await taskNotification(hour, minute, period, editTaskName); // Call scheduleNotification with the selected time
+      }
+  
       const newTask = {
         taskName: editTaskName,
         category: selectedCategory === "All" ? null : selectedCategory,
@@ -68,6 +77,7 @@ export default function TasksScreen({ navigation }) {
         isCompleted: false,
         createdAt: new Date(),
         timeValue: getTimeValue(taskTime),
+        notificationId, // Store the notificationId in the new task object (or leave it undefined if no time is set)
       };
   
       await firestore.collection(`users/${currentUser.uid}/tasks`).add(newTask);
@@ -78,9 +88,6 @@ export default function TasksScreen({ navigation }) {
       setTaskTime("");
       setTaskDate("");
       setTaskDescription("");
-  
-      // Set alarm/notification
-      setAlarm(taskDate, taskTime, editTaskName);
     } catch (error) {
       console.error("Error adding task:", error);
     }
@@ -112,8 +119,15 @@ export default function TasksScreen({ navigation }) {
 
   const deleteTask = async (taskId) => {
     try {
+      const snapshot = await firestore.collection(`users/${currentUser.uid}/tasks`).doc(taskId).get();
+      const taskData = snapshot.data();
+  
+      if (taskData && taskData.notificationId) {
+        await removeAlarm(taskData.notificationId, [], () => {}, () => {}); // Cancel the scheduled notification
+      }
+  
       await firestore.collection(`users/${currentUser.uid}/tasks`).doc(taskId).delete();
-
+  
       const updatedTasks = taskItems.filter((task) => task.id !== taskId);
       setTaskItems(updatedTasks);
     } catch (error) {

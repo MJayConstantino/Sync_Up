@@ -5,6 +5,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { format, setDate } from 'date-fns';
 import { firebase } from '../../firebase-config';
 import { Menu, MenuOption, MenuOptions, MenuTrigger, MenuProvider } from 'react-native-popup-menu';
+import { taskNotification, removeAlarm } from '../components/Alarms/Alarm';
 
 const firestore = firebase.firestore();
 
@@ -118,9 +119,20 @@ const EditTaskScreen = ({ navigation, route }) => {
     try {
       // Update task in your data store
       await updateTaskInFirebase(taskId, editedTask); // Pass task ID and edited task details
-      navigation.goBack();
+  
+      // Schedule a new notification with the updated time
+      const [time, ampm] = taskTime.split(' ');
+      const [hour, minute] = time.split(':');
+      const period = ampm.toUpperCase(); // Extract AM/PM from the time string
+      const notificationId = await taskNotification(hour, minute, period, taskName);
+  
+        // Update the task in Firebase with the new notification IDs
+      await firestore.collection(`users/${currentUser.uid}/tasks`).doc(taskId).update({ notificationId });
+
     } catch (error) {
       console.error("Error updating task:", error);
+    } finally {
+      navigation.goBack();
     }
   };
 

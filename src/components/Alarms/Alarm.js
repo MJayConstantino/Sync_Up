@@ -12,7 +12,7 @@ Notifications.setNotificationHandler({
   }),
 });
 
-async function scheduleNotification(hour, minute, ampm) {
+async function taskNotification(hour, minute, ampm, taskName) {
   let newHour = parseInt(hour);
   if (ampm === "PM") {
     newHour = (newHour % 12) + 12; // Convert to 24-hour format if PM
@@ -21,8 +21,52 @@ async function scheduleNotification(hour, minute, ampm) {
   }
   const identifier = await Notifications.scheduleNotificationAsync({
     content: {
-      title: "Alarm",
-      body: "It is time to wake up!",
+      title: "Task Reminder",
+      body: taskName,
+      sound: "default",
+    },
+    trigger: {
+      hour: newHour,
+      minute: parseInt(minute),
+      repeats: true,
+    },
+  });
+  return identifier;
+}
+
+async function scheduleNotification(hour, minute, ampm, scheduleName) {
+  let newHour = parseInt(hour);
+  if (ampm === "PM") {
+    newHour = (newHour % 12) + 12; // Convert to 24-hour format if PM
+  } else {
+    newHour %= 12; // Convert to 24-hour format if AM
+  }
+  const identifier = await Notifications.scheduleNotificationAsync({
+    content: {
+      title: "Schedule Reminder",
+      body: scheduleName,
+      sound: "default",
+    },
+    trigger: {
+      hour: newHour,
+      minute: parseInt(minute),
+      repeats: true,
+    },
+  });
+  return identifier;
+}
+
+async function classScheduleNotification(hour, minute, ampm, classScheduleName) {
+  let newHour = parseInt(hour);
+  if (ampm === "PM") {
+    newHour = (newHour % 12) + 12; // Convert to 24-hour format if PM
+  } else {
+    newHour %= 12; // Convert to 24-hour format if AM
+  }
+  const identifier = await Notifications.scheduleNotificationAsync({
+    content: {
+      title: "Class Reminder",
+      body: classScheduleName,
       sound: "default",
     },
     trigger: {
@@ -43,7 +87,7 @@ async function playAlarmSound() {
   }
 }
 
-async function addAlarm(hour, minute, ampm, editMode, editId, alarms, setAlarms, clearInputFields, storeAlarms) {
+async function addAlarm(hour, minute, ampm, editMode, editId, alarms, setAlarms, clearInputFields, storeAlarms, editTaskName) {
   if (editMode) {
     await removeAlarm(editId, alarms, setAlarms, storeAlarms);
   }
@@ -51,7 +95,7 @@ async function addAlarm(hour, minute, ampm, editMode, editId, alarms, setAlarms,
     hour: hour,
     minute: minute,
     ampm: ampm,
-    id: await scheduleNotification(hour, minute, ampm),
+    id: await scheduleNotification(hour, minute, ampm, editTaskName),
   };
   setAlarms([...alarms, newAlarm]);
   clearInputFields();
@@ -173,7 +217,7 @@ const Alarm = () => {
   );
 }
 
-export { scheduleNotification, removeAlarm, storeAlarms, getData };
+export { taskNotification, scheduleNotification, classScheduleNotification, removeAlarm, storeAlarms, getData };
 
 const styles = StyleSheet.create({
   container: {

@@ -3,6 +3,7 @@ import { Modal, StyleSheet, Text, TouchableOpacity, View, TextInput, Keyboard, P
 import { MaterialCommunityIcons as Icon } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { format } from 'date-fns';
+import { scheduleNotification, removeAlarm } from '../../components/Alarms/Alarm';
 
 const AddScheduleModal = ({
   isVisible,
@@ -76,7 +77,18 @@ const AddScheduleModal = ({
     return timeValue;
   }
 
-  const handleSaveSchedule = () => {
+  const handleSaveSchedule = async () => {
+    let notificationId;
+  
+    // Check if a start time is selected
+    if (selectedStartTime) {
+      const selectedAlarmTime = format(selectedStartTime, "hh:mm aa")
+      const [time, ampm] = selectedAlarmTime.split(' ');
+      const [hour, minute] = time.split(':');
+      const period = ampm.toUpperCase(); // Extract AM/PM from the time string
+      notificationId = await scheduleNotification(hour, minute, period, scheduleName); // Call scheduleNotification with the selected time
+    }
+  
     const newSchedule = {
       scheduleName,
       timeStart: format(selectedStartTime, "hh:mm aa"),
@@ -84,12 +96,15 @@ const AddScheduleModal = ({
       date: format(selectedDate, "yyyy-MM-dd"),
       description: '', 
       createdAt: new Date(),
-      timeValue: getTimeValue(format(selectedStartTime, "hh:mm aa"))
+      timeValue: getTimeValue(format(selectedStartTime, "hh:mm aa")),
+      notificationId,
     };
-
+  
     onSave(newSchedule);
+  
     onDismiss();
-
+  
+    // Clear input fields and selected values
     setScheduleName("");
     setSelectedDate("");
     setSelectedStartTime("");
