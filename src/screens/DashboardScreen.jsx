@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, RefreshControl, ActivityIndicator, TouchableOpacity} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, RefreshControl, ActivityIndicator, TouchableOpacity, Image } from 'react-native';
 import { firebase } from '../../firebase-config';
 import { useNavigation } from '@react-navigation/native';
 import TaskCard from '../components/Dashboard/TasksCard';
@@ -13,6 +13,7 @@ const DEFAULT_PROFILE_PIC = "https://firebasestorage.googleapis.com/v0/b/syncup-
 
 const DashboardScreen = () => {
   const [name, setName] = useState('');
+  const [profileImageUrl, setProfileImageUrl] = useState(DEFAULT_PROFILE_PIC);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const navigation = useNavigation();
@@ -20,9 +21,11 @@ const DashboardScreen = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const snapshot = await firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).get();
-        if (snapshot.exists) {
-          setName(snapshot.data().firstName);
+        const userDoc = await firebase.firestore().collection('users').doc(firebase.auth().currentUser.uid).get();
+        if (userDoc.exists) {
+          const userData = userDoc.data();
+          setName(userData.firstName);
+          setProfileImageUrl(userData.imageUrl || DEFAULT_PROFILE_PIC);
         } else {
           console.log('User does not exist');
         }
@@ -36,6 +39,7 @@ const DashboardScreen = () => {
     fetchUserData();
   }, []);
 
+
   const onRefresh = () => {
     setRefreshing(true);
     setTimeout(() => {
@@ -46,7 +50,7 @@ const DashboardScreen = () => {
   if (loading) {
     return (
       <ActivityIndicator style={{ flex: 1, justifyContent: "center", alignItems: "center" }} color="00adf5" size="large" />
-    )
+    );
   } else   return (
     <View style={styles.container}>
       <ScrollView
@@ -54,12 +58,17 @@ const DashboardScreen = () => {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       >
         <View style={styles.header}>
+          <Image
+            source={{ uri: profileImageUrl }}
+            style={styles.profileImage}
+          />
           <View style={styles.greetingContainer}>
             <Text style={styles.greeting}>Hello, {name}</Text>
-            <Text style={styles.subgreeting}>Let's see what's in store for you today..</Text>
+            <Text style={styles.subgreeting} numberOfLines={2} adjustsFontSizeToFit>
+              Let's see what's in store for you today..
+            </Text>
           </View>
         </View>
-
         {/* Schedule Section */}
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionHeaderText}>Schedules</Text>
@@ -147,17 +156,32 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10
   },
   header: {
+    marginTop: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 20,
   },
+  profileImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginRight: 10,
+  },
+  greetingContainer: {
+    flexDirection: 'column',
+    flex: 1, // This allows the greeting container to take the remaining space
+  },
   greeting: {
-    fontSize: 34,
+    fontSize: 28,
     fontWeight: 'bold',
     color: '#4B98FF',
   },
   subgreeting: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 16, // Smaller size to fit
+    fontWeight: 'normal',
     color: '#333333',
+    flexShrink: 1, // Prevents overflow
+    textAlign: 'left', // Aligns text to the start
   },
   sectionHeader: {
     backgroundColor: '#F0F0F0',
