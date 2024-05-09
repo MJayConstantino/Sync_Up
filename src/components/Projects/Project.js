@@ -1,33 +1,26 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { firebase } from "../../../firebase-config"; // Import your Firebase configuration file
+import { firebase } from "../../../firebase-config";
 
 const Project = ({ projectName, deadline, collaborators, progress }) => {
   const [collaboratorImages, setCollaboratorImages] = useState([]);
 
   useEffect(() => {
-    const unsubscribe = firebase.firestore().collection("collaborators").onSnapshot(snapshot => {
-      const images = snapshot.docs.map(doc => doc.data().imageUrl);
-      setCollaboratorImages(images);
-    });
+    const fetchCollaboratorImages = async () => {
+      const promises = collaborators.map(collaboratorId =>
+        firebase.firestore().collection("users").doc(collaboratorId).get().then(doc => ({
+          userId: collaboratorId,
+          imageUrl: doc.data()?.imageUrl || 'https://firebasestorage.googleapis.com/v0/b/syncup-4b36a.appspot.com/o/profilepic.png?alt=media&token=4f9acff6-166b-4e21-9ac8-42bc5f441e63',
+        }))
+      );
 
-    return () => unsubscribe();
-  }, []);
+      const results = await Promise.all(promises);
+      setCollaboratorImages(results);
+    };
 
-  // Calculate progress status color based on completion percentage
-  let progressColor;
-  let statusText;
-  if (progress >= 100) {
-    progressColor = "#00FF00"; // Green for completed
-    statusText = "Completed";
-  } else if (progress > 0) {
-    progressColor = "#FFA500"; // Orange for in-progress
-    statusText = "In Progress";
-  } else {
-    progressColor = "#FF0000"; // Red for not started
-    statusText = "Not Started";
-  }
+    fetchCollaboratorImages();
+  }, [collaborators]);
 
   return (
     <View style={styles.item}>
@@ -38,33 +31,22 @@ const Project = ({ projectName, deadline, collaborators, progress }) => {
             <Text style={styles.deadlineText}>{deadline}</Text>
           </View>
         </View>
-        {/* Circular progress bar */}
-        <View style={[styles.progressContainer, { borderColor: progressColor }]}>
-          <View style={[styles.progressBar, { backgroundColor: progressColor }]}>
-            <Text style={[styles.progressText, { color: progress >= 100 ? "#FFFFFF" : "#000000" }]}>
-              {progress.toFixed(2)}%
-            </Text>
-          </View>
-        </View>
       </View>
+
       <View style={styles.contentContainer}>
-        <View style={styles.itemLeft}>
+        <View style={styles.projectNameContainer}>
           <Text style={styles.textContainer}>{projectName}</Text>
         </View>
-        {/* Placeholder for collaborator images */}
+
         <View style={styles.collaboratorContainer}>
           {collaboratorImages.map((imageUrl, index) => (
             <Image
               key={index}
-              source={{ uri: imageUrl }}
+              source={{ uri: imageUrl.imageUrl }}
               style={styles.collaboratorAvatar}
             />
           ))}
         </View>
-      </View>
-      {/* Status box */}
-      <View style={[styles.statusBox, { backgroundColor: progressColor }]}>
-        <Text style={styles.statusText}>{statusText}</Text>
       </View>
     </View>
   );
@@ -98,48 +80,35 @@ const styles = StyleSheet.create({
     marginLeft: 5,
   },
   deadlineText: {
-    fontSize: 16, // Increased font size
+    fontSize: 16,
     color: "#FFFFFF",
-  },
-  contentContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  itemLeft: {
-    flex: 1,
   },
   textContainer: {
     fontSize: 25,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  contentContainer: {
+    flexDirection: "column",
+    justifyContent: "space-between",
+    marginBottom: 10,
+  },
+  projectNameContainer: {
+    flex: 1,
+    borderBottomWidth: 1,
   },
   collaboratorContainer: {
+    marginTop: 10,
     flexDirection: "row",
-    alignItems: "center",
+    justifyContent: 'flex-end',
   },
   collaboratorAvatar: {
     width: 30,
     height: 30,
-    borderRadius: 15, // Make it circular
+    borderRadius: 50, // Make it circular
     marginRight: 5,
-  },
-  progressContainer: {
-    borderWidth: 2,
-    borderRadius: 50,
-    width: 50,
-    height: 50,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  progressBar: {
-    borderRadius: 50,
-    width: "100%",
-    height: "100%",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  progressText: {
-    fontSize: 12,
+    borderWidth: 1,
+    borderColor: '#39e75f',
   },
   statusBox: {
     borderRadius: 20,
