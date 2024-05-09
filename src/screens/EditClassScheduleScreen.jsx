@@ -3,8 +3,10 @@ import { StyleSheet, Text, TouchableOpacity, View, TextInput, Platform, Activity
 import { MaterialCommunityIcons as Icon } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { format } from 'date-fns';
+import { EvilIcons } from '@expo/vector-icons';
 import { firebase } from '../../firebase-config';
 import { Menu, MenuOption, MenuOptions, MenuTrigger, MenuProvider } from 'react-native-popup-menu';
+import { ScrollView } from "react-native-gesture-handler";
 
 const firestore = firebase.firestore();
 
@@ -130,6 +132,15 @@ const EditClassScheduleScreen = ({ navigation, route }) => {
     }
   };
 
+  const deleteClassSchedule = async () => {
+    try {
+      await firestore.collection(`users/${currentUser.uid}/tasks`).doc(taskId).delete();
+      navigation.goBack();
+    } catch (error) {
+      console.error("Error deleting task:", error);
+    }
+  };
+
   const updateClassScheduleInFirebase = async (classScheduleId, editedClassSchedule) => {
     try {
       // Update the schedule in Firebase using the taskId
@@ -144,73 +155,78 @@ const EditClassScheduleScreen = ({ navigation, route }) => {
       <ActivityIndicator style={{flex: 1, justifyContent: "center", alignItems: "center"}} color="00adf5" size="large" />
     )
   } else return (
+    
     <MenuProvider>
+      <ScrollView>
       <View style={[styles.container, { paddingTop: 25, backgroundColor: '#f0f0f0' }]}>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Icon name="arrow-left" size={24} color="#000" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Edit Class Schedule</Text>
-          <TouchableOpacity onPress={handleSaveClassSchedule}>
-            <Text style={styles.saveButton}>Save changes</Text>
+
+          <TouchableOpacity onPress={deleteClassSchedule}>
+            <EvilIcons name="trash" size={24} style={{ padding: 10 }} color="red" />
           </TouchableOpacity>
         </View>
 
-        {/* Subject Section */}
-        <View style={styles.sectionContainer}>
-          <Text style={styles.sectionLabel}>Subject</Text>
-          <TextInput
+        <View style={styles.rowButton01}> 
+          <View style={styles.sectionContainer}>
+            <Text style={styles.sectionLabel}>Room</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter room"
+              value={room}
+              onChangeText={setRoom}
+            />
+          </View>
+
+          <View style={styles.sectionContainer}>
+            <Text style={styles.sectionLabel}>Stub Code</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter stub code"
+              value={stubCode}
+              onChangeText={setStubCode}
+            />
+          </View>
+        </View>
+
+        <View style={styles.rowButton02}> 
+          <View style={styles.sectionContainer}>
+            <Text style={styles.sectionLabel}>Subject</Text>
+            <TextInput
             style={styles.input}
             placeholder="Enter subject name"
             value={subject}
             onChangeText={setSubject}
-          />
+            />
+          </View>
+
+          <View style={styles.sectionContainer}>
+            <Text style={styles.sectionLabel}>Instructor</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter instructor"
+              value={instructor}
+              onChangeText={setInstructor}
+            />
+          </View>
+
+
         </View>
 
-        {/* Stub Code Section */}
         <View style={styles.sectionContainer}>
-          <Text style={styles.sectionLabel}>Stub Code</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter stub code"
-            value={stubCode}
-            onChangeText={setStubCode}
-          />
-        </View>
 
-        {/* Instructor Section */}
-        <View style={styles.sectionContainer}>
-          <Text style={styles.sectionLabel}>Instructor</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter instructor"
-            value={instructor}
-            onChangeText={setInstructor}
-          />
-        </View>
-
-        {/* Room Section */}
-        <View style={styles.sectionContainer}>
-          <Text style={styles.sectionLabel}>Room</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter room"
-            value={room}
-            onChangeText={setRoom}
-          />
-        </View>
-
-        {/* Day Section */}
-        <View style={styles.sectionContainer}>
-            <Text style={styles.sectionLabel}>Day</Text>
             <Menu>
-              <MenuTrigger>
+              <MenuTrigger style={styles.sectionDay}>
+              <Text style={styles.sectionLabel}>Day</Text>
                 <View style={styles.dayDropdown}>
                   <Text style={styles.dayDropdownText}>
-                    {day.length > 0 ? day.join(', ') : 'Select Day(s)'}
+                    {/* {day.length > 0 ? day.join(', ') : 'Select Day(s)'} */}
                   </Text>
-                  <Icon name="chevron-down" size={24} color="#000" />
                 </View>
+              <Icon name="chevron-down" size={30} color="#000" />
               </MenuTrigger>
               <MenuOptions>
                 {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday', 'TBA'].map((dayOption) => (
@@ -241,19 +257,42 @@ const EditClassScheduleScreen = ({ navigation, route }) => {
         {/* Section title for Class Duration */}
         <Text style={styles.sectionTitle}>Class Duration</Text>
         {/* Start Time and End Time in the same row */}
+
         <View style={styles.timeContainer}>
           <TouchableOpacity style={styles.timeButton} onPress={openTimePicker}>
+          <View style={styles.timeIconandDue}> 
             <Icon name="clock" size={20} color="#ccc" />
+            <Text styles={styles.textTime}> Start Time </Text>
+          </View>
+          <View style={styles.timeButtonShape}> 
             <Text style={styles.timeButtonText}>
-              {timeStart ? timeStart : 'Set Start Time'}
+              {timeStart ? timeStart : '7:00 AM'}
             </Text>
+          </View>
           </TouchableOpacity>
-          <Text style={styles.dashText}>-</Text>
+
+          {/* <Text style={styles.dashText}>-</Text> */}
+
           <TouchableOpacity style={styles.timeButton} onPress={openEndTimePicker}>
+          <View style={styles.timeIconandDue}> 
             <Icon name="clock" size={20} color="#ccc" />
+            <Text styles={styles.textTime}> End TIme </Text>
+          </View>
+          <View style={styles.timeButtonShape}> 
             <Text style={styles.timeButtonText}>
-              {timeEnd ? timeEnd : 'Set End Time'}
+              {timeEnd ? timeEnd : '8:00 AM'}
             </Text>
+          </View>
+
+
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.savebutonContainer}> 
+          <TouchableOpacity onPress={handleSaveClassSchedule}> 
+            <View style={styles.savebuton}> 
+              <Text style={styles.savebuttonText} > SAVE </Text>
+            </View>
           </TouchableOpacity>
         </View>
 
@@ -268,6 +307,7 @@ const EditClassScheduleScreen = ({ navigation, route }) => {
           />
         )}
       </View>
+      </ScrollView>
     </MenuProvider>
   );
 }
@@ -277,10 +317,18 @@ export default EditClassScheduleScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f2f2f2",
-    padding: 20,
-    paddingTop: 25,
-    marginTop: 50,
+    paddingHorizontal: 20,
+    paddingTop: 50
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
   },
   headerContainer: {
     flexDirection: "row",
@@ -288,10 +336,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 20,
   },
-  header: {
-    fontSize: 24,
-    fontWeight: "bold",
-  },
+  // header: {
+  //   fontSize: 24,
+  //   fontWeight: "bold",
+  // },
   formContainer: {
     backgroundColor: "#fff",
     borderRadius: 10,
@@ -304,6 +352,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+    // justifyContent: 'center',
+    // alignContent: 'center',
+    // alignItems: 'center',
   },
   input: {
     borderWidth: 1,
@@ -311,19 +362,46 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 10,
     marginBottom: 10,
+    width: 150,
   },
+  rowButton01: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+
+  },
+  rowButton02: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+
+  },
+  dayDropdown: {
+    marginLeft: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  // Don't have idea of this 
   sectionContainer: {
     marginBottom: 20,
   },
+  sectionDay: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    // width: 100,
+    // marginLeft: 115,
+  },
   sectionLabel: {
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: "bold",
     marginBottom: 5,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 5,
+    marginBottom: 10,
   },
   timeContainer: {
     flexDirection: "row",
@@ -331,24 +409,24 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 10,
   },
-  timeButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    padding: 10,
-    marginRight: 5,
-  },
-  timeButtonText: {
-    fontSize: 16,
-    marginLeft: 5,
-  },
-  dashText: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginHorizontal: 5,
-  },
+  // timeButton: {
+  //   flexDirection: "row",
+  //   alignItems: "center",
+  //   borderWidth: 1,
+  //   borderColor: "#ccc",
+  //   borderRadius: 5,
+  //   padding: 10,
+  //   marginRight: 5,
+  // },
+  // timeButtonText: {
+  //   fontSize: 16,
+  //   marginLeft: 5,
+  // },
+  // dashText: {
+  //   fontSize: 16,
+  //   fontWeight: "bold",
+  //   marginHorizontal: 5,
+  // },
   datePicker: {
     width: "100%",
   },
@@ -369,5 +447,92 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
+  },
+
+  dateButton: {
+    flexDirection: "row",
+    justifyContent: 'space-between',
+    alignItems: "center",
+    borderTopWidth: 1,
+    borderColor: "#ccc",
+    padding: 10,
+    marginBottom: 10,
+  },
+  dateButtonShape: {
+    alignItems: 'center',
+    backgroundColor: '#ccc',
+    borderRadius: 20,
+    padding: 1,
+  },
+  dateButtonText: {
+    fontSize: 14,
+    padding: 5,
+    width: 'auto',
+  },
+  dateIconandDue: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  textDueDate: {
+    color: '#ccc',
+    fontSize: 20,
+    marginLeft: 5,
+  },
+  //
+  timeButton: {
+    flexDirection: "row",
+    justifyContent: 'space-between',
+    alignItems: "center",
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: "#ccc",
+    padding: 10,
+    marginBottom: 10,
+  },
+  timeButtonShape: {
+    alignItems: 'center',
+    // backgroundColor: '#ccc',
+    // borderRadius: 20,
+    padding: 1,
+    width: "auto",
+  },
+  timeButtonText: {
+    fontSize: 14,
+    padding: 5,
+    width: 'auto',
+  },
+  timeIconandDue: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  textTime: {
+    color: 'white',
+    fontSize: 14,
+    marginLeft: 5,
+  },
+  datePicker: {
+    width: "100%",
+  },
+  savebutonContainer: {
+    borderColor: '#ccc',
+    alignItems: "center",
+    padding: 10,
+    marginBottom: 10,
+  },
+  savebuton: {
+    borderWidth: 1,
+    borderRadius: 20,
+    borderColor: '#ccc',
+    padding: 5,
+    backgroundColor: "#03a1fc",
+    borderRadius: 40,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+  },
+  savebuttonText: {
+    alignItems: 'center',
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });

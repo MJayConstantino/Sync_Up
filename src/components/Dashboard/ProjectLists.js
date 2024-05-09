@@ -57,6 +57,7 @@ const ProjectList = () => {
 
     return () => {
       unsubscribe();
+
       tasksUnsubscribes.forEach((unsubscribe) => unsubscribe());
     };
   }, [currentUser.uid]);

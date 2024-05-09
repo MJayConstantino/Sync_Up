@@ -7,11 +7,9 @@ import ScheduleCard from '../components/Dashboard/ScheduleCard';
 import ScheduleTaskCard from '../components/Dashboard/ScheduleTaskCard';
 import ClassScheduleCard from '../components/Dashboard/ClassScheduleCard';
 import ProjectCard from '../components/Dashboard/ProjectCard';
-import ThisWeekEventsCard from '../components/Dashboard/ThisWeekEventsCard';
-import NextWeekEventsCard from '../components/Dashboard/NextWeekEventsCard';
-import ThisMonthEventsCard from '../components/Dashboard/ThisMonthEventsCard';
-import NextMonthEventsCard from '../components/Dashboard/NextMonthEventsCard';
 import ProjectList from '../components/Dashboard/ProjectLists';
+
+const DEFAULT_PROFILE_PIC = "https://firebasestorage.googleapis.com/v0/b/syncup-4b36a.appspot.com/o/profilepic.png?alt=media&token=4f9acff6-166b-4e21-9ac8-42bc5f441e63";
 
 const DashboardScreen = () => {
   const [name, setName] = useState('');
@@ -56,8 +54,10 @@ const DashboardScreen = () => {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       >
         <View style={styles.header}>
-          <Text style={styles.greeting}>Hello, {name}</Text>
-          <Text style={styles.subgreeting}>Let's see what's in store for you today..</Text>
+          <View style={styles.greetingContainer}>
+            <Text style={styles.greeting}>Hello, {name}</Text>
+            <Text style={styles.subgreeting}>Let's see what's in store for you today..</Text>
+          </View>
         </View>
 
         {/* Schedule Section */}

@@ -21,6 +21,7 @@ const CreateProjectScreen = ({ navigation }) => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const currentUser = firebase.auth().currentUser;
   const [loading, setLoading] = useState(true);
+  
 
   useEffect(() => {
     const fetchExistingEmails = async () => {
@@ -128,7 +129,7 @@ const CreateProjectScreen = ({ navigation }) => {
     <MenuProvider>
       <View style={styles.container}>
       <View style={styles.headerContainer}>
-        <Text style={styles.header}>Edit Class Schedule</Text>
+        <Text style={styles.header}>Create Project</Text>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <MaterialIcons name="close" size={24} color="black" />
         </TouchableOpacity>
