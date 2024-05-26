@@ -19,21 +19,19 @@ export default function Chat() {
   const chatRoomId = route.params?.chatRoomId;
   const userName = route.params?.userName;
 
-  // Extract the other user's email from chatRoomId
   const currentUserEmail = auth.currentUser?.email;
   const otherUserEmail = chatRoomId
     .split('_')
     .find((email) => email !== currentUserEmail);
 
-  // Retrieve other user's profile picture
   useEffect(() => {
     const userDocRef = collection(database, 'users');
-    const userQuery = query(userDocRef, where('email', '==', otherUserEmail)); // Correct use of 'where'
+    const userQuery = query(userDocRef, ('email', '==', otherUserEmail));
 
     const unsubscribe = onSnapshot(userQuery, (snapshot) => {
       if (snapshot.docs.length > 0) {
         const userData = snapshot.docs[0].data();
-        setUserAvatar(userData.imageUrl || DEFAULT_PROFILE_PIC); // Update avatar
+        setUserAvatar(userData.imageUrl || DEFAULT_PROFILE_PIC);
       }
     });
 
@@ -71,9 +69,11 @@ export default function Chat() {
 
   const onSend = useCallback(
     (messages = []) => {
+      if (!chatRoomId) return;
+  
       const newMessage = messages[0];
       setMessages((previousMessages) => GiftedChat.append(previousMessages, messages));
-
+  
       addDoc(collection(database, 'chats', chatRoomId, 'messages'), {
         _id: newMessage._id,
         createdAt: newMessage.createdAt,
@@ -87,6 +87,7 @@ export default function Chat() {
     },
     [chatRoomId]
   );
+  
 
   if (loading) {
     return <ActivityIndicator style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }} color="00adf5" size="large" />;

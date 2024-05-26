@@ -32,6 +32,7 @@ const ChatListScreen = () => {
   const [allUsers, setAllUsers] = useState([]);
   const [recentMessages, setRecentMessages] = useState({});
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedChatRoomId, setSelectedChatRoomId] = useState(null);
   const navigation = useNavigation();
   const [loading, setLoading] = useState(true);
 
@@ -70,6 +71,8 @@ const ChatListScreen = () => {
       const userEmails = [currentUserEmail, user.email].sort();
       const chatRoomId = userEmails.join('_');
 
+      if (chatRoomId.trim() === '') return () => {};
+
       const chatRef = collection(database, 'chats', chatRoomId, 'messages');
       const recentMessageQuery = query(
         chatRef,
@@ -103,20 +106,24 @@ const ChatListScreen = () => {
     const currentUserEmail = auth.currentUser?.email;
     const userEmails = [currentUserEmail, user.email].sort();
     const chatRoomId = userEmails.join('_');
-
+  
+    if (chatRoomId.trim() === '') return;
+  
+    setSelectedChatRoomId(chatRoomId);
     const chatRef = collection(database, 'chats', chatRoomId, 'messages');
     const recentMessage = recentMessages[chatRoomId];
-
-    if (recentMessage && !recentMessage.read) {
+  
+    if (recentMessage && recentMessage.id && !recentMessage.read) {
       const messageDoc = doc(chatRef, recentMessage.id);
       updateDoc(messageDoc, { read: true });
     }
-
+  
     navigation.navigate('ChatRoom', {
       chatRoomId,
       userName: user.name,
     });
-  };
+  };  
+  
 
   const usersWithRecentMessages = allUsers
     .filter((user) => {
@@ -193,7 +200,7 @@ const ChatListScreen = () => {
                   <Text
                     style={[
                       styles.userName,
-                      isUnread ? { fontWeight: 'bold' } : {},
+                      isUnread || chatRoomId === selectedChatRoomId ? { fontWeight: 'normal' } : {},
                     ]}
                   >
                     {item.name}
@@ -201,7 +208,7 @@ const ChatListScreen = () => {
                   <Text
                     style={[
                       styles.recentMessage,
-                      isUnread ? { fontWeight: 'bold', color: 'black' } : {},
+                      (isUnread || chatRoomId === selectedChatRoomId) ? { fontWeight: 'normal', color: 'gray' } : {},
                     ]}
                   >
                     {recentText}
@@ -257,7 +264,7 @@ const styles = StyleSheet.create({
   },
   userName: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: 'normal',
   },
   recentMessage: {
     fontSize: 16,
