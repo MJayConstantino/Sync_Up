@@ -268,7 +268,7 @@ const EditClassScheduleScreen = ({ navigation, route }) => {
           <TouchableOpacity style={styles.timeButton} onPress={openEndTimePicker}>
           <View style={styles.timeIconandDue}> 
             <Icon name="clock" size={20} color="#ccc" />
-            <Text styles={styles.textTime}> End TIme </Text>
+            <Text styles={styles.textTime}> End Time </Text>
           </View>
           <View style={styles.timeButtonShape}> 
             <Text style={styles.timeButtonText}>
