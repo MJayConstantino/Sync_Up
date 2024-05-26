@@ -9,7 +9,7 @@ const Registration = () => {
     const [password, setPassword] = useState('');
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
-    const [showPassword, setShowPassword] = useState(false); // State to control password visibility
+    const [showPassword, setShowPassword] = useState(false);
     const imageUrl = "https://firebasestorage.googleapis.com/v0/b/syncup-4b36a.appspot.com/o/profilepic.png?alt=media&token=4f9acff6-166b-4e21-9ac8-42bc5f441e63";
     const [bio] = useState('');
     const [birthDate] = useState('');
@@ -18,7 +18,6 @@ const Registration = () => {
 
 
     const registerUser = async (email, password, firstName, lastName) => {
-      // Basic validation to ensure all fields are filled
       if (!firstName || !lastName || !email || !password) {
           Alert.alert(
               "Incomplete Information",
@@ -77,7 +76,7 @@ const Registration = () => {
     return (
         <ScrollView contentContainerStyle={styles.container}>
             <Image
-                source={require('../assets/SyncUp Logo.png')} // Same image as in Login
+                source={require('../assets/SyncUp Logo.png')}
                 style={{ width: 200, height: 200, marginBottom: 20 }}
             />
             <Text style={styles.subtitle}>Register Here!</Text>
@@ -153,13 +152,13 @@ const styles = StyleSheet.create({
     },
     subtitle: {
         fontSize: 35,
-        textAlign: 'left', // Same alignment as Login
+        textAlign: 'left',
         fontWeight: 'bold',
     },
     label: {
         fontWeight: 'bold',
         fontSize: 18,
-        textAlign: 'left', // Same alignment as Login
+        textAlign: 'left',
     },
     textInput: {
         paddingTop: 20,

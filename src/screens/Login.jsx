@@ -18,14 +18,12 @@ const Login = () => {
     const navigation = useNavigation();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [showPassword, setShowPassword] = useState(false); // State to control password visibility
+    const [showPassword, setShowPassword] = useState(false);
 
     const loginUser = async (email, password) => {
         try {
             await firebase.auth().signInWithEmailAndPassword(email, password);
-            // if (navigation) {
-            //     navigation.navigate('Dashboards'); // Fix the destination to a valid screen
-            // }
+
         } catch (error) {
             let errorMessage = "An error occurred during login.";
 
@@ -77,7 +75,7 @@ const Login = () => {
     useFocusEffect(
         React.useCallback(() => {
             const onBackPress = () => {
-                return true; // Returning true stops the back button
+                return true;
             };
 
             BackHandler.addEventListener('hardwareBackPress', onBackPress);
@@ -91,12 +89,9 @@ const Login = () => {
     return (
         <ScrollView contentContainerStyle={styles.container}>
             <Image
-                source={require('../assets/SyncUp Logo.png')} // Correct the image source name if required
+                source={require('../assets/SyncUp Logo.png')}
                 style={{ width: 200, height: 200, marginBottom: 20 }}
             />
-            {/* <View style={styles.titleContainer}>
-                <Text style={styles.title}>pls like hepta uwu</Text>
-            </View> */}
             <View style={{ marginTop: 40 }}>
                 <Text style={styles.subtitle}>Login</Text>
                 <Text style={styles.label}>Email</Text>
@@ -118,7 +113,7 @@ const Login = () => {
                         onChangeText={(text) => setPassword(text)}
                         autoCapitalize="none"
                         autoCorrect={false}
-                        secureTextEntry={!showPassword} // Toggle based on showPassword state
+                        secureTextEntry={!showPassword}
                     />
                     <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
                         <Icon
@@ -165,24 +160,19 @@ const styles = StyleSheet.create({
         paddingBottom: 50,
     },
     titleContainer: {
-        alignItems: 'left', // Center the title components
+        alignItems: 'left',
     },
-    // title: {
-    //     fontWeight: 'bold',
-    //     fontSize: 5,
-    //     textAlign: 'center', // Align text to center
-    //     fontFamily: 'normal',
-    // },
+
     subtitle: {
-        fontSize: 30, // Subtitle font size
+        fontSize: 30,
         textAlign: 'left',
-        marginBottom: 30, // Align subtitle to center
+        marginBottom: 30,
         fontWeight: 'bold',
     },
     label: {
         fontWeight: 'bold',
-        fontSize: 18, // Label font size for email and password
-        textAlign: 'left', // Align label text to the left
+        fontSize: 18,
+        textAlign: 'left',
     },
     textInput: {
         paddingTop: 20,
@@ -194,8 +184,8 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     passwordContainer: {
-        flexDirection: 'row', // Horizontal layout for password input and eye icon
-        alignItems: 'center', // Center vertically
+        flexDirection: 'row',
+        alignItems: 'center', 
     },
     button: {
         marginTop: 50,

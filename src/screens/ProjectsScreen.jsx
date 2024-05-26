@@ -29,7 +29,7 @@ const ProjectsScreen = () => {
         fetchProjectTasks(filteredProjects);
       });
 
-    return () => unsubscribe(); // Unsubscribe when the component unmounts
+    return () => unsubscribe();
   }, []);
 
   const fetchProjectTasks = async (projectsData) => {
@@ -56,10 +56,7 @@ const ProjectsScreen = () => {
 
   const deleteProject = async (projectId) => {
     try {
-      // Implement deletion logic using projectId
-      // For example:
       await firestore.collection("projects").doc(projectId).delete();
-      // After successful deletion, you may want to update the state to reflect the changes
       setProjects(projects.filter(project => project.id !== projectId));
     } catch (error) {
       console.error("Error deleting project:", error);

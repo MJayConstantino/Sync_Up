@@ -77,39 +77,32 @@ const ScheduleScreen = ({ navigation, route }) => {
           .orderBy("timeValue", "asc")
           .onSnapshot(snapshot => {
             const schedules = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), type: 'schedule' }));
-            // Update state or handle schedules
 
             const unsubscribeFromTasks = firestore
               .collection(`users/${currentUser.uid}/tasks`)
               .orderBy("timeValue", "asc")
               .onSnapshot(snapshot => {
                 const tasks = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), type: 'task' }));
-                // Update state or handle tasks
 
                 const unsubscribeFromClassSchedules = firestore
                   .collection(`users/${currentUser.uid}/classSchedules`)
                   .orderBy("timeValue", "asc")
                   .onSnapshot(snapshot => {
                     const classSchedules = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), type: 'classSchedule' }));
-                    // Update state or handle class schedules
 
                     const unsubscribeFromProjects = firestore
                       .collection('projects')
                       .where('collaborators', 'array-contains', currentUser.uid)
                       .onSnapshot(snapshot => {
                         const projects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), type: 'project' }));
-                        // Update state or handle projects
 
-                        // For each project, set up a listener for tasks where the current user is assigned
                         projects.forEach(project => {
                           const unsubscribeFromProjectTasks = firestore
                             .collection(`projects/${project.id}/tasks`)
                             .where('assignedTo', 'array-contains', currentUser.uid)
                             .onSnapshot(taskSnapshot => {
                               const projectTasks = taskSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), type: 'projectTask' }));
-                              // Update state or handle project tasks
 
-                              // Combine all items (schedules, tasks, class schedules, projects, and project tasks)
                               const combinedItems = {};
 
                               schedules.forEach(schedule => {
@@ -131,7 +124,7 @@ const ScheduleScreen = ({ navigation, route }) => {
                               classSchedules.forEach(classSchedule => {
                                 const days = Array.isArray(classSchedule.day) ? classSchedule.day : [classSchedule.day];
                                 days.forEach(day => {
-                                  const occurrences = getOccurrencesOfMonth(day); // Assuming getOccurrencesOfMonth is defined elsewhere
+                                  const occurrences = getOccurrencesOfMonth(day); 
                                   occurrences.forEach(date => {
                                     if (!combinedItems[date]) {
                                       combinedItems[date] = [];
@@ -142,7 +135,7 @@ const ScheduleScreen = ({ navigation, route }) => {
                               });
 
                               projects.forEach(project => {
-                                const projectTasks = project.tasks || []; // Add a check for project.tasks
+                                const projectTasks = project.tasks || [];
                                 combinedItems[project.deadline] = combinedItems[project.deadline] || [];
                                 combinedItems[project.deadline].push(project);
 
@@ -158,24 +151,19 @@ const ScheduleScreen = ({ navigation, route }) => {
                               setItems(combinedItems);
                             });
 
-                          // Return a function to unsubscribe from the project tasks collection
                           return unsubscribeFromProjectTasks;
                         });
                       });
 
-                    // Return a function to unsubscribe from the projects collection
                     return unsubscribeFromProjects;
                   });
 
-                // Return a function to unsubscribe from the class schedules collection
                 return unsubscribeFromClassSchedules;
               });
 
-            // Return a function to unsubscribe from the tasks collection
             return unsubscribeFromTasks;
           });
 
-        // Return a function to unsubscribe from the schedules collection
         return unsubscribeFromSchedules;
       } catch (error) {
         console.error("Error fetching schedules and tasks:", error);
@@ -326,7 +314,6 @@ const ScheduleScreen = ({ navigation, route }) => {
         <Agenda
           items={filterItems(items, filter)}
           renderItem={renderItem}
-          // Other Agenda props
         />
 
       <TouchableOpacity style={styles.addButton} onPress={() => setIsModalVisible(true)}>
@@ -364,8 +351,8 @@ const styles = StyleSheet.create({
   },
   filterContainer: {
     backgroundColor: '#fff',
-    elevation: 4, // Add elevation for a slight shadow effect
-    paddingVertical: 5, // Add some vertical padding for spacing
+    elevation: 4,
+    paddingVertical: 5,
   },
   filterScrollContainer: {
     flexDirection: 'row',
@@ -377,15 +364,15 @@ const styles = StyleSheet.create({
   filterButton: {
     backgroundColor: '#f2f2f2',
     borderRadius: 20,
-    paddingVertical: 6, // Reduced vertical padding
-    paddingHorizontal: 12, // Reduced horizontal padding
+    paddingVertical: 8,
+    paddingHorizontal: 12,
     marginHorizontal: 5,
   },
   selectedFilterButton: {
     backgroundColor: '#00adf5',
   },
   filterButtonText: {
-    fontSize: 12, // Reduced font size
+    fontSize: 12,
     color: '#333',
   },
   selectedFilterButtonText: {

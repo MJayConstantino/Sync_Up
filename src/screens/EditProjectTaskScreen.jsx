@@ -299,7 +299,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
   },
-  // Title of Task 
   input: {
     borderBottomWidth: 2,
     borderColor: '#A9A9A9',
@@ -310,17 +309,12 @@ const styles = StyleSheet.create({
     fontSize: 30,
     borderTopWidth: 2,
   },
-  // Desciption
   inputDescription: {
-    // borderWidth: 1,
-    // borderColor: "#ccc",
-    // borderRadius: 5,
     padding: 10,
     marginBottom: 10,
-    flex: 1, // Fill remaining space
-    textAlignVertical: "top", // Align text to the top
+    flex: 1,
+    textAlignVertical: "top",
   },
-  //
   dateButton: {
     flexDirection: "row",
     justifyContent: 'space-between',
@@ -350,13 +344,11 @@ const styles = StyleSheet.create({
     fontSize: 20,
     marginLeft: 5,
   },
-  //
   timeButton: {
     flexDirection: "row",
     justifyContent: 'space-between',
     alignItems: "center",
     borderTopWidth: 1,
-    // borderBottomWidth: 1,
     borderColor: "#ccc",
     padding: 10,
     marginBottom: 10,

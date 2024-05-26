@@ -29,7 +29,7 @@ const EditTaskScreen = ({ navigation, route }) => {
       try {
         const snapshot = await firestore.collection(`users/${currentUser.uid}/tasks/`).doc(taskId).get();
         const taskData = snapshot.data();
-        console.log("Task data:", taskData); // Log the task data
+        console.log("Task data:", taskData);
         if (taskData) {
           setTaskName(taskData.taskName);
           setSelectedCategory(taskData.category);
@@ -38,7 +38,7 @@ const EditTaskScreen = ({ navigation, route }) => {
           setTaskDescription(taskData.description);
         } else {
           alert("Task not found!");
-          navigation.goBack(); // Navigate back if task not found
+          navigation.goBack();
         }
       } catch (error) {
         console.error("Error fetching task details:", error);
@@ -73,7 +73,7 @@ const EditTaskScreen = ({ navigation, route }) => {
       setSelectedDate(selectedDate);
       const formattedDate = format(selectedDate, "yyyy-MM-dd");
       if (isDatePickerVisible) {
-        setTaskDate(formattedDate); // If date picker was visible, update taskDate
+        setTaskDate(formattedDate);
       }
 
       closeDateTimePicker();
@@ -86,7 +86,7 @@ const EditTaskScreen = ({ navigation, route }) => {
       const formattedTime = format(selectedTime, "HH:mm aa");
 
       if (isTimePickerVisible) {
-        setTaskTime(formattedTime); // If time picker was visible, update taskTime
+        setTaskTime(formattedTime);
       }
       closeDateTimePicker();
     }
@@ -127,16 +127,13 @@ const EditTaskScreen = ({ navigation, route }) => {
     };
 
     try {
-      // Update task in your data store
-      await updateTaskInFirebase(taskId, editedTask); // Pass task ID and edited task details
+      await updateTaskInFirebase(taskId, editedTask);
   
-      // Schedule a new notification with the updated time
       const [time, ampm] = taskTime.split(' ');
       const [hour, minute] = time.split(':');
-      const period = ampm.toUpperCase(); // Extract AM/PM from the time string
+      const period = ampm.toUpperCase();
       const notificationId = await taskNotification(hour, minute, period, taskName);
   
-        // Update the task in Firebase with the new notification IDs
       await firestore.collection(`users/${currentUser.uid}/tasks`).doc(taskId).update({ notificationId });
 
     } catch (error) {
@@ -148,7 +145,6 @@ const EditTaskScreen = ({ navigation, route }) => {
 
   const updateTaskInFirebase = async (taskId, editedTask) => {
     try {
-      // Update the task in Firebase using the taskId
       await firestore.collection(`users/${currentUser.uid}/tasks`).doc(taskId).update(editedTask);
     } catch (error) {
       console.error("Error updating task in Firebase:", error);
@@ -213,7 +209,7 @@ const EditTaskScreen = ({ navigation, route }) => {
           style={styles.inputDescription}
           placeholder="Write a description (optional)"
           multiline
-          textAlignVertical="top" // Ensure text stays at the top
+          textAlignVertical="top"
           value={taskDescription}
           onChangeText={setTaskDescription}
         />
@@ -251,9 +247,6 @@ const EditTaskScreen = ({ navigation, route }) => {
             </View>
           </TouchableOpacity>
         </View>
-
-
-
 
         {isDatePickerVisible && (
           <DateTimePicker
@@ -297,7 +290,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
   },
-  // Title of Task 
   input: {
     borderBottomWidth: 2,
     borderBottomColor: 'black',
@@ -307,17 +299,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 30,
   },
-  // Desciption
   inputDescription: {
-    // borderWidth: 1,
-    // borderColor: "#ccc",
-    // borderRadius: 5,
     padding: 10,
     marginBottom: 10,
-    flex: 1, // Fill remaining space
-    textAlignVertical: "top", // Align text to the top
+    flex: 1, 
+    textAlignVertical: "top",
   },
-  //  Categorry
+
   categoryButton: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -333,7 +321,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: 'white'
   },
-  //
   dateButton: {
     flexDirection: "row",
     justifyContent: 'space-between',
@@ -363,13 +350,11 @@ const styles = StyleSheet.create({
     fontSize: 20,
     marginLeft: 5,
   },
-  //
   timeButton: {
     flexDirection: "row",
     justifyContent: 'space-between',
     alignItems: "center",
     borderTopWidth: 1,
-    // borderBottomWidth: 1,
     borderColor: "#ccc",
     padding: 10,
     marginBottom: 10,

@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
   noClassesText: {
     fontSize: 16,
     color: '#777',
-    paddingTop: 8, // or adjust as needed to align with your design
+    paddingTop: 8,
   },
 });
 

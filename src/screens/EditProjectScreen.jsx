@@ -24,7 +24,6 @@ const EditProjectScreen = ({ navigation, route }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch existing emails from users collection
     const fetchExistingEmails = async () => {
       try {
         const usersSnapshot = await firestore.collection("users").get();

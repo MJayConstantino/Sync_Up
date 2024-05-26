@@ -3,7 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Button, StyleSheet, Text, Image, SafeAreaView, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { firebase } from '../../firebase-config';
-import { MaterialCommunityIcons } from '@expo/vector-icons'; // Importing icon library
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { ScrollView } from 'react-native-gesture-handler';
 
 const firestore = firebase.firestore();
@@ -24,7 +24,7 @@ export default function RFScannerScreen() {
       const instructorLine = lines[i + 3].trim();
 
       let subject = stubCodeSubjectLine.slice(1).join(' ');
-      // Check if subject has only one word
+
       if (subject.split(' ').length === 1) {
         subject = '[LAB]';
       }
@@ -86,7 +86,6 @@ export default function RFScannerScreen() {
   };
 
   const performOCR = (file) => {
-    // Reset classSchedule to clear previous data
     setClassSchedule([]);
   
     let myHeaders = new Headers();
@@ -114,9 +113,8 @@ export default function RFScannerScreen() {
           time: convertTimeFormat(course.time),
           timeValue: getTimeValue(convertTimeFormat(course.time).timeStart)
         }));
-        console.log(convertedSchedule); // Log convertedSchedule here
+        console.log(convertedSchedule);
         
-        // Delete existing documents from the classSchedules collection
         firestore.collection(`users/${currentUser.uid}/classSchedules`).get()
           .then(querySnapshot => {
             const batch = firestore.batch();
@@ -127,7 +125,6 @@ export default function RFScannerScreen() {
           })
           .then(() => {
             console.log("Existing schedules deleted successfully.");
-            // Add each schedule to Firebase
             convertedSchedule.forEach(schedule => {
               addScheduleToFirestore(schedule);
             });
@@ -138,7 +135,6 @@ export default function RFScannerScreen() {
       })
       .catch((error) => {
         console.log('Error performing OCR:', error.message);
-        // Alert the user to capture a clearer picture of the RF
         alert('Error: Unable to extract text from the image. Please capture a clearer picture.');
       });
   };
@@ -183,7 +179,6 @@ export default function RFScannerScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.topContainer}>
-        {/* <Image source={require('./rf_scanner_image.png')} style={styles.rfImage} /> */}
         <Text style={styles.title}>Scan your Registration Form</Text>
       </View>
       <ScrollView showsVerticalScrollIndicator={false}>

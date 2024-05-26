@@ -33,7 +33,6 @@ import Chat from "./src/screens/Chat";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
-const Drawer = createDrawerNavigator();
 
 export default function App() {
   const [user, setUser] = useState(null);
@@ -48,11 +47,10 @@ export default function App() {
     return subscriber;
   }, []);
 
-  // After the splash screen animation completes, hide the splash screen
   useEffect(() => {
     const timer = setTimeout(() => {
       setSplashVisible(false);
-    }, 3000); // Adjust this value as per your animation duration
+    }, 3000);
     return () => clearTimeout(timer);
   }, []);
 
@@ -60,13 +58,12 @@ export default function App() {
   function CustomDrawerContent(props) {
     return (
       <LinearGradient
-        colors={['#0859C6', '#0A3D62']} // Your preferred gradient colors
+        colors={['#0859C6', '#0A3D62']}
         start={[0, 0]}
         end={[1, 1]}
         style={{ flex: 1 }}
       >
         <DrawerContentScrollView {...props}>
-          {/* Custom top section with logo placeholder */}
           <View style={{ alignItems: 'center', marginTop: 20, marginBottom: 20, }}>
             <Image
               source={require('./src/assets/icon.png')}
@@ -74,27 +71,26 @@ export default function App() {
             />
             <Text style={{ fontSize: 18, fontWeight: 'bold', color: "yellow" }}>SyncUp</Text>
           </View>
-          {/* Your custom drawer content goes here */}
           <DrawerItem
             label="Profile"
             onPress={() => props.navigation.navigate('Profile')}
             icon={({ color, size }) => <Ionicons name="person" size={size} color="white" />}
             labelStyle={{ color: "white" }}
-            style={{ borderRadius: 10 }} // Add this line
+            style={{ borderRadius: 10 }}
           />
           <DrawerItem
             label="Dashboard"
             onPress={() => props.navigation.navigate('Dashboard')}
             icon={({ color, size }) => <Ionicons name="home" size={size} color="white" />}
             labelStyle={{ color: "white" }}
-            style={{ borderRadius: 10 }} // Add this line
+            style={{ borderRadius: 10 }}
           />
           <DrawerItem
             label="Scan RF"
             onPress={() => props.navigation.navigate('Scan RF')}
             icon={({ color, size }) => <Ionicons name="barcode" size={size} color="white" />}
             labelStyle={{ color: "white" }}
-            style={{ borderRadius: 10 }} // Add this line
+            style={{ borderRadius: 10 }}
           />
           <DrawerItem
             label="Class Schedules"
@@ -103,17 +99,16 @@ export default function App() {
               <Ionicons name="book" size={size} color="white" />
             )}
             labelStyle={{ color: "white" }}
-            style={{ borderRadius: 10 }} // Add this line
+            style={{ borderRadius: 10 }}
           />
           <DrawerItem
             label="Settings"
             onPress={() => props.navigation.navigate('Settings')}
             icon={({ color, size }) => <Ionicons name="settings" size={size} color="white" />}
             labelStyle={{ color: "white" }}
-            style={{ borderRadius: 10 }} // Add this line
+            style={{ borderRadius: 10 }}
           />
         </DrawerContentScrollView>
-        {/* Bottom section for Sign Out */}
         <View style={styles.bottomDrawerSection}>
           <DrawerItem
             label="Change Password"
@@ -127,7 +122,7 @@ export default function App() {
             }}
             icon={({ color, size }) => <Ionicons name="key" size={size} color="white" />}
             labelStyle={{ color: "white" }}
-            style={{ borderRadius: 10 }} // Add this line
+            style={{ borderRadius: 10 }}
           />
           <DrawerItem
             label="Sign Out"
@@ -136,7 +131,7 @@ export default function App() {
             }}
             icon={({ color, size }) => <Ionicons name="log-out" size={size} color="white" />}
             labelStyle={{ color: "white" }}
-            style={{ borderRadius: 10 }} // Add this line
+            style={{ borderRadius: 10 }}
           />
         </View>
       </LinearGradient>
@@ -158,15 +153,15 @@ export default function App() {
   
     return (
       <Drawer.Navigator
-        drawerContent={(props) => <CustomDrawerContent {...props} />} // Use CustomDrawerContent for drawer content
+        drawerContent={(props) => <CustomDrawerContent {...props} />} 
         screenOptions={{
-          headerShown: false, // Optionally show header
-          headerStyle: { backgroundColor: 'blue' }, // Header background color
-          headerTintColor: 'white', // Header text color
-          headerTitleStyle: { fontWeight: 'bold' }, // Header title style
-          drawerActiveBackgroundColor: '00adf5', // Active screen background color (changed to yellow)
-          drawerActiveTintColor: 'white', // Active screen text color
-          drawerInactiveTintColor: 'black', // Inactive screen text color
+          headerShown: false, 
+          headerStyle: { backgroundColor: 'blue' }, 
+          headerTintColor: 'white',
+          headerTitleStyle: { fontWeight: 'bold' }, 
+          drawerActiveBackgroundColor: '00adf5', 
+          drawerActiveTintColor: 'white', 
+          drawerInactiveTintColor: 'black', 
         }}
       >
         <Drawer.Screen name="Dashboard" component={HomeTabNavigator} />
@@ -182,7 +177,7 @@ export default function App() {
     return(
       <Stack.Navigator
         screenOptions={{
-          headerShown: false, // Hide header for all screens in this stack
+          headerShown: false,
         }}
       >
         <Stack.Screen name="ClassScheduleScreen" component={ClassScheduleScreen} />
@@ -195,7 +190,7 @@ export default function App() {
     return(
       <Stack.Navigator
         screenOptions={{
-          headerShown: false, // Hide header for all screens in this stack
+          headerShown: false,
         }}
       >
         <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
@@ -220,7 +215,7 @@ export default function App() {
             } else if (route.name === 'Tasks') {
               iconName = focused ? 'document-text' : 'document-text-outline';
             } else if (route.name === 'Chat') {
-              iconName = focused ? 'chatbox' : 'chatbox-outline'; // Changed the icon name for 'Chat' screen
+              iconName = focused ? 'chatbox' : 'chatbox-outline'; 
             }
   
             return <Ionicons name={iconName} size={size} color={color} />;
@@ -245,7 +240,7 @@ export default function App() {
     return(
       <Stack.Navigator
         screenOptions={{
-          headerShown: false, // Hide header for all screens in this stack
+          headerShown: false,
         }}
       >
         <Stack.Screen name="ProjectsScreen" component={ProjectsScreen} />
@@ -261,7 +256,7 @@ export default function App() {
     return(
       <Stack.Navigator
         screenOptions={{
-          headerShown: true, // Hide header for all screens in this stack
+          headerShown: true,
         }}
       >
         <Stack.Screen name="Chat" component={ChatListScreen} />
@@ -274,7 +269,7 @@ export default function App() {
     return(
       <Stack.Navigator
         screenOptions={{
-          headerShown: false, // Hide header for all screens in this stack
+          headerShown: false,
         }}
       >
         <Stack.Screen name="TaskScreen" component={TasksScreen} />
@@ -287,7 +282,7 @@ export default function App() {
     return(
       <Stack.Navigator
         screenOptions={{
-          headerShown: false, // Hide header for all screens in this stack
+          headerShown: false,
         }}
       >
         <Stack.Screen name="ScheduleScreen" component={ScheduleScreen} />
@@ -305,17 +300,15 @@ export default function App() {
       <NavigationContainer>
         <Stack.Navigator
           screenOptions={{
-            headerShown: false, // Apply globally to all screens in the stack
+            headerShown: false, 
           }}
         >
-          {/* AppRoot manages the splash screen and initialization */}
           {isSplashVisible ? (
             <Stack.Screen 
               name="SplashScreen" 
               component={AppRoot}
             />
           ) : (
-            // If there's no user, navigate to Login and Registration screens
             !user ? (
               <>
                 <Stack.Screen
@@ -328,7 +321,6 @@ export default function App() {
                 />
               </>
             ) : (
-              // If user is logged in, navigate to Dashboard
               <Stack.Screen
                 name="Dashboard"
                 component={DrawerNavigator}

@@ -69,7 +69,7 @@ const DashboardScreen = () => {
             </Text>
           </View>
         </View>
-        {/* Schedule Section */}
+
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionHeaderText}>Schedules</Text>
         </View>
@@ -93,27 +93,7 @@ const DashboardScreen = () => {
           </View>
         </ScrollView>
 
-        {/* This Week's and Next Week's Events */}
-        {/* <View style={styles.rowContainer}>
-          <TouchableOpacity style={styles.smallCardContainer} onPress={() => navigation.navigate('Schedule')}>
-            <ThisWeekEventsCard />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.smallCardContainer} onPress={() => navigation.navigate('Schedule')}>
-            <NextWeekEventsCard />
-          </TouchableOpacity>
-        </View>
-
-        {/* This Month's and Next Month's Events */}
-        {/* <View style={styles.rowContainer}>
-          <TouchableOpacity style={styles.smallCardContainer} onPress={() => navigation.navigate('Schedule')}>
-            <ThisMonthEventsCard />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.smallCardContainer} onPress={() => navigation.navigate('Schedule')}>
-            <NextMonthEventsCard />
-          </TouchableOpacity>
-        </View> */}
-
-        {/* Tasks Section */}
+        
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionHeaderText}>Tasks</Text>
         </View>
@@ -122,14 +102,14 @@ const DashboardScreen = () => {
           <TaskCard title="Completed Tasks" isCompleted={true} onPress={() => navigation.navigate('Tasks')} />
         </View>
 
-        {/* Projects Section */}
+
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionHeaderText}>Projects</Text>
         </View>
         <View style={styles.projectsContainer}>
           <ProjectCard title="Current Projects" onPress={() => navigation.navigate('Projects')} />
           <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={styles.projectListContainer}>
-            {/* Render ProjectList component here */}
+
             <ProjectList />
           </ScrollView>
         </View>
@@ -138,8 +118,6 @@ const DashboardScreen = () => {
   );
 };
 
-
-// Function to get the current date in the format YYYY-MM-DD
 const getCurrentDate = () => {
   const date = new Date();
   const year = date.getFullYear();
@@ -169,7 +147,7 @@ const styles = StyleSheet.create({
   },
   greetingContainer: {
     flexDirection: 'column',
-    flex: 1, // This allows the greeting container to take the remaining space
+    flex: 1,
   },
   greeting: {
     fontSize: 28,
@@ -177,11 +155,11 @@ const styles = StyleSheet.create({
     color: '#4B98FF',
   },
   subgreeting: {
-    fontSize: 16, // Smaller size to fit
+    fontSize: 16,
     fontWeight: 'normal',
     color: '#333333',
-    flexShrink: 1, // Prevents overflow
-    textAlign: 'left', // Aligns text to the start
+    flexShrink: 1,
+    textAlign: 'left',
   },
   sectionHeader: {
     backgroundColor: '#F0F0F0',
@@ -210,7 +188,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   smallCardContainer: {
-    width: '45%', // Adjust the width to fit two cards in a row
+    width: '45%',
     borderRadius: 10,
     padding: 10,
     marginRight: 10,
@@ -223,7 +201,7 @@ const styles = StyleSheet.create({
   projectsContainer: {
     flexDirection: 'row',
     marginBottom: 20,
-    maxHeight: 200, // Set a maximum height to enable scrolling
+    maxHeight: 200,
   },
 });
 

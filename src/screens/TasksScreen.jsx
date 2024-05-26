@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { StyleSheet, Text, TouchableOpacity, View, ScrollView, RefreshControl, ActivityIndicator } from "react-native";
 import Task from "../components/Tasks/Task";
 import AddTaskModal from "../components/Tasks/AddTask";
-import EditTaskScreen from "./EditTasksScreen";
 import { firebase } from "../../firebase-config";
 import { Swipeable } from 'react-native-gesture-handler';
 import { taskNotification, removeAlarm } from '../components/Alarms/Alarm';
@@ -18,7 +17,6 @@ export default function TasksScreen({ navigation }) {
   const [taskDate, setTaskDate] = useState("");
   const [taskDescription, setTaskDescription] = useState("");
   const [refreshing, setRefreshing] = React.useState(false);
-  const [taskAdded, setTaskAdded] = React.useState(false);
   const categories = ["All", "Work", "School", "Home", "Personal"];
   const currentUser = firebase.auth().currentUser;
   const [loading, setLoading] = useState(true);
@@ -33,8 +31,8 @@ export default function TasksScreen({ navigation }) {
   useEffect(() => {
     const unsubscribe = firestore
       .collection(`users/${currentUser.uid}/tasks`)
-      .orderBy("isCompleted", "asc") // Order by isCompleted in ascending order
-      .orderBy("createdAt", "desc") // Order by createdAt in descending order
+      .orderBy("isCompleted", "asc")
+      .orderBy("createdAt", "desc")
       .onSnapshot((snapshot) => {
         const tasks = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
         setTaskItems(tasks);
@@ -64,8 +62,8 @@ export default function TasksScreen({ navigation }) {
       if (taskTime) {
         const [time, ampm] = taskTime.split(' ');
         const [hour, minute] = time.split(':');
-        const period = ampm.toUpperCase(); // Extract AM/PM from the time string
-        notificationId = await taskNotification(hour, minute, period, editTaskName); // Call scheduleNotification with the selected time
+        const period = ampm.toUpperCase();
+        notificationId = await taskNotification(hour, minute, period, editTaskName);
       }
   
       const newTask = {
@@ -77,7 +75,7 @@ export default function TasksScreen({ navigation }) {
         isCompleted: false,
         createdAt: new Date(),
         timeValue: getTimeValue(taskTime),
-        notificationId, // Store the notificationId in the new task object (or leave it undefined if no time is set)
+        notificationId,
       };
   
       await firestore.collection(`users/${currentUser.uid}/tasks`).add(newTask);
@@ -94,7 +92,6 @@ export default function TasksScreen({ navigation }) {
   };
 
   const openAddModal = () => {
-    // Check if the selected category is an empty string
     const updatedCategory = selectedCategory.trim() === "" ? "All" : selectedCategory.trim();
     setSelectedCategory(updatedCategory);
     setIsAddModalVisible(true);
@@ -123,7 +120,7 @@ export default function TasksScreen({ navigation }) {
       const taskData = snapshot.data();
   
       if (taskData && taskData.notificationId) {
-        await removeAlarm(taskData.notificationId, [], () => {}, () => {}); // Cancel the scheduled notification
+        await removeAlarm(taskData.notificationId, [], () => {}, () => {});
       }
   
       await firestore.collection(`users/${currentUser.uid}/tasks`).doc(taskId).delete();
@@ -137,13 +134,12 @@ export default function TasksScreen({ navigation }) {
 
   const filterTasks = (items) => {
     if (selectedCategory === "All") {
-      return items; // Show all tasks
+      return items;
     } else {
       return items.filter((item) => item.category === selectedCategory);
     }
   };
 
-  // Function to schedule notification
   const renderRightActions = (taskId) => (
     <View style={styles.rightActions}>
       <TouchableOpacity onPress={() => navigation.navigate('EditTaskScreen', { taskId: taskId })} style={[styles.actionButton, styles.editButton]}>
@@ -174,7 +170,7 @@ export default function TasksScreen({ navigation }) {
               <TouchableOpacity
                 key={category}
                 style={[styles.categoryButton, { backgroundColor: selectedCategory === category ? "#03a1fc" : "#D6D6D6" }]}
-                onPress={() => setSelectedCategory(category === null ? "All" : category)} // Set "All" for "None"
+                onPress={() => setSelectedCategory(category === null ? "All" : category)}
               >
                 <Text style={[styles.categoryText, { color: selectedCategory === category ? "#FFFFFF" : "#000000" }]}>
                   {category}
@@ -201,7 +197,7 @@ export default function TasksScreen({ navigation }) {
                 category={item.category}
                 taskId={item.id}
                 isCompleted={item.isCompleted}
-                toggleCompleted={toggleCompleted} // Pass toggleTaskStatus function here
+                toggleCompleted={toggleCompleted} 
               />
             </TouchableOpacity>
             </Swipeable>  
@@ -221,8 +217,8 @@ export default function TasksScreen({ navigation }) {
         onSave={addNewTask}
         taskName={editTaskName}
         setTaskName={setEditTaskName}
-        taskDate={taskDate} // Updated to `taskDate` from `taskDay`
-        setTaskDate={setTaskDate} // Updated to `setTaskDate` from `setTaskDay`
+        taskDate={taskDate}
+        setTaskDate={setTaskDate}
         taskTime={taskTime}
         setTaskTime={setTaskTime}
         taskDescription={taskDescription}

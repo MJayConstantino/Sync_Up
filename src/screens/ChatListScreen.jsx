@@ -137,7 +137,7 @@ const ChatListScreen = () => {
       const bMessage = recentMessages[bChatRoomId];
 
       if (aMessage?.createdAt && bMessage?.createdAt) {
-        return bMessage.createdAt - aMessage.createdAt; // Sort by most recent message time
+        return bMessage.createdAt - aMessage.createdAt;
       }
 
       return 0;

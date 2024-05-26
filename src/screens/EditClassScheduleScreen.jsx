@@ -22,7 +22,7 @@ const EditClassScheduleScreen = ({ navigation, route }) => {
   const [day, setDay] = useState([]);
   const [isTimePickerVisible, setIsTimePickerVisible] = useState(false);
   const [selectedTime, setSelectedTime] = useState('');
-  const [isEditingEndTime, setIsEditingEndTime] = useState(false); // Declare isEditingEndTime state
+  const [isEditingEndTime, setIsEditingEndTime] = useState(false);
   const [loading, setLoading] = useState(true);
   const currentUser = firebase.auth().currentUser;
 
@@ -31,7 +31,7 @@ const EditClassScheduleScreen = ({ navigation, route }) => {
       try {
         const snapshot = await firestore.collection(`users/${currentUser.uid}/classSchedules/`).doc(classScheduleId).get();
         const classScheduleData = snapshot.data();
-        console.log("Class Schedule data:", classScheduleData); // Log the schedule data
+        console.log("Class Schedule data:", classScheduleData);
         if (classScheduleData) {
           setStubCode(classScheduleData.stubCode);
           setSubject(classScheduleData.subject);
@@ -45,7 +45,7 @@ const EditClassScheduleScreen = ({ navigation, route }) => {
 
         } else {
           alert("Schedule not found!");
-          navigation.goBack(); // Navigate back if schedule not found
+          navigation.goBack();
         }
       } catch (error) {
         console.error("Error fetching schedule details:", error);
@@ -62,12 +62,12 @@ const EditClassScheduleScreen = ({ navigation, route }) => {
 
   const openTimePicker = () => {
     setIsTimePickerVisible(true);
-    setIsEditingEndTime(false); // Ensure isEditingEndTime is false when opening time picker for start time
+    setIsEditingEndTime(false);
   };
 
   const openEndTimePicker = () => {
     setIsTimePickerVisible(true);
-    setIsEditingEndTime(true); // Set isEditingEndTime to true when opening time picker for end time
+    setIsEditingEndTime(true);
   };
 
   const closeTimePicker = () => {
@@ -90,16 +90,13 @@ const EditClassScheduleScreen = ({ navigation, route }) => {
       const formattedTime = format(selectedTime, "hh:mm aa");
   
       if (isEditingEndTime) {
-        // If editing end time, update timeEnd
         setTimeEnd(formattedTime);
       } else {
-        // If editing start time, update timeStart and timeValue
         setTimeStart(formattedTime);
         const timeValue = getTimeValue(formattedTime);
         setTimeValue(timeValue);
       }
   
-      // Close the time picker after selecting a time
       closeTimePicker();
     }
   };
@@ -121,7 +118,7 @@ const EditClassScheduleScreen = ({ navigation, route }) => {
       day,
       instructor,
       room,
-      timeValue, // Add timeValue to the schedule object
+      timeValue,
     };
 
     try {
@@ -143,7 +140,6 @@ const EditClassScheduleScreen = ({ navigation, route }) => {
 
   const updateClassScheduleInFirebase = async (classScheduleId, editedClassSchedule) => {
     try {
-      // Update the schedule in Firebase using the taskId
       await firestore.collection(`users/${currentUser.uid}/classSchedules`).doc(classScheduleId).update(editedClassSchedule);
     } catch (error) {
       console.error("Error updating schedule in Firebase:", error);
@@ -254,9 +250,7 @@ const EditClassScheduleScreen = ({ navigation, route }) => {
             </Menu>
         </View>
 
-        {/* Section title for Class Duration */}
         <Text style={styles.sectionTitle}>Class Duration</Text>
-        {/* Start Time and End Time in the same row */}
 
         <View style={styles.timeContainer}>
           <TouchableOpacity style={styles.timeButton} onPress={openTimePicker}>
@@ -270,8 +264,6 @@ const EditClassScheduleScreen = ({ navigation, route }) => {
             </Text>
           </View>
           </TouchableOpacity>
-
-          {/* <Text style={styles.dashText}>-</Text> */}
 
           <TouchableOpacity style={styles.timeButton} onPress={openEndTimePicker}>
           <View style={styles.timeIconandDue}> 
@@ -296,7 +288,6 @@ const EditClassScheduleScreen = ({ navigation, route }) => {
           </TouchableOpacity>
         </View>
 
-        {/* DateTimePicker component */}
         {isTimePickerVisible && (
           <DateTimePicker
             value={selectedTime ? new Date(selectedTime) : new Date()}
@@ -336,10 +327,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 20,
   },
-  // header: {
-  //   fontSize: 24,
-  //   fontWeight: "bold",
-  // },
   formContainer: {
     backgroundColor: "#fff",
     borderRadius: 10,
@@ -352,9 +339,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
-    // justifyContent: 'center',
-    // alignContent: 'center',
-    // alignItems: 'center',
+
   },
   input: {
     borderWidth: 1,
@@ -382,7 +367,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
-  // Don't have idea of this 
   sectionContainer: {
     marginBottom: 20,
   },
@@ -390,8 +374,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-start',
-    // width: 100,
-    // marginLeft: 115,
+
   },
   sectionLabel: {
     fontSize: 20,
@@ -409,24 +392,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 10,
   },
-  // timeButton: {
-  //   flexDirection: "row",
-  //   alignItems: "center",
-  //   borderWidth: 1,
-  //   borderColor: "#ccc",
-  //   borderRadius: 5,
-  //   padding: 10,
-  //   marginRight: 5,
-  // },
-  // timeButtonText: {
-  //   fontSize: 16,
-  //   marginLeft: 5,
-  // },
-  // dashText: {
-  //   fontSize: 16,
-  //   fontWeight: "bold",
-  //   marginHorizontal: 5,
-  // },
+
   datePicker: {
     width: "100%",
   },
@@ -478,7 +444,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     marginLeft: 5,
   },
-  //
+
   timeButton: {
     flexDirection: "row",
     justifyContent: 'space-between',
@@ -491,8 +457,6 @@ const styles = StyleSheet.create({
   },
   timeButtonShape: {
     alignItems: 'center',
-    // backgroundColor: '#ccc',
-    // borderRadius: 20,
     padding: 1,
     width: "auto",
   },

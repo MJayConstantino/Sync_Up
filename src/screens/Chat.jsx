@@ -28,7 +28,7 @@ export default function Chat() {
   // Retrieve other user's profile picture
   useEffect(() => {
     const userDocRef = collection(database, 'users');
-    const userQuery = query(userDocRef, ('email', '==', otherUserEmail)); // Correct use of 'where'
+    const userQuery = query(userDocRef, where('email', '==', otherUserEmail)); // Correct use of 'where'
 
     const unsubscribe = onSnapshot(userQuery, (snapshot) => {
       if (snapshot.docs.length > 0) {

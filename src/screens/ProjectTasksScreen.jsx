@@ -36,7 +36,7 @@ const ProjectTasksScreen = ({ route }) => {
         setLoading(false);
       });
 
-    return () => unsubscribe(); // Unsubscribe when the component unmounts
+    return () => unsubscribe();
   }, [projectId]);
 
   const handleBack = () => {

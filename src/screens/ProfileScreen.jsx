@@ -25,7 +25,6 @@ const ProfileScreen = () => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Function to fetch user data
   const fetchUserData = async () => {
     try {
       const userDoc = await firestore.collection("users").doc(currentUser.uid).get();
@@ -37,7 +36,6 @@ const ProfileScreen = () => {
     }
     setLoading(false);
   };
-  // Re-fetch user data when the screen gains focus
   useFocusEffect(
     useCallback(() => {
       setLoading(true);

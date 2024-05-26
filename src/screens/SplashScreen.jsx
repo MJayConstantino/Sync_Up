@@ -9,12 +9,12 @@ const SplashScreen = ({ navigation }) => {
     const animation = Animated.sequence([
       Animated.parallel([
         Animated.timing(mainImagePosition, {
-          toValue: -60, // left
+          toValue: -60,
           duration: 1000,
           useNativeDriver: true,
         }),
         Animated.timing(textImagePosition, {
-          toValue: 60, // right
+          toValue: 60,
           duration: 1000,
           useNativeDriver: true,
         }),
@@ -22,10 +22,8 @@ const SplashScreen = ({ navigation }) => {
       Animated.delay(1000),
     ]);
 
-    // Start the animation
     animation.start()
 
-    // Cleanup on unmount
     return () => {
       animation.stop();
     };
