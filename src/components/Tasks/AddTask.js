@@ -16,8 +16,8 @@ import { Menu, MenuOption, MenuOptions, MenuTrigger, MenuProvider } from 'react-
 
 const AddTaskModal = ({
   isVisible,
-  onDismiss, // Function to dismiss the modal
-  onSave, // Function to save the task to Firebase
+  onDismiss,
+  onSave,
   taskName,
   setTaskName,
   taskDescription,
@@ -31,20 +31,20 @@ const AddTaskModal = ({
 }) => {
   const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
   const [isTimePickerVisible, setIsTimePickerVisible] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(''); // Initialize selectedDate
-  const [selectedTime, setSelectedTime] = useState(''); // New state for selected time
+  const [selectedDate, setSelectedDate] = useState('');
+  const [selectedTime, setSelectedTime] = useState('');
   const taskNameInputRef = useRef(null);
 
   const openDatePicker = () => {
     setIsDatePickerVisible(true);
     setIsTimePickerVisible(false);
-    Keyboard.dismiss(); // Close soft keyboard if open
+    Keyboard.dismiss();
   };
 
   const openTimePicker = () => {
     setIsTimePickerVisible(true);
     setIsDatePickerVisible(false);
-    Keyboard.dismiss(); // Close soft keyboard if open
+    Keyboard.dismiss();
   };
 
   const closeDateTimePicker = () => {
@@ -57,7 +57,7 @@ const AddTaskModal = ({
       setSelectedDate(selectedDate);
       const formattedDate = format(selectedDate, "yyyy-MM-dd");
       if (isDatePickerVisible) {
-        setTaskDate(formattedDate); // If date picker was visible, update taskDate
+        setTaskDate(formattedDate);
       }
 
       closeDateTimePicker();
@@ -70,20 +70,18 @@ const AddTaskModal = ({
       const formattedTime = format(selectedTime, "hh:mm aa");
 
       if (isTimePickerVisible) {
-        setTaskTime(formattedTime); // If time picker was visible, update taskTime
+        setTaskTime(formattedTime);
       }
       closeDateTimePicker();
     }
   };
 
   const handleSaveTask = () => {
-    // Basic validation (optional)
     if (!taskName) {
       alert("Please enter a task name.");
       return;
     }
   
-    // Set task information with selected category
     const newTask = {
       taskName,
       category: selectedCategory !== "All" ? selectedCategory : null,
@@ -93,32 +91,27 @@ const AddTaskModal = ({
       isCompleted: false
     };
   
-    // Invoke onSave function with the newTask object
     onSave(newTask);
   
-    // Close the modal
     onDismiss();
   
-    // Clear input fields
     setTaskName("");
     setTaskTime("");
     setSelectedTime("");
-    setTaskDate(""); // Clear taskDate
-    setSelectedDate(""); // Clear selectedDate
+    setTaskDate("");
+    setSelectedDate(""); 
     setTaskDescription("");
     setSelectedCategory("All");
   };
 
   const handleCancel = () => {
-    // Clear input if taskName is not empty
     setTaskName("");
     setTaskTime("");
     setSelectedTime("");
-    setTaskDate(""); // Clear taskDate
-    setSelectedDate(""); // Clear selectedDate
+    setTaskDate(""); 
+    setSelectedDate("");
     setTaskDescription("");
     setSelectedCategory("All");
-    // Call the onDismiss function to close the modal
     onDismiss();
   };
 
@@ -162,12 +155,8 @@ const AddTaskModal = ({
                         </MenuOption>
                       </MenuOptions>
                     </Menu>
-                  {/* Category Button */}
                   <View style={styles.buttonRow}>
-                    {/* Category Button */}
 
-
-                    {/* Date Button */}
                     <TouchableOpacity style={styles.dateButton} onPress={openDatePicker}>
                       <Icon name="calendar" size={20} color="#ccc" />
                       <Text style={styles.timeButtonText}>
@@ -175,7 +164,6 @@ const AddTaskModal = ({
                       </Text>
                     </TouchableOpacity>
 
-                    {/* Time Button */}
                     <TouchableOpacity style={styles.timeButton} onPress={openTimePicker}>
                       <Icon name="clock" size={20} color="#ccc" />
                       <Text style={styles.timeButtonText}>
@@ -229,8 +217,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent background color
-    shadowColor: "#000", // Shadow color
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    shadowColor: "#000",
     maxWidth: '100%',
     elevation: 10,
     borderTopLeftRadius: 40,
@@ -249,12 +237,12 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     padding: 20,
     borderRadius: 10,
-    width: "100%", // Adjust the width as needed
+    width: "100%",
   },
   buttonRow: {
-    flexDirection: "row", // Align buttons horizontally
-    alignItems: "center", // Align items vertically
-    marginBottom: 10, // Reduce vertical space between category container and other inputs
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
   },
   input: {
     borderWidth: 1,
@@ -264,14 +252,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   categoryButton: {
-    // flex: 1, // Expand to fill available space horizontally
-    // marginRight: 5, // Add some space between category button and date/time buttons
-    // borderWidth: 1,
-    // borderColor: "#ccc",
-    // borderRadius: 5,
-    // padding: 10,
-    // marginBottom: 10,
-
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -280,13 +260,12 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 10,
     marginBottom: 10,
-    // width: "100%",
   },
   categoryButtonText: {
     fontSize: 14,
   },
   dateButton: {
-    marginRight: 5, // Add some space between date/time buttons
+    marginRight: 5,
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 5,
@@ -316,19 +295,13 @@ const styles = StyleSheet.create({
     marginTop: 10,
     alignItems: 'center',
   },
-
-  // buttonContainer: {
-  //   flexDirection: "row",
-  //   justifyContent: "space-between",
-  //   marginTop: 10,
-  // },
   cancelButton: {
     borderRadius: 20,
     padding: 10,
     marginRight: 10,
   },
   saveButton: {
-    backgroundColor: "#03a1fc", // Blue background for save button
+    backgroundColor: "#03a1fc",
     borderRadius: 20,
     padding: 10,
   },
@@ -349,6 +322,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent background color
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
 });

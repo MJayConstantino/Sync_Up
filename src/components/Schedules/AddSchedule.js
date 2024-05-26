@@ -23,21 +23,21 @@ const AddScheduleModal = ({
     setIsDatePickerVisible(true);
     setIsStartTimePickerVisible(false);
     setIsEndTimePickerVisible(false);
-    Keyboard.dismiss(); // Close soft keyboard if open
+    Keyboard.dismiss();
   };
 
   const openStartTimePicker = () => {
     setIsStartTimePickerVisible(true);
     setIsDatePickerVisible(false);
     setIsEndTimePickerVisible(false);
-    Keyboard.dismiss(); // Close soft keyboard if open
+    Keyboard.dismiss();
   };
 
   const openEndTimePicker = () => {
     setIsEndTimePickerVisible(true);
     setIsDatePickerVisible(false);
     setIsStartTimePickerVisible(false);
-    Keyboard.dismiss(); // Close soft keyboard if open
+    Keyboard.dismiss();
   };
 
   const closeDateTimePicker = () => {
@@ -80,13 +80,12 @@ const AddScheduleModal = ({
   const handleSaveSchedule = async () => {
     let notificationId;
   
-    // Check if a start time is selected
     if (selectedStartTime) {
       const selectedAlarmTime = format(selectedStartTime, "hh:mm aa")
       const [time, ampm] = selectedAlarmTime.split(' ');
       const [hour, minute] = time.split(':');
-      const period = ampm.toUpperCase(); // Extract AM/PM from the time string
-      notificationId = await scheduleNotification(hour, minute, period, scheduleName); // Call scheduleNotification with the selected time
+      const period = ampm.toUpperCase();
+      notificationId = await scheduleNotification(hour, minute, period, scheduleName); 
     }
   
     const newSchedule = {
@@ -104,7 +103,6 @@ const AddScheduleModal = ({
   
     onDismiss();
   
-    // Clear input fields and selected values
     setScheduleName("");
     setSelectedDate("");
     setSelectedStartTime("");
@@ -112,13 +110,11 @@ const AddScheduleModal = ({
   };
 
   const handleCancel = () => {
-    // Clear input fields
     setScheduleName("");
     setSelectedDate("");
     setSelectedStartTime("");
     setSelectedEndTime("");
 
-    // Call the onDismiss function to close the modal
     onDismiss();
   };
 
@@ -189,7 +185,6 @@ const AddScheduleModal = ({
                     <Icon name="close-circle-outline" size={28} color="#FF0000" />
                   </TouchableOpacity>
                   <TouchableOpacity style={styles.saveButton} onPress={handleSaveSchedule}>
-                    {/* <Icon name="content-save" size={24} color="#FFF" /> */}
                     <Text style={styles.saveButtonText}>SAVE</Text>
                   </TouchableOpacity>
                 </View>
@@ -206,13 +201,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent background color
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalView: {
     backgroundColor: "white",
     padding: 20,
     borderRadius: 10,
-    width: "80%", // Adjust the width as needed
+    width: "80%",
   },
   input: {
     borderWidth: 1,

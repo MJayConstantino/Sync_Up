@@ -29,7 +29,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginTop: 10,
     marginBottom: 0.5,
-    // Increase height
     minHeight: 120,
   },
   categoryContainer: {

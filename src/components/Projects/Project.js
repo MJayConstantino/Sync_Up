@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
   deadlineContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#00adf5", // Blue oval
+    backgroundColor: "#00adf5",
     borderRadius: 20,
     paddingHorizontal: 10,
     paddingVertical: 5,

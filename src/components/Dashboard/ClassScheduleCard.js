@@ -11,13 +11,10 @@ const ClassScheduleCard = ({ title, date, onPress }) => {
         const currentUser = firebase.auth().currentUser;
         const classSchedulesCollection = firebase.firestore().collection(`users/${currentUser.uid}/classSchedules`);
         
-        // Get the snapshot of class schedules where the day array includes today's day
         const snapshot = await classSchedulesCollection.where('day', 'array-contains', getCurrentDay()).get();
         
-        // Get the count of documents in the snapshot
         const count = snapshot.size;
         
-        // Update the class count state
         setClassCount(count);
       } catch (error) {
         console.error('Error fetching class count:', error);
@@ -27,10 +24,9 @@ const ClassScheduleCard = ({ title, date, onPress }) => {
     fetchClassCount();
   }, []);
 
-  // Function to get the current day (e.g., "Monday", "Tuesday", etc.)
   const getCurrentDay = () => {
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    const todayIndex = new Date().getDay(); // 0 for Sunday, 1 for Monday, etc.
+    const todayIndex = new Date().getDay(); 
     return days[todayIndex];
   };
 

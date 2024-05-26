@@ -19,8 +19,8 @@ const ProjectList = () => {
           return {
             id: doc.id,
             ...projectData,
-            tasks: [], // Initialize tasks as an empty array
-            progress: 0, // Initialize progress as 0
+            tasks: [],
+            progress: 0,
           };
         });
         setProjects(fetchedProjects);
@@ -45,7 +45,6 @@ const ProjectList = () => {
 
     fetchTasksAndUpdateProgress();
 
-    // Subscribe to changes in the tasks collection of each project
     const tasksUnsubscribes = projects.map((project) =>
       firebase
         .firestore()
@@ -101,11 +100,11 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   itemCountContainer: {
-    backgroundColor: 'blue', // Change to your desired color
+    backgroundColor: 'blue', 
     borderRadius: 20,
     paddingHorizontal: 12,
     paddingVertical: 8,
-    marginTop: 5, // Adjust spacing
+    marginTop: 5,
   },
   itemCount: {
     fontSize: 20,
@@ -113,32 +112,32 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   projectListContainer: {
-    height: 200, // Reduced height
+    height: 200,
   },
   projectCard: {
     backgroundColor: 'red',
     borderRadius: 10,
-    padding: 8, // Reduced padding
+    padding: 8,
     marginRight: 10,
-    width: 200, // Reduced width
+    width: 200,
     justifyContent: 'center',
     alignItems: 'center',
   },
   projectName: {
-    fontSize: 16, // Reduced font size
+    fontSize: 16,
     fontWeight: 'bold',
-    marginBottom: 5, // Reduced margin
+    marginBottom: 5,
     color: 'white',
   },
   projectProgress: {
-    fontSize: 14, // Reduced font size
-    marginBottom: 5, // Reduced margin
+    fontSize: 14,
+    marginBottom: 5,
     color: 'white',
   },
   projectTasks: {
-    fontSize: 14, // Reduced font size
+    fontSize: 14,
     fontWeight: 'bold',
-    marginBottom: 5, // Reduced margin
+    marginBottom: 5,
     color: 'white',
   },
 });

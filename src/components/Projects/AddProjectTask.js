@@ -10,28 +10,26 @@ const firestore = firebase.firestore();
 
 const AddProjectTaskModal = ({
   isVisible,
-  onDismiss, // Function to dismiss the modal
-  onSave, // Function to save the task to Firebase
-  projectId, // projectId prop
+  onDismiss,
+  onSave,
+  projectId,
 }) => {
   const [taskName, setTaskName] = useState("");
   const [taskTime, setTaskTime] = useState("");
   const [taskDate, setTaskDate] = useState("");
-  const [assignedTo, setAssignedTo] = useState([]); // Updated to be an array
+  const [assignedTo, setAssignedTo] = useState([]);
   const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
   const [isTimePickerVisible, setIsTimePickerVisible] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(""); // Initialize selectedDate
-  const [selectedTime, setSelectedTime] = useState(""); // New state for selected time
+  const [selectedDate, setSelectedDate] = useState(""); 
+  const [selectedTime, setSelectedTime] = useState(""); 
   const [collaborators, setCollaborators] = useState([]);
   const taskNameInputRef = useRef(null);
 
-  // Fetch collaborators from Firebase Firestore
   const fetchCollaborators = async () => {
     try {
       const projectDoc = await firestore.collection('projects').doc(projectId).get();
       const collaboratorsIds = projectDoc.data().collaborators || [];
 
-      // Fetch user names for each collaborator id
       const collaboratorsData = await Promise.all(
         collaboratorsIds.map(async (collaboratorId) => {
           const userDoc = await firestore.collection('users').doc(collaboratorId).get();
@@ -39,7 +37,6 @@ const AddProjectTaskModal = ({
         })
       );
 
-      // Filter out null values (for non-existing users, if any)
       const validCollaborators = collaboratorsData.filter(collaborator => collaborator !== null);
 
       setCollaborators(validCollaborators);
@@ -48,7 +45,6 @@ const AddProjectTaskModal = ({
     }
   };
 
-  // Fetch collaborators on component mount
   useEffect(() => {
     fetchCollaborators();
   }, []);
@@ -56,13 +52,13 @@ const AddProjectTaskModal = ({
   const openDatePicker = () => {
     setIsDatePickerVisible(true);
     setIsTimePickerVisible(false);
-    Keyboard.dismiss(); // Close soft keyboard if open
+    Keyboard.dismiss();
   };
 
   const openTimePicker = () => {
     setIsTimePickerVisible(true);
     setIsDatePickerVisible(false);
-    Keyboard.dismiss(); // Close soft keyboard if open
+    Keyboard.dismiss();
   };
 
   const closeDateTimePicker = () => {
@@ -74,7 +70,7 @@ const AddProjectTaskModal = ({
     if (selectedDate) {
       setSelectedDate(selectedDate);
       const formattedDate = format(selectedDate, "yyyy-MM-dd");
-      setTaskDate(formattedDate); // Update taskDate
+      setTaskDate(formattedDate);
 
       closeDateTimePicker();
     }
@@ -84,20 +80,18 @@ const AddProjectTaskModal = ({
     if (selectedTime) {
       setSelectedTime(selectedTime);
       const formattedTime = format(selectedTime, "HH:mm aa");
-      setTaskTime(formattedTime); // Update taskTime
+      setTaskTime(formattedTime);
 
       closeDateTimePicker();
     }
   };
 
   const handleSaveTask = () => {
-    // Basic validation (optional)
     if (!taskName) {
       alert("Please enter a task name.");
       return;
     }
 
-    // Set task information
     const newTask = {
       taskName,
       time: taskTime,
@@ -105,30 +99,26 @@ const AddProjectTaskModal = ({
       assignedTo, 
       description: "",
       isCompleted: false,
-      createdAt: new Date()// Include assignedTo in newTask
+      createdAt: new Date()
     };
 
-    // Invoke onSave function with the newTask object
     onSave(newTask);
 
-    // Close the modal
     onDismiss();
 
-    // Clear input fields
     setTaskName("");
     setTaskTime("");
     setTaskDate("");
-    setAssignedTo([]); // Clear assignedTo after saving
+    setAssignedTo([]);
   };
 
   const handleCancel = () => {
-    // Clear input fields
+
     setTaskName("");
     setTaskTime("");
     setTaskDate("");
-    setAssignedTo([]); // Clear assignedTo when canceling
+    setAssignedTo([]); 
 
-    // Call the onDismiss function to close the modal
     onDismiss();
   };
 
@@ -140,7 +130,6 @@ const AddProjectTaskModal = ({
     setAssignedTo((prev) => prev.filter((email) => email !== collaborator));
   };
   
-  // JSX for displaying selected collaborators
   const selectedCollaboratorsUI = assignedTo.map((collaborator, index) => (
     <View key={index} style={styles.collaboratorBox}>
       <Text style={styles.collaboratorEmail}>{collaborator}</Text>
@@ -166,7 +155,6 @@ const AddProjectTaskModal = ({
                     onChangeText={setTaskName}
                   />
 
-                  {/* Collaborator Dropdown */}
                   <View style={styles.assignToContainer}>
                   <Text style={styles.assignToLabel}>Assign To:</Text>
                   <Menu style={styles.menu}>
@@ -180,11 +168,9 @@ const AddProjectTaskModal = ({
                     </MenuOptions>
                   </Menu>
 
-                  {/* Display selected collaborators */}
                   <View style={styles.selectedCollaboratorsContainer}>{selectedCollaboratorsUI}</View>
                 </View>
                 <View style={styles.buttonRow}> 
-                  {/* Date Button */}
                   <TouchableOpacity style={styles.dateButton} onPress={openDatePicker}>
                     <Icon name="calendar" size={20} color="#ccc" />
                     <Text style={styles.dateButtonText}>
@@ -192,7 +178,6 @@ const AddProjectTaskModal = ({
                     </Text>
                   </TouchableOpacity>
 
-                  {/* Time Button */}
                   <TouchableOpacity style={styles.timeButton} onPress={openTimePicker}>
                     <Icon name="clock" size={20} color="#ccc" />
                     <Text style={styles.timeButtonText}>
@@ -201,8 +186,6 @@ const AddProjectTaskModal = ({
                   </TouchableOpacity>
 
                 </View>
-
-
 
                   {isDatePickerVisible && (
                     <DateTimePicker
@@ -249,25 +232,25 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent background color
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   container: {
     flex: 1,
-    justifyContent: "center", // Center content vertically
-    paddingHorizontal: 20, // Add horizontal padding
-    width: "100%", // Set width to 100%
+    justifyContent: "center",
+    paddingHorizontal: 20,
+    width: "100%",
   },
   centeredView: {
     justifyContent: "center",
     alignItems: "center",
-    width: "100%", // Set width to 100%
+    width: "100%",
   },
 
   modalView: {
     backgroundColor: "white",
     padding: 20,
     borderRadius: 10,
-    width: "100%", // Set width to 100%
+    width: "100%",
   },
   input: {
     borderWidth: 1,
@@ -299,28 +282,23 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginBottom: 10,
   },
-  // selectedCollaboratorsContainer: {
-  //   fontWeight: 'bold',
-  //   backgroundColor: 'ccc',
-  // },
+
   collaboratorBox: {
     padding: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 10,
-    // borderWidth: 1,
-    // borderColor: "#ccc",
-    // borderRadius: 5,
+
   },
 
   buttonRow: {
-    flexDirection: "row", // Align buttons horizontally
-    alignItems: "center", // Align items vertically
-    marginBottom: 10, // Reduce vertical space between category container and other inputs
+    flexDirection: "row",
+    alignItems: "center", 
+    marginBottom: 10, 
   },
 
   dateButton: {
-    marginRight: 15, // Add some space between date/time buttons
+    marginRight: 15,
     marginLeft: 1,
     flexDirection: "row",
     justifyContent: "space-between",
@@ -368,30 +346,4 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 10,
   },
-
-
-  // cancelButton: {
-  //   borderRadius: 20,
-  //   padding: 10,
-  //   marginRight: 10,
-  // },
-  // saveButton: {
-  //   backgroundColor: "#03a1fc", // Blue background for save button
-  //   borderRadius: 20,
-  //   padding: 10,
-  // },
-  // buttonText: {
-  //     color: "#FFF",
-  //     fontSize: 14,
-  //     fontWeight: "bold",
-  //   },
-
-  // saveButton: {
-  //   backgroundColor: "#03a1fc",
-  //   borderRadius: 20,
-  //   paddingVertical: 10,
-  //   paddingHorizontal: 20,
-  // },
-
-
 });

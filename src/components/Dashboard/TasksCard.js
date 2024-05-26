@@ -20,7 +20,6 @@ const TaskCard = ({ title, isCompleted, onPress }) => {
     return () => unsubscribe();
   }, [isCompleted]);
 
-  // Define the card color based on the status
   const cardColor = isCompleted ? '#CCFFCC' : '#FFCCCC';
 
   return (

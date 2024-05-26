@@ -63,10 +63,10 @@ const styles = StyleSheet.create({
   timeContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 15, // Added margin from the container with color
+    marginTop: 15,
   },
   timeText: {
-    fontSize: 18, // Increased font size for time
+    fontSize: 18,
     marginLeft: 5,
   },
   bottomRow: {

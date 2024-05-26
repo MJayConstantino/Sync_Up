@@ -4,35 +4,25 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import CheckBox from "./CheckBox";
 
 const ProjectTask = ({ assignedTo, taskName, description, time, date, deleteTask, toggleCompleted, taskId, isCompleted }) => {
-  // Function to determine the color of the deadline date text based on completion status
   const getDeadlineColor = () => {
-    return isCompleted ? "#00FF00" : "#FF0000"; // Green if completed, red if not completed
+    return isCompleted ? "#00FF00" : "#FF0000"; 
   };
 
   return (
     <View style={styles.item}>
-      {/* Deadline container with background color */}
       <View style={[styles.deadlineContainer, { backgroundColor: getDeadlineColor() }]}>
-        {/* Deadline icon */}
         <MaterialCommunityIcons name="calendar" size={20} color="#FFFFFF" />
-        {/* Deadline text */}
         <Text style={styles.deadlineText}> {date}</Text>
       </View>
 
-      {/* Time container */}
       <View style={styles.timeContainer}>
-        {/* Clock icon */}
         <MaterialCommunityIcons name="clock-outline" size={24} color="#000000" />
-        {/* Time text */}
+
         <Text style={styles.time}>{time}</Text>
       </View>
 
-      {/* Main content container */}
       <View style={styles.contentContainer}>
-        {/* Description */}
-        
 
-        {/* Checkbox and Task Name in one row */}
         <View style={styles.checkboxAndTaskNameContainer}>
           <CheckBox taskId={taskId} isCompleted={isCompleted} toggleCompleted={toggleCompleted} />
           <Text style={styles.taskName}>{taskName}</Text>
@@ -87,10 +77,10 @@ const styles = StyleSheet.create({
   taskName: {
     fontSize: 22,
     fontWeight: "bold",
-    marginLeft: 5, // Reduced margin
+    marginLeft: 5,
   },
   checkBoxMargin: {
-    marginRight: 5, // Adjusted margin for checkbox
+    marginRight: 5
   },
   descriptionText: {
     fontSize: 18,
