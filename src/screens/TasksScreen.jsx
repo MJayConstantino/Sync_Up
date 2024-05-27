@@ -177,7 +177,7 @@ export default function TasksScreen({ navigation }) {
             {categories.map((category) => (
               <TouchableOpacity
                 key={category}
-                style={[styles.categoryButton, { backgroundColor: selectedCategory === category ? "#03a1fc" : "#D6D6D6" }]}
+                style={[styles.categoryButton, { backgroundColor: selectedCategory === category ? "#00adf5" : "#D6D6D6" }]}
                 onPress={() => setSelectedCategory(category === null ? "All" : category)}
               >
                 <Text style={[styles.categoryText, { color: selectedCategory === category ? "#FFFFFF" : "#000000" }]}>
@@ -286,7 +286,7 @@ const styles = StyleSheet.create({
     right: 20,
     width: 85,
     height: 85,
-    backgroundColor: "#0384fc",
+    backgroundColor: "#00adf5",
     borderRadius: 60,
     justifyContent: "center",
     alignItems: "center",
