@@ -15,9 +15,9 @@ Notifications.setNotificationHandler({
 async function taskNotification(hour, minute, ampm, taskName) {
   let newHour = parseInt(hour);
   if (ampm === "PM") {
-    newHour = (newHour % 12) + 12; // Convert to 24-hour format if PM
+    newHour = (newHour % 12) + 12;
   } else {
-    newHour %= 12; // Convert to 24-hour format if AM
+    newHour %= 12;
   }
   const identifier = await Notifications.scheduleNotificationAsync({
     content: {
@@ -37,9 +37,9 @@ async function taskNotification(hour, minute, ampm, taskName) {
 async function scheduleNotification(hour, minute, ampm, scheduleName) {
   let newHour = parseInt(hour);
   if (ampm === "PM") {
-    newHour = (newHour % 12) + 12; // Convert to 24-hour format if PM
+    newHour = (newHour % 12) + 12;
   } else {
-    newHour %= 12; // Convert to 24-hour format if AM
+    newHour %= 12;
   }
   const identifier = await Notifications.scheduleNotificationAsync({
     content: {
