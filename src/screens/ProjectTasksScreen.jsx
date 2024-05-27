@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View, Text, TouchableOpacity, FlatList, RefreshControl, ActivityIndicator } from "react-native";
+import { StyleSheet, View, Text, TouchableOpacity, FlatList, RefreshControl, ActivityIndicator, Image } from "react-native";
 import { MaterialIcons } from '@expo/vector-icons';
 import { firebase } from '../../firebase-config';
 import ProjectTask from '../components/Projects/ProjectTask';
@@ -16,7 +16,6 @@ const ProjectTasksScreen = ({ route }) => {
   const navigation = useNavigation();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [taskAdded, setTaskAdded] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const onRefresh = React.useCallback(() => {
@@ -103,26 +102,21 @@ const ProjectTasksScreen = ({ route }) => {
   } else return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
-        <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-          <MaterialIcons name="arrow-back" size={24} color="#000" />
-        </TouchableOpacity>
-        <Text style={styles.header}>Project Tasks</Text>
+    <TouchableOpacity onPress={handleBack} style={styles.backButton}>
+      <MaterialIcons name="arrow-back" size={24} color="#000" />
+    </TouchableOpacity>
+      <Text style={styles.header}>Project Tasks</Text>
+    </View>
+    {tasks.length === 0 ? (
+      <View style={styles.emptyStateContainer}>
+        <Image
+          source={require('../assets/gifs/bubu-bored.gif')}
+          style={styles.emptyStateImage}
+        />
+        <Text style={styles.emptyStateText}>
+          There are no tasks assigned to you for this project yet.
+        </Text>
       </View>
-      {tasks.length === 0 ? (
-          <>
-            <Image
-              source={require('../assets/gifs/bubu-bored.gif')}
-              style={{
-                width: 150,
-                height: 150,
-                alignSelf: "center", // Center the image horizontally
-                marginVertical: 20, // Add some vertical spacing
-              }}
-            />
-            <Text style={styles.noProjectsTasksText}>
-              No projects and collaborations. Press 'Add Project' to create one or become a collaborator.
-            </Text>
-          </>
         ) : (
         <FlatList
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
@@ -162,7 +156,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    paddingTop: 50
+    paddingTop: 50,
   },
   headerContainer: {
     flexDirection: 'row',
@@ -187,9 +181,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  noTasksText: {
+  emptyStateContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyStateImage: {
+    width: 200,
+    height: 200,
+    marginBottom: 20,
+  },
+  emptyStateText: {
+    fontSize: 18,
     textAlign: 'center',
-    fontSize: 16,
+    color: '#666',
   },
   rightActions: {
     flexDirection: 'row',
@@ -219,12 +224,6 @@ const styles = StyleSheet.create({
   editText: {
     color: 'white',
     fontWeight: 'bold',
-  }, 
-  noProjectsTasksText: {
-    marginTop: 15,
-    textAlign: 'center',
-    fontSize: 20,
-    marginBottom: 10,
   },
 });
 

@@ -21,6 +21,14 @@ export default function TasksScreen({ navigation }) {
   const currentUser = firebase.auth().currentUser;
   const [loading, setLoading] = useState(true);
 
+  const gifs = {
+    "All": require('../assets/gifs/mochi-peach.gif'),
+    "Work": require('../assets/gifs/work.gif'),
+    "School": require('../assets/gifs/school.gif'),
+    "Home": require('../assets/gifs/home.gif'),
+    "Personal": require('../assets/gifs/personal.gif'),
+  };
+
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
     setTimeout(() => {
@@ -178,12 +186,12 @@ export default function TasksScreen({ navigation }) {
               </TouchableOpacity>
             ))}
           </ScrollView>
-          {taskItems.length === 0 ? (
+          {filterTasks(taskItems).length === 0 ? (
             <View style={styles.noTasksContainer}>
               <Image 
-        source={require('../assets/gifs/mochi-peach.gif')}
-        style={{width: 150, height: 150 , alignItems: 'center'}}
-    />
+                  source={gifs[selectedCategory]}
+                  style={{width: 180, height: 180 , alignItems: 'center'}}
+              />
               <Text style={styles.noTasksText}> You have no pending tasks </Text>
               <Text style={styles.noTasksSubText}>Press + to add task</Text>
             </View>
@@ -286,9 +294,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   noTasksContainer: {
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 250,
+    marginTop: 180
   },
   noTasksText: {
     fontSize: 20,

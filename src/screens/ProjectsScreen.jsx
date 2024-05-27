@@ -88,12 +88,12 @@ const ProjectsScreen = () => {
         {projects.length === 0 ? (
           <>
             <Image
-              source={require('../assets/gifs/person-man.gif')}
+              source={require('../assets/gifs/cutiehaha.gif')}
               style={{
                 width: 150,
                 height: 150,
-                alignSelf: "center", // Center the image horizontally
-                marginVertical: 20, // Add some vertical spacing
+                alignSelf: "center",
+                marginVertical: 20,
               }}
             />
             <Text style={styles.noProjectsText}>
