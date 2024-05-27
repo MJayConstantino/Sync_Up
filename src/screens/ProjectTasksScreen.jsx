@@ -109,8 +109,21 @@ const ProjectTasksScreen = ({ route }) => {
         <Text style={styles.header}>Project Tasks</Text>
       </View>
       {tasks.length === 0 ? (
-        <Text style={styles.noTasksText}>No pending tasks. Create one and assign it to a collaborator.</Text>
-      ) : (
+          <>
+            <Image
+              source={require('../assets/gifs/bubu-bored.gif')}
+              style={{
+                width: 150,
+                height: 150,
+                alignSelf: "center", // Center the image horizontally
+                marginVertical: 20, // Add some vertical spacing
+              }}
+            />
+            <Text style={styles.noProjectsTasksText}>
+              No projects and collaborations. Press 'Add Project' to create one or become a collaborator.
+            </Text>
+          </>
+        ) : (
         <FlatList
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
           data={tasks}
@@ -149,7 +162,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    paddingTop: 25
+    paddingTop: 50
   },
   headerContainer: {
     flexDirection: 'row',
@@ -206,6 +219,12 @@ const styles = StyleSheet.create({
   editText: {
     color: 'white',
     fontWeight: 'bold',
+  }, 
+  noProjectsTasksText: {
+    marginTop: 15,
+    textAlign: 'center',
+    fontSize: 20,
+    marginBottom: 10,
   },
 });
 

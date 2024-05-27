@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView, RefreshControl, ActivityIndicator } from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, RefreshControl, ActivityIndicator, Image } from "react-native";
 import { firebase } from '../../firebase-config';
 import Project from "../components/Projects/Project";
 import { useNavigation } from '@react-navigation/native';
@@ -82,11 +82,24 @@ const ProjectsScreen = () => {
   } else return (
     <View style={styles.container}>
       <ScrollView 
-       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       >
         <Text style={styles.header}>Projects</Text>
         {projects.length === 0 ? (
-          <Text style={styles.noProjectsText}>No projects and collaborations. Press 'Add Project' to create one or become a collaborator.</Text>
+          <>
+            <Image
+              source={require('../assets/gifs/person-man.gif')}
+              style={{
+                width: 150,
+                height: 150,
+                alignSelf: "center", // Center the image horizontally
+                marginVertical: 20, // Add some vertical spacing
+              }}
+            />
+            <Text style={styles.noProjectsText}>
+              No projects and collaborations. Press 'Add Project' to create one or become a collaborator.
+            </Text>
+          </>
         ) : (
           projects.map(project => (
             <Swipeable key={project.id} renderRightActions={() => renderRightActions(project.id)}>  
@@ -120,7 +133,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    paddingTop: 25
+    paddingTop: 50
   },
   header: {
     fontSize: 30,
@@ -143,9 +156,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   noProjectsText: {
+    marginTop: 15,
     textAlign: 'center',
-    fontSize: 16,
-    marginBottom: 20,
+    fontSize: 20,
+    marginBottom: 10,
   },
   rightActions: {
     flexDirection: 'row',

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, TouchableOpacity, View, ScrollView, RefreshControl, ActivityIndicator } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View, ScrollView, RefreshControl, ActivityIndicator, Image } from "react-native";
 import Task from "../components/Tasks/Task";
 import AddTaskModal from "../components/Tasks/AddTask";
 import { firebase } from "../../firebase-config";
@@ -180,8 +180,12 @@ export default function TasksScreen({ navigation }) {
           </ScrollView>
           {taskItems.length === 0 ? (
             <View style={styles.noTasksContainer}>
-              <Text style={styles.noTasksText}>No tasks to do</Text>
-              <Text style={styles.noTasksSubText}>Please tap the + button to create one</Text>
+              <Image 
+        source={require('../assets/gifs/mochi-peach.gif')}
+        style={{width: 150, height: 150 , alignItems: 'center'}}
+    />
+              <Text style={styles.noTasksText}> You have no pending tasks </Text>
+              <Text style={styles.noTasksSubText}>Press + to add task</Text>
             </View>
           ) : (
             <View style={styles.items}>
