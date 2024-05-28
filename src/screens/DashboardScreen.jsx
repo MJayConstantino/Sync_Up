@@ -123,10 +123,6 @@ const DashboardScreen = () => {
           <ProjectList />
           </ScrollView>
         </View>
-
-
-
-
       </ScrollView>
     </View>
   );
@@ -205,17 +201,6 @@ const styles = StyleSheet.create({
   scheduleContainer: {
     flexDirection: 'row',
     marginBottom: 20,
-  },
-  smallCardContainer: {
-    width: '45%',
-    borderRadius: 10,
-    padding: 10,
-    marginRight: 10,
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderWidth: 0.3,
   },
   projectsContainer: {
     marginBottom: 20,

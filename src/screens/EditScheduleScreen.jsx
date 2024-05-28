@@ -20,7 +20,7 @@ const EditScheduleScreen = ({ navigation, route }) => {
   const [isTimePickerVisible, setIsTimePickerVisible] = useState(false);
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
-  const [isEditingEndTime, setIsEditingEndTime] = useState(false); // Declare isEditingEndTime state
+  const [isEditingEndTime, setIsEditingEndTime] = useState(false);
   const currentUser = firebase.auth().currentUser;
   const [loading, setLoading] = useState(true);
 
@@ -29,7 +29,7 @@ const EditScheduleScreen = ({ navigation, route }) => {
       try {
         const snapshot = await firestore.collection(`users/${currentUser.uid}/schedules/`).doc(scheduleId).get();
         const scheduleData = snapshot.data();
-        console.log("Schedule data:", scheduleData); // Log the schedule data
+        console.log("Schedule data:", scheduleData);
         if (scheduleData) {
           setScheduleName(scheduleData.scheduleName);
           setDate(scheduleData.date);
@@ -38,7 +38,7 @@ const EditScheduleScreen = ({ navigation, route }) => {
           setDescription(scheduleData.description);
         } else {
           alert("Schedule not found!");
-          navigation.goBack(); // Navigate back if schedule not found
+          navigation.goBack();
         }
       } catch (error) {
         console.error("Error fetching schedule details:", error);
@@ -61,13 +61,13 @@ const EditScheduleScreen = ({ navigation, route }) => {
   const openTimePicker = () => {
     setIsTimePickerVisible(true);
     setIsDatePickerVisible(false);
-    setIsEditingEndTime(false); // Ensure isEditingEndTime is false when opening time picker for start time
+    setIsEditingEndTime(false);
   };
 
   const openEndTimePicker = () => {
     setIsTimePickerVisible(true);
     setIsDatePickerVisible(false);
-    setIsEditingEndTime(true); // Set isEditingEndTime to true when opening time picker for end time
+    setIsEditingEndTime(true);
   };
 
   const closeDateTimePicker = () => {
@@ -80,7 +80,7 @@ const EditScheduleScreen = ({ navigation, route }) => {
       setSelectedDate(selectedDate);
       const formattedDate = format(selectedDate, "yyyy-MM-dd");
       if (isDatePickerVisible) {
-        setDate(formattedDate); // If date picker was visible, update date
+        setDate(formattedDate);
       }
 
       closeDateTimePicker();
@@ -94,10 +94,8 @@ const EditScheduleScreen = ({ navigation, route }) => {
   
       if (isTimePickerVisible) {
         if (isEditingEndTime) {
-          // If editing end time, update timeEnd
           setTimeEnd(formattedTime);
         } else {
-          // If editing start time, update timeStart
           setTimeStart(formattedTime);
         }
       }
@@ -131,18 +129,13 @@ const EditScheduleScreen = ({ navigation, route }) => {
     };
     
     try {
-      // Update schedule in your data store
-      await updateScheduleInFirebase(scheduleId, editedSchedule); // Pass schedule ID and edited schedule details
+      await updateScheduleInFirebase(scheduleId, editedSchedule);
       
-      // Extract hour, minute, and period from timeStart
       const [time, ampm] = timeStart.split(' ');
       const [hour, minute] = time.split(':');
-      const period = ampm.toUpperCase(); // Convert period to uppercase (AM/PM)
-      
-      // Schedule notification for the updated schedule
+      const period = ampm.toUpperCase(); 
       const notificationId = await scheduleNotification(hour, minute, period, scheduleName);
   
-      // Update the schedule in Firebase with the new notification ID
       await firestore.collection(`users/${currentUser.uid}/schedules`).doc(scheduleId).update({ notificationId });
   
       navigation.goBack();
@@ -163,7 +156,6 @@ const EditScheduleScreen = ({ navigation, route }) => {
   
   const updateScheduleInFirebase = async (taskId, editedSchedule) => {
     try {
-      // Update the schedule in Firebase using the taskId
       await firestore.collection(`users/${currentUser.uid}/schedules`).doc(taskId).update(editedSchedule);
     } catch (error) {
       console.error("Error updating schedule in Firebase:", error);
@@ -198,7 +190,7 @@ const EditScheduleScreen = ({ navigation, route }) => {
         style={styles.inputDescription}
         placeholder="Write a description (optional)"
         multiline
-        textAlignVertical="top" // Ensure text stays at the top
+        textAlignVertical="top"
         value={description}
         onChangeText={setDescription}
       />
@@ -280,67 +272,6 @@ const EditScheduleScreen = ({ navigation, route }) => {
 export default EditScheduleScreen;
 
 const styles = StyleSheet.create({
-  // container: {
-  //   flex: 1,
-  //   paddingHorizontal: 20,
-  //   paddingTop: 50
-  // },
-  // header: {
-  //   flexDirection: "row",
-  //   justifyContent: "space-between",
-  //   alignItems: "center",
-  //   marginBottom: 20,
-  // },
-  // headerTitle: {
-  //   fontSize: 20,
-  //   fontWeight: "bold",
-  // },
-  // input: {
-  //   borderWidth: 1,
-  //   borderColor: "#ccc",
-  //   borderRadius: 5,
-  //   padding: 10,
-  //   marginBottom: 10,
-  // },
-  // inputDescription: {
-  //   borderWidth: 1,
-  //   borderColor: "#ccc",
-  //   borderRadius: 5,
-  //   padding: 10,
-  //   marginBottom: 10,
-  //   flex: 1, // Fill remaining space
-  //   textAlignVertical: "top", // Align text to the top
-  // },
-  // dateButton: {
-  //   flexDirection: "row",
-  //   alignItems: "center",
-  //   borderWidth: 1,
-  //   borderColor: "#ccc",
-  //   borderRadius: 5,
-  //   padding: 10,
-  //   marginBottom: 10,
-  // },
-  // dateButtonText: {
-  //   fontSize: 16,
-  //   marginLeft: 5,
-  // },
-  // timeButton: {
-  //   flexDirection: "row",
-  //   alignItems: "center",
-  //   borderWidth: 1,
-  //   borderColor: "#ccc",
-  //   borderRadius: 5,
-  //   padding: 10,
-  //   marginBottom: 10,
-  // },
-  // timeButtonText: {
-  //   fontSize: 16,
-  //   marginLeft: 5,
-  // },
-  // datePicker: {
-  //   width: "100%",
-  // },
-
   container: {
     flex: 1,
     paddingHorizontal: 20,
@@ -356,7 +287,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
   },
-  // Title of Task 
   input: {
     borderBottomWidth: 2,
     borderBottomColor: 'black',
@@ -366,17 +296,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 30,
   },
-  // Desciption
   inputDescription: {
-    // borderWidth: 1,
-    // borderColor: "#ccc",
-    // borderRadius: 5,
     padding: 10,
     marginBottom: 10,
-    flex: 1, // Fill remaining space
-    textAlignVertical: "top", // Align text to the top
+    flex: 1,
+    textAlignVertical: "top",
   },
-  //  Categorry
+
   categoryButton: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -392,7 +318,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: 'white'
   },
-  //
   dateButton: {
     flexDirection: "row",
     justifyContent: 'space-between',
@@ -422,13 +347,11 @@ const styles = StyleSheet.create({
     fontSize: 20,
     marginLeft: 5,
   },
-  //
   timeButton: {
     flexDirection: "row",
     justifyContent: 'space-between',
     alignItems: "center",
     borderTopWidth: 1,
-    // borderBottomWidth: 1,
     borderColor: "#ccc",
     padding: 10,
     marginBottom: 10,

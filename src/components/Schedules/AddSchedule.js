@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Modal, StyleSheet, Text, TouchableOpacity, View, TextInput, Keyboard, Platform } from "react-native";
+import { Modal, StyleSheet, Text, TouchableOpacity, View, TextInput, Keyboard, Platform, Alert } from "react-native";
 import { MaterialCommunityIcons as Icon } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { format } from 'date-fns';
@@ -78,6 +78,11 @@ const AddScheduleModal = ({
   }
 
   const handleSaveSchedule = async () => {
+    if (!scheduleName.trim()) {
+      Alert.alert("Error", "Please enter a schedule name.");
+      return;
+    }
+
     let notificationId;
   
     if (selectedStartTime) {

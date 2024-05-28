@@ -238,6 +238,7 @@ const styles = StyleSheet.create({
     },
     orline: {
         alignItems: 'center',
+        textAlign: 'center',
         margin: 10,
         marginTop: -5,
         color: 'gray',
