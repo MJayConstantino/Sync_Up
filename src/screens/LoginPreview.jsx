@@ -3,82 +3,86 @@ import { View, Text, TouchableOpacity, StyleSheet, ImageBackground, Image } from
 import mainbg from '../assets/images/mainbg.png';
 
 const LoginPreview = ({ navigation }) => {
-    return (
-        <ImageBackground source={mainbg} style={styles.background}>
-        <Image
-                    source={require('../assets/SyncUp Logo.png')}
-                    style={styles.logo}
-                />
-            <View style={styles.container}>
-                <Text style={styles.title}>Welcome to SyncUp!</Text>
-                <Text style={styles.subtitle}>Revolutionizing productvity management for students.</Text>
-                <TouchableOpacity
-                    style={[styles.button, styles.loginButton]}
-                    onPress={() => navigation.navigate('Login')}
-                >
-                    <Text style={styles.buttonText}>Log In</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={[styles.button, styles.signupButton]}
-                    onPress={() => navigation.navigate('Registration')}
-                >
-                    <Text style={styles.buttonText}>Sign Up</Text>
-                </TouchableOpacity>
-            </View>
-        </ImageBackground>
-    );
+  return (
+    <ImageBackground source={mainbg} style={styles.background}>
+      <Image source={require('../assets/SyncUp Logo.png')} style={styles.logo} />
+      <View style={styles.container}>
+        <Text style={styles.title}>Welcome to SyncUp!</Text>
+        <Text style={styles.subtitle}>Revolutionizing productivity management for students.</Text>
+        <TouchableOpacity
+          style={[styles.button, styles.loginButton]}
+          onPress={() => navigation.navigate('Login')}
+          activeOpacity={0.7}
+        >
+          <Text style={[styles.buttonText, styles.buttonTextFont]}>Log In</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.button, styles.signupButton]}
+          onPress={() => navigation.navigate('Registration')}
+          activeOpacity={0.7}
+        >
+          <Text style={[styles.buttonText, styles.buttonTextFont]}>Sign Up</Text>
+        </TouchableOpacity>
+      </View>
+    </ImageBackground>
+  );
 };
 
 const styles = StyleSheet.create({
-    background: {
-        flex: 1,
-        resizeMode: 'cover',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    container: {
-        alignItems: 'center',
-    },
-    logo: {
-        width: 150,
-        height: 150,
-    },
-    title: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        marginBottom: 10,
-        color: '#fff',
-    },
-    subtitle: {
-        fontSize: 18,
-        marginBottom: 30,
-        color: '#fff',
-        textAlign: 'center',
-    },
-    button: {
-        width: '70%',
-        height: 50,
-        borderRadius: 10,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom: 20,
-    },
-    loginButton: {
-        backgroundColor: '#007bff', //007bff
-        borderWidth: 2,
-        borderColor: '#FFF',
-    },
-    signupButton: {
-        backgroundColor: '#28a745', //28a745
-        borderWidth: 2,
-        borderColor: '#FFF',
-    },
-    buttonText: {
-        fontSize: 18,
-        color: '#fff',
-        marginLeft: 30,
-        marginRight: 30,
-    },
+  background: {
+    flex: 1,
+    resizeMode: 'cover',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  container: {
+    alignItems: 'center',
+  },
+  logo: {
+    width: 200,
+    height: 200,
+  },
+  title: {
+    fontSize: 32,
+    fontFamily: 'Helvetica',
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#fff',
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: 20,
+    fontFamily: 'Helvetica',
+    marginBottom: 150,
+    color: '#fff',
+    textAlign: 'center',
+    paddingHorizontal: 20,
+  },
+  button: {
+    width: 260,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+    borderWidth: 2,
+  },
+  loginButton: {
+    backgroundColor: '#007bff',
+    borderColor: '#fff',
+  },
+  signupButton: {
+    backgroundColor: '#fff',
+    borderColor: '#007bff',
+  },
+  buttonText: {
+    fontSize: 18,
+    marginLeft: 30,
+    marginRight: 30,
+  },
+  buttonTextFont: {
+    fontFamily: 'Helvetica-Bold',
+  },
 });
 
 export default LoginPreview;
