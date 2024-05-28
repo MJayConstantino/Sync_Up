@@ -8,6 +8,7 @@ import ScheduleTaskCard from '../components/Dashboard/ScheduleTaskCard';
 import ClassScheduleCard from '../components/Dashboard/ClassScheduleCard';
 import ProjectCard from '../components/Dashboard/ProjectCard';
 import ProjectList from '../components/Dashboard/ProjectLists';
+import ProgressCard from '../components/Dashboard/ProgressCard';
 
 const DEFAULT_PROFILE_PIC = "https://firebasestorage.googleapis.com/v0/b/syncup-4b36a.appspot.com/o/profilepic.png?alt=media&token=4f9acff6-166b-4e21-9ac8-42bc5f441e63";
 
@@ -95,6 +96,14 @@ const DashboardScreen = () => {
 
         
         <View style={styles.sectionHeader}>
+          <Text style={styles.sectionHeaderText}>Progress Tasks</Text>
+        </View>
+        <View style={styles.progressContainer}>
+          <ProgressCard/>
+        </View>
+
+        
+        <View style={styles.sectionHeader}>
           <Text style={styles.sectionHeaderText}>Tasks</Text>
         </View>
         <View style={styles.taskContainer}>
@@ -108,11 +117,16 @@ const DashboardScreen = () => {
         </View>
         <View style={styles.projectsContainer}>
           <ProjectCard title="Current Projects" onPress={() => navigation.navigate('Projects')} />
-          <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={styles.projectListContainer}>
-
-            <ProjectList />
+        </View>
+        <View style={styles.projectsCurrentContainer}> 
+        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={styles.projectListContainer}>
+          <ProjectList />
           </ScrollView>
         </View>
+
+
+
+
       </ScrollView>
     </View>
   );
@@ -180,7 +194,12 @@ const styles = StyleSheet.create({
   },
   taskContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-around',
+    marginBottom: 20,
+  },
+  progressContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
     marginBottom: 20,
   },
   scheduleContainer: {
@@ -199,7 +218,6 @@ const styles = StyleSheet.create({
     borderWidth: 0.3,
   },
   projectsContainer: {
-    flexDirection: 'row',
     marginBottom: 20,
     maxHeight: 200,
   },

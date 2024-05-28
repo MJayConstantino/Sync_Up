@@ -8,11 +8,14 @@ import {
     Image,
     ScrollView,
     Alert,
-    BackHandler
+    BackHandler,
+    ImageBackground
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { firebase } from '../../firebase-config';
+import google from '../assets/images/google.png';
+import loginbg from '../assets/images/loginbg.png';
 
 const Login = () => {
     const navigation = useNavigation();
@@ -23,7 +26,6 @@ const Login = () => {
     const loginUser = async (email, password) => {
         try {
             await firebase.auth().signInWithEmailAndPassword(email, password);
-
         } catch (error) {
             let errorMessage = "An error occurred during login.";
 
@@ -88,66 +90,98 @@ const Login = () => {
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
-            <Image
-                source={require('../assets/SyncUp Logo.png')}
-                style={{ width: 200, height: 200, marginBottom: 20 }}
-            />
-            <View style={{ marginTop: 40 }}>
-                <Text style={styles.subtitle}>Login</Text>
-                <Text style={styles.label}>Email</Text>
-                <TextInput
-                    style={styles.textInput}
-                    placeholder="Enter your email"
-                    value={email}
-                    onChangeText={(text) => setEmail(text)}
-                    autoCapitalize="none"
-                    autoCorrect={false}
+            <ImageBackground
+                source={loginbg}
+                style={styles.imageBackground}
+                resizeMode="contain"
+            >
+                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                    <Icon name="arrow-back" size={24} color="black" />
+                </TouchableOpacity>
+                <Image
+                    source={require('../assets/SyncUp Logo.png')}
+                    style={styles.logo}
                 />
-
-                <Text style={styles.label}>Password</Text>
-                <View style={styles.passwordContainer}>
-                    <TextInput
-                        style={styles.textInput}
-                        placeholder="Enter your password"
-                        value={password}
-                        onChangeText={(text) => setPassword(text)}
-                        autoCapitalize="none"
-                        autoCorrect={false}
-                        secureTextEntry={!showPassword}
-                    />
-                    <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                        <Icon
-                            name={showPassword ? 'eye-outline' : 'eye-off-outline'}
-                            size={24}
-                            color="#4B98FF"
+                <View style={{ marginTop: 20 }}>
+                    <Text style={styles.subtitle}>Login</Text>
+                    <Text style={styles.subtitle1}>Welcome back.</Text>
+                    <Text style={styles.label}>Email</Text>
+                    <View style={styles.textInputContainer}>
+                        <TextInput
+                            style={styles.textInput}
+                            placeholder="Enter your email"
+                            value={email}
+                            onChangeText={(text) => setEmail(text)}
+                            autoCapitalize="none"
+                            autoCorrect={false}
                         />
+                    </View>
+
+                    <Text style={styles.label}>Password</Text>
+                    <View style={[styles.textInputContainer, styles.passwordContainer]}>
+                        <TextInput
+                            style={styles.textInput}
+                            placeholder="Enter your password"
+                            value={password}
+                            onChangeText={(text) => setPassword(text)}
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                            secureTextEntry={!showPassword}
+                        />
+                        <TouchableOpacity onPress={() => setShowPassword(!showPassword)}
+                            style={{ marginRight: 10 }}
+                        >
+                            <Icon
+                                name={showPassword ? 'eye-outline' : 'eye-off-outline'}
+                                size={24}
+                                color="#000000"
+                            />
+                        </TouchableOpacity>
+                    </View>
+                    <Text style={styles.orline}>—————————————   or   —————————————</Text>
+                </View>
+                
+                <View style={styles.socialLoginContainer}>
+                    <TouchableOpacity
+                        onPress={() => {/* handle Google login */}}
+                        style={[styles.socialButton, { backgroundColor: '#FFFFFF' }]}
+                    >
+                        <Image source={google} style={{ width: 32, height: 32 }} />
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        onPress={() => {/* handle Facebook login */}}
+                        style={[styles.socialButton, { backgroundColor: '#4267B2' }]}
+                    >
+                        <Icon name="logo-facebook" size={32} color="white" />
                     </TouchableOpacity>
                 </View>
-            </View>
-            
-            <TouchableOpacity
-                onPress={() => loginUser(email, password)}
-                style={styles.button}
-            >
-                <Text style={{ fontWeight: 'bold', fontSize: 22, color: 'white' }}>Login</Text>
-            </TouchableOpacity>
 
-            <TouchableOpacity
-                onPress={() => forgetPassword(email)}
-                style={{ marginTop: 20 }}
-            >
-                <Text style={{ fontWeight: 'bold', fontSize: 16, color: '#4B98FF' }}>Forgot Password?</Text>
-            </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() => loginUser(email, password)}
+                    style={styles.button}
+                >
+                    <Text style={{ fontWeight: 'bold', fontSize: 22, color: 'white' }}>Login</Text>
+                </TouchableOpacity>
 
-            <TouchableOpacity
-                onPress={() => navigation.navigate('Registration')}
-                style={{ marginTop: 20 }}
-            >
-                <Text style={{ fontWeight: 'bold', fontSize: 16 }}>
-                    Don't have an account?{' '}
-                    <Text style={{ color: '#4B98FF', textDecorationLine: 'underline' }}>Register Now!</Text>
-                </Text>
-            </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() => forgetPassword(email)}
+                    style={{ marginTop: 20 }}
+                >
+                    <Text style={{ fontWeight: 'bold', fontSize: 16, color: '#000' }}>Forgot Password?</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                    onPress={() => navigation.navigate('Registration')}
+                    style={{ marginTop: 20 }}
+                >
+                    <Text style={{ fontWeight: 'bold', fontSize: 16, color: '#505050' }}>
+                        Don't have an account?{' '}
+                        <Text style={{ textDecorationLine: 'underline', color: 'black' }}>Register Now!</Text>
+                    </Text>
+                </TouchableOpacity>
+            </ImageBackground>
+            <View style={styles.whiteSpace}></View>
         </ScrollView>
     );
 };
@@ -156,45 +190,106 @@ const styles = StyleSheet.create({
     container: {
         flexGrow: 1,
         alignItems: 'center',
-        paddingTop: 100,
-        paddingBottom: 50,
+        justifyContent: 'flex-start',
+        backgroundColor: '#FFFFFF',
+        top: -260
     },
-    titleContainer: {
-        alignItems: 'left',
+    imageBackground: {
+        width: '100%',
+        alignItems: 'center',
     },
-
+    backButton: {
+        top: 560,
+        position: 'absolute',
+        left: 2,
+        margin: 20,
+        padding: 5,
+        borderWidth: 1,
+        borderRadius: 50,
+    },
+    logo: {
+        width: 150,
+        height: 150,
+        marginLeft: 180,
+        marginTop: 520,
+    },
     subtitle: {
+        fontSize: 35,
+        textAlign: 'left',
+        marginBottom: 20,
+        fontWeight: 'bold',
+    },
+    subtitle1: {
         fontSize: 30,
         textAlign: 'left',
         marginBottom: 30,
-        fontWeight: 'bold',
+        fontWeight: 'normal',
+        color: 'gray',
+        opacity: 0.7,
+        marginBottom: 40,
     },
     label: {
         fontWeight: 'bold',
         fontSize: 18,
         textAlign: 'left',
-    },
-    textInput: {
-        paddingTop: 20,
-        paddingBottom: 10,
-        width: 300,
-        fontSize: 20,
-        borderBottomWidth: 1,
-        borderBottomColor: '#000',
         marginBottom: 10,
     },
-    passwordContainer: {
+    orline: {
+        alignItems: 'center',
+        margin: 10,
+        marginTop: -5,
+        color: 'gray',
+        marginBottom: 20,
+    },
+    textInput: {
+        paddingTop: 10,
+        paddingBottom: 10,
+        paddingLeft: 10,
+        paddingRight: 10,
+        flex: 1,
+        fontSize: 15,
+    },
+    textInputContainer: {
         flexDirection: 'row',
-        alignItems: 'center', 
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        borderWidth: 1,
+        borderRadius: 15,
+        marginBottom: 10,
+        width: 300,
+        borderColor: 'gray',
+    },
+    passwordContainer: {
+        paddingRight: 0,
+        marginBottom: 30,
+    },
+    socialLoginContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        width: '100%',
+        marginBottom: 20,
+    },
+    socialButton: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: 50,
+        width: 50,
+        borderRadius: 25,
+        marginHorizontal: 10,
+        borderWidth: 1,
+        borderColor: 'gray',
     },
     button: {
-        marginTop: 50,
         height: 70,
         width: 250,
-        backgroundColor: '#4B98FF',
+        backgroundColor: '#000',
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 50,
+    },
+    whiteSpace: {
+        height: 200,
+        backgroundColor: '#FFFFFF',
     },
 });
 

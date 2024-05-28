@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ImageBackground } from 'react-native';
 import { firebase } from '../../../firebase-config';
+import { FontAwesome } from '@expo/vector-icons';
+import background from '../../assets/bgcp3.png';
 
 const ProjectCard = ({ title, onPress }) => {
   const [projectCount, setProjectCount] = useState(0);
@@ -18,10 +20,18 @@ const ProjectCard = ({ title, onPress }) => {
 
   return (
     <TouchableOpacity onPress={onPress} style={styles.card}>
-      <Text style={styles.title}>{title}</Text>
-      <View style={styles.itemCountContainer}>
-        <Text style={styles.itemCount}>{projectCount}</Text>
-      </View>
+      <ImageBackground source={background} style={styles.imageBackground} imageStyle={{ borderRadius: 10 }}>
+        <FontAwesome
+          style={styles.iconContainer}
+          name="hourglass-half"
+          size={36}
+          color="#4B98FF"
+        />
+        <Text style={styles.title}>{title}</Text>
+        <View style={styles.itemCountContainer}>
+          <Text style={styles.itemCount}>{projectCount}</Text>
+        </View>
+      </ImageBackground>
     </TouchableOpacity>
   );
 };
@@ -29,22 +39,27 @@ const ProjectCard = ({ title, onPress }) => {
 const styles = StyleSheet.create({
   card: {
     borderRadius: 10,
-    padding: 20,
+    overflow: 'hidden',
     marginRight: 10,
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: 200,
+    height: 'auto',
     backgroundColor: '#FFFFFF',
     borderWidth: 0.3,
   },
+  imageBackground: {
+    padding: 20,
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+  },
+  iconContainer: {
+    alignItems: 'flex-start',
+  },
   title: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 10,
   },
   itemCountContainer: {
-    backgroundColor: 'red',
+    backgroundColor: '#4B98FF',
     borderRadius: 20,
     paddingHorizontal: 12,
     paddingVertical: 8,
@@ -84,4 +99,5 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
 });
+
 export default ProjectCard;

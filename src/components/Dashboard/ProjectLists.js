@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { firebase } from '../../../firebase-config';
 import { useNavigation } from '@react-navigation/native';
+import { FontAwesome } from '@expo/vector-icons'; 
+
 
 const ProjectList = () => {
   const navigation = useNavigation();
@@ -71,7 +73,7 @@ const ProjectList = () => {
       {projects.map((project) => (
         <TouchableOpacity
           key={project.id}
-          onPress={() => navigation.navigate('Projects', { projectId: project.id })}
+          onPress={() => navigation.navigate('ProjectTasksScreen', { projectId: project.id })}
           style={styles.projectCard}
         >
           <Text style={styles.projectName}>{project.projectName}</Text>
@@ -100,11 +102,11 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   itemCountContainer: {
-    backgroundColor: 'blue', 
+    backgroundColor: '#4B98FF',
     borderRadius: 20,
     paddingHorizontal: 12,
     paddingVertical: 8,
-    marginTop: 5,
+    marginTop: 5, 
   },
   itemCount: {
     fontSize: 20,
@@ -115,27 +117,28 @@ const styles = StyleSheet.create({
     height: 200,
   },
   projectCard: {
-    backgroundColor: 'red',
+    backgroundColor: '#4B98FF', 
     borderRadius: 10,
     padding: 8,
     marginRight: 10,
-    width: 200,
+    width: 150, 
     justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: 20,
   },
   projectName: {
-    fontSize: 16,
+    fontSize: 16, 
     fontWeight: 'bold',
-    marginBottom: 5,
+    marginBottom: 5, 
     color: 'white',
   },
   projectProgress: {
     fontSize: 14,
-    marginBottom: 5,
+    marginBottom: 5, 
     color: 'white',
   },
   projectTasks: {
-    fontSize: 14,
+    fontSize: 14, 
     fontWeight: 'bold',
     marginBottom: 5,
     color: 'white',

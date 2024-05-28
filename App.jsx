@@ -29,6 +29,7 @@ import ClassScheduleScreen from "./src/screens/ClassSchedulesScreen";
 import EditProfileScreen from "./src/screens/EditProfileScreen";
 import ChatListScreen from "./src/screens/ChatListScreen";
 import Chat from "./src/screens/Chat";
+import LoginPreview from "./src/screens/LoginPreview";
 
 
 const Stack = createStackNavigator();
@@ -311,9 +312,13 @@ export default function App() {
           ) : (
             !user ? (
               <>
+                <Stack.Screen 
+                  name="LoginPreview" 
+                  component={LoginPreview} />
                 <Stack.Screen
                   name="Login"
                   component={Login}
+                  options={{ headerShown: false }}
                 />
                 <Stack.Screen
                   name="Registration"
