@@ -14,14 +14,14 @@ const LoginPreview = ({ navigation }) => {
           onPress={() => navigation.navigate('Login')}
           activeOpacity={0.7}
         >
-          <Text style={[styles.buttonText, styles.buttonTextFont]}>Log In</Text>
+          <Text style={[styles.buttonText]}>Log In</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.button, styles.signupButton]}
           onPress={() => navigation.navigate('Registration')}
           activeOpacity={0.7}
         >
-          <Text style={[styles.buttonText, styles.buttonTextFont]}>Sign Up</Text>
+          <Text style={[styles.buttonText]}>Sign Up</Text>
         </TouchableOpacity>
       </View>
     </ImageBackground>
@@ -44,7 +44,6 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 32,
-    fontFamily: 'Helvetica',
     fontWeight: 'bold',
     marginBottom: 10,
     color: '#fff',
@@ -52,7 +51,6 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 20,
-    fontFamily: 'Helvetica',
     marginBottom: 150,
     color: '#fff',
     textAlign: 'center',
@@ -79,9 +77,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginLeft: 30,
     marginRight: 30,
-  },
-  buttonTextFont: {
-    fontFamily: 'Helvetica-Bold',
   },
 });
 

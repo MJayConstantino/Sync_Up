@@ -89,7 +89,7 @@ const Login = () => {
     );
 
     return (
-        <ScrollView contentContainerStyle={styles.container}>
+        <ScrollView contentContainerStyle={styles.container} style={styles.scrollView}>
             <ImageBackground
                 source={loginbg}
                 style={styles.imageBackground}
@@ -181,12 +181,14 @@ const Login = () => {
                     </Text>
                 </TouchableOpacity>
             </ImageBackground>
-            <View style={styles.whiteSpace}></View>
         </ScrollView>
     );
 };
 
 const styles = StyleSheet.create({
+    scrollView: {
+        backgroundColor: '#FFFFFF',
+    },
     container: {
         flexGrow: 1,
         alignItems: 'center',
@@ -256,7 +258,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderRadius: 15,
         marginBottom: 10,
-        width: 300,
+        width: 330,
         borderColor: 'gray',
     },
     passwordContainer: {
@@ -287,10 +289,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         borderRadius: 50,
     },
-    whiteSpace: {
-        height: 200,
-        backgroundColor: '#FFFFFF',
-    },
+
 });
 
 export default Login;
